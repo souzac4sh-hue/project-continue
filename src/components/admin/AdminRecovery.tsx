@@ -310,8 +310,34 @@ export function AdminRecovery() {
         <StatCard icon={TrendingUp} label="Mais Recuperação" value={stats.topRecovered} small />
       </div>
 
-      {/* Filters */}
+      {/* Priority Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {priorityTabs.map(tab => (
+          <button key={tab.id} onClick={() => setPriorityTab(tab.id)}
+            className={cn('text-xs font-semibold px-4 py-2 rounded-xl border transition-all',
+              priorityTab === tab.id
+                ? 'gold-gradient text-primary-foreground border-transparent shadow-md'
+                : 'bg-secondary/50 text-muted-foreground border-border hover:border-primary/30'
+            )}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Search + Filters */}
       <div className="space-y-3">
+        {/* Phone/Name Search */}
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={phoneSearch}
+            onChange={e => setPhoneSearch(e.target.value)}
+            placeholder="Buscar por telefone ou nome..."
+            className="w-full text-sm bg-secondary/50 border border-border rounded-xl pl-9 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           {periodFilters.map(f => (
@@ -366,6 +392,11 @@ export function AdminRecovery() {
           </select>
         </div>
       </div>
+
+      {/* Results count */}
+      <p className="text-xs text-muted-foreground">
+        {filtered.length} lead{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
+      </p>
 
       {/* Leads List */}
       <div className="space-y-3">

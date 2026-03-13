@@ -470,7 +470,7 @@ export default function PixCheckoutPage() {
                       variant="outline"
                       size="sm"
                       className="h-8 text-xs border-primary/30 text-primary mt-1"
-                      onClick={() => window.open(supportUrl, '_blank')}
+                     onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
                     >
                       <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                       Falar com suporte

@@ -1,22 +1,36 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Settings2, GripVertical, Loader2, Save } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical, Loader2, Save, Star } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { toast } from '@/hooks/use-toast';
 import { Reference } from '@/data/mockData';
 
+const REFERENCE_TYPES = [
+  { value: 'payment', label: '💰 Pagamento' },
+  { value: 'delivery', label: '📦 Entrega' },
+  { value: 'testimonial', label: '💬 Depoimento' },
+];
+
+function maskName(name: string): string {
+  if (!name || name.length <= 2) return name + '***';
+  const parts = name.split(' ');
+  return parts.map(p => p.length <= 2 ? p : p[0] + '***').join(' ');
+}
+
 export function AdminReferences() {
   const { references, setReferences, settings, setSettings, saveAll } = useStore();
   const [editOpen, setEditOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
-  const [current, setCurrent] = useState<Partial<Reference>>({});
+  const [current, setCurrent] = useState<Partial<Reference & { type?: string; highlight?: boolean }>>({});
   const [saving, setSaving] = useState(false);
+  const [autoMask, setAutoMask] = useState(false);
   const channel = settings.referenceChannel;
 
   const updateChannel = (key: string, value: any) => {
@@ -28,16 +42,24 @@ export function AdminReferences() {
 
   const openNew = () => {
     setCurrent({ image: '', comment: '', shortText: '', date: new Date().toISOString().split('T')[0], active: true });
+    setAutoMask(false);
     setEditOpen(true);
   };
-  const openEdit = (r: Reference) => { setCurrent({ ...r }); setEditOpen(true); };
+  const openEdit = (r: Reference) => { setCurrent({ ...r }); setAutoMask(false); setEditOpen(true); };
 
   const save = () => {
     if (!current.comment?.trim()) { toast({ title: 'Comentário obrigatório', variant: 'destructive' }); return; }
+    // Auto mask name if enabled
+    let shortText = current.shortText || '';
+    if (autoMask && shortText) {
+      shortText = maskName(shortText);
+    }
+    const refData = { ...current, shortText };
+    
     if (current.id) {
-      setReferences(prev => prev.map(r => r.id === current.id ? { ...r, ...current } as Reference : r));
+      setReferences(prev => prev.map(r => r.id === current.id ? { ...r, ...refData } as Reference : r));
     } else {
-      setReferences(prev => [...prev, { ...current, id: Date.now().toString() } as Reference]);
+      setReferences(prev => [...prev, { ...refData, id: Date.now().toString() } as Reference]);
     }
     setEditOpen(false);
     toast({ title: '✅ Referência salva!' });
@@ -68,7 +90,7 @@ export function AdminReferences() {
           <Plus className="h-4 w-4 mr-2" /> Nova Referência
         </Button>
         <Button onClick={() => setConfigOpen(true)} variant="outline" size="icon">
-          <Settings2 className="h-4 w-4" />
+          <Star className="h-4 w-4" />
         </Button>
         <Button onClick={handlePersist} disabled={saving} variant="outline" className="border-primary/30 text-primary">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4 mr-1" /> Salvar</>}
@@ -102,10 +124,26 @@ export function AdminReferences() {
           <DialogHeader><DialogTitle className="font-serif">{current.id ? 'Editar' : 'Nova'} Referência</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <ImageUpload value={current.image || ''} onChange={url => setCurrent(c => ({ ...c, image: url }))} folder="references" label="Imagem / Print" aspectRatio="aspect-square" />
-            <div><Label>Texto curto</Label><Input value={current.shortText || ''} onChange={e => setCurrent(c => ({ ...c, shortText: e.target.value }))} className="mt-1" /></div>
-            <div><Label>Comentário</Label><Input value={current.comment || ''} onChange={e => setCurrent(c => ({ ...c, comment: e.target.value }))} className="mt-1" /></div>
+            <div>
+              <Label>Nome do cliente</Label>
+              <Input value={current.shortText || ''} onChange={e => setCurrent(c => ({ ...c, shortText: e.target.value }))} className="mt-1" placeholder="Ex: João Silva" />
+              <div className="flex items-center gap-2 mt-1.5">
+                <Switch checked={autoMask} onCheckedChange={setAutoMask} />
+                <Label className="text-[10px] text-muted-foreground">Mascarar nome automaticamente (João Silva → J*** S***)</Label>
+              </div>
+            </div>
+            <div><Label>Comentário / Feedback</Label><Textarea value={current.comment || ''} onChange={e => setCurrent(c => ({ ...c, comment: e.target.value }))} className="mt-1" rows={3} /></div>
+            <div>
+              <Label>Tipo de referência</Label>
+              <Select value={(current as any).type || 'testimonial'} onValueChange={v => setCurrent(c => ({ ...c, type: v }))}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>{REFERENCE_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
             <div><Label>Data</Label><Input type="date" value={current.date || ''} onChange={e => setCurrent(c => ({ ...c, date: e.target.value }))} className="mt-1" /></div>
-            <div className="flex items-center gap-2"><Switch checked={current.active ?? true} onCheckedChange={v => setCurrent(c => ({ ...c, active: v }))} /><Label>Ativa</Label></div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2"><Switch checked={current.active ?? true} onCheckedChange={v => setCurrent(c => ({ ...c, active: v }))} /><Label>Ativa</Label></div>
+            </div>
             <Button onClick={save} className="w-full gold-gradient text-primary-foreground font-bold">Salvar</Button>
           </div>
         </DialogContent>

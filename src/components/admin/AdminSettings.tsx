@@ -58,8 +58,37 @@ export function AdminSettings() {
 
       <section className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold">WhatsApp</h3>
-        <div><Label>Número</Label><Input value={settings.whatsappNumber} onChange={e => update('whatsappNumber', e.target.value)} className="mt-1" /></div>
+        <div><Label>Número vendas</Label><Input value={settings.whatsappNumber} onChange={e => update('whatsappNumber', e.target.value)} className="mt-1" /></div>
         <div><Label>Link Grupo VIP</Label><Input value={settings.vipGroupLink} onChange={e => update('vipGroupLink', e.target.value)} className="mt-1" /></div>
+      </section>
+
+      <section className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="font-serif font-semibold">Redes Sociais</h3>
+        <div><Label>Link Telegram</Label><Input value={(settings as any).telegramLink || ''} onChange={e => update('telegramLink', e.target.value)} className="mt-1" placeholder="https://t.me/seucanalaqui" /></div>
+        <div><Label>Link Instagram</Label><Input value={(settings as any).instagramLink || ''} onChange={e => update('instagramLink', e.target.value)} className="mt-1" placeholder="https://instagram.com/seuuser" /></div>
+      </section>
+
+      <section className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="font-serif font-semibold">Notificação Superior</h3>
+        <div className="flex items-center gap-2">
+          <Switch checked={(settings as any).showTopNotification || false} onCheckedChange={v => update('showTopNotification', v)} />
+          <Label>Exibir barra de notificação no topo</Label>
+        </div>
+        {(settings as any).showTopNotification && (
+          <div>
+            <Label>Texto da notificação</Label>
+            <Input value={(settings as any).topNotificationText || ''} onChange={e => update('topNotificationText', e.target.value)} className="mt-1" placeholder="🔥 Promoção por tempo limitado!" />
+          </div>
+        )}
+      </section>
+
+      <section className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="font-serif font-semibold">Modo Manutenção</h3>
+        <div className="flex items-center gap-2">
+          <Switch checked={(settings as any).maintenanceMode || false} onCheckedChange={v => update('maintenanceMode', v)} />
+          <Label>Ativar modo manutenção</Label>
+        </div>
+        <p className="text-[10px] text-muted-foreground">Quando ativado, visitantes verão uma mensagem de manutenção no site.</p>
       </section>
 
       <section className="glass-card rounded-xl p-5 space-y-4">

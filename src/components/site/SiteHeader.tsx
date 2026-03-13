@@ -16,7 +16,16 @@ export function SiteHeader() {
   const { settings } = useStore();
   const { brand } = settings;
 
+  const showTopNotif = (settings as any).showTopNotification && (settings as any).topNotificationText;
+
   return (
+    <>
+      {/* Top notification bar */}
+      {showTopNotif && (
+        <div className="w-full bg-primary/10 border-b border-primary/20 py-1.5 text-center">
+          <p className="text-xs font-medium text-primary">{(settings as any).topNotificationText}</p>
+        </div>
+      )}
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
       <div className="container flex h-14 items-center justify-between gap-3">
         {/* Logo */}

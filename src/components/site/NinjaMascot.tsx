@@ -169,10 +169,10 @@ export function NinjaMascot() {
 
   const {
     enabled = true,
-    frequencyMin = 3,
-    frequencyMax = 5,
-    cooldownMinutes = 10,
-    maxPerSession = 1,
+    frequencyMin = 1.5,
+    frequencyMax = 3,
+    cooldownMinutes = 2,
+    maxPerSession = 2,
     positionPreference = 'random',
     ninjaSize = 72,
     animationSpeed = 4,

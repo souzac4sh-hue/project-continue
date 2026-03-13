@@ -47,7 +47,7 @@ export function ProductTrustBlock() {
           >
             <div
               className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-              style={{ background: `${item.color}20` }}
+              style={{ background: item.bg }}
             >
               <item.icon className="h-4.5 w-4.5" style={{ color: item.color }} />
             </div>

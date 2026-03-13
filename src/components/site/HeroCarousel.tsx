@@ -100,7 +100,7 @@ export function HeroCarousel() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.6, delay: 0.15 }}
                     className="font-serif text-xl sm:text-2xl md:text-4xl font-bold gold-text leading-tight"
-                    style={{ textShadow: '0 2px 20px hsl(43 74% 49% / 0.3), 0 4px 40px hsl(0 0% 0% / 0.5)' }}
+                    style={{ textShadow: '0 2px 20px hsl(200 100% 50% / 0.3), 0 4px 40px hsl(0 0% 0% / 0.5)' }}
                   >
                     {banner.title}
                   </motion.h2>

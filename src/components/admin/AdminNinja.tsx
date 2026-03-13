@@ -152,6 +152,14 @@ export function AdminNinja() {
 
           <div className="border-t border-border/30 pt-4">
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              🧪 Modo de teste
+            </h4>
+            <ToggleRow label="Ativar Ninja Test Mode" checked={ninja.testMode ?? false} onChange={v => update('testMode', v)} />
+            <p className="text-[10px] text-muted-foreground mt-1">Quando ativo, o Ninja aparece rapidamente sem cooldown. Ideal para testar no preview.</p>
+          </div>
+
+          <div className="border-t border-border/30 pt-4">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
               <Globe className="h-3 w-3 inline mr-1" /> Páginas ativas
             </h4>
             <ToggleRow label="Homepage" checked={ninja.showOnHomepage} onChange={v => update('showOnHomepage', v)} />

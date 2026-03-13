@@ -1,0 +1,2 @@
+ALTER TABLE public.ninja_coupons DROP CONSTRAINT ninja_coupons_discount_percentage_check;
+ALTER TABLE public.ninja_coupons ADD CONSTRAINT ninja_coupons_discount_percentage_check CHECK (discount_percentage = ANY (ARRAY[5, 10, 15, 20]));

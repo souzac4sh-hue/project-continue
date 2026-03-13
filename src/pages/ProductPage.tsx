@@ -352,18 +352,7 @@ export default function ProductPage() {
           </a>
         </motion.div>
 
-        {/* Trust seals below CTA */}
-        <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-muted-foreground/60" /> Entrega rápida
-          </span>
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground/60" /> Processo seguro
-          </span>
-          <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <MessageCircle className="h-3.5 w-3.5 text-muted-foreground/60" /> Suporte via WhatsApp
-          </span>
-        </div>
+
 
         {/* Trust Block */}
         <div className="mb-8">

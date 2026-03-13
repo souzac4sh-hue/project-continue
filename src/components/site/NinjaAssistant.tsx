@@ -229,14 +229,20 @@ export function NinjaAssistant({ context = 'homepage', productId }: NinjaAssista
     if (!ninja.enabled || !ninja.stateCouponHunter || !pageAllowed) return;
     if (context === 'checkout') return; // Not in checkout
 
-    const sessionCount = getSessionCount(SESSION_COUPON_KEY);
-    const dayCount = getDayCount(DAY_COUPON_KEY);
+    const testMode = ninja.testMode ?? false;
+    const urlParams = new URLSearchParams(window.location.search);
+    const debugMode = urlParams.get('ninja') === '1' || testMode;
 
-    if (sessionCount >= ninja.couponMaxPerSession) return;
-    if (dayCount >= ninja.couponMaxPerDay) return;
+    if (!debugMode) {
+      const sessionCount = getSessionCount(SESSION_COUPON_KEY);
+      const dayCount = getDayCount(DAY_COUPON_KEY);
+
+      if (sessionCount >= ninja.couponMaxPerSession) return;
+      if (dayCount >= ninja.couponMaxPerDay) return;
+    }
 
     setShowCouponHunter(true);
-  }, [ninja.enabled, ninja.stateCouponHunter, ninja.couponMaxPerSession, ninja.couponMaxPerDay, pageAllowed, context]);
+  }, [ninja.enabled, ninja.stateCouponHunter, ninja.couponMaxPerSession, ninja.couponMaxPerDay, ninja.testMode, pageAllowed, context]);
 
   const handleBubbleClose = useCallback(() => {
     setBubbleVisible(false);

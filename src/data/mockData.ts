@@ -160,8 +160,20 @@ export type StoreMode = 'online' | 'busy' | 'offline';
 
 export interface NinjaRewardTier {
   code: string;
-  weight: number; // 0-100, all weights summed = total pool
-  label: string;  // e.g. "5% desconto"
+  weight: number;
+  label: string;
+}
+
+export interface NinjaPromoMessage {
+  id: string;
+  text: string;
+  active: boolean;
+}
+
+export interface NinjaCheckoutMessage {
+  id: string;
+  text: string;
+  active: boolean;
 }
 
 export interface NinjaSettings {
@@ -171,17 +183,63 @@ export interface NinjaSettings {
   cooldownMinutes: number;
   maxPerSession: number;
   positionPreference: 'left' | 'right' | 'random';
-  ninjaSize: number; // px height, 60-90
-  animationSpeed: number; // seconds for run, 3-6
+  ninjaSize: number;
+  animationSpeed: number;
   discountCodes: string[];
   rewardTiers: NinjaRewardTier[];
   rewardMessage: string;
   showReward: boolean;
+
+  // States toggles
+  stateIdle: boolean;
+  statePromo: boolean;
+  stateCouponHunter: boolean;
+  stateCheckoutHelper: boolean;
+  stateRareEvent: boolean;
+  rareEventChance: number; // 0-100
+
+  // Page toggles
+  showOnHomepage: boolean;
+  showOnProductPage: boolean;
+  showOnCheckout: boolean;
+
+  // Promo alert settings
+  promoEnabled: boolean;
+  promoMessages: NinjaPromoMessage[];
+  promoFrequencySeconds: number;
+  promoCooldownMinutes: number;
+  promoIncludesCoupon: boolean;
+  promoDisplayStyle: 'floating' | 'bubble' | 'banner';
+
+  // Checkout assistant settings
+  checkoutEnabled: boolean;
+  checkoutDelaySeconds: number;
+  checkoutInactivitySeconds: number;
+  checkoutMaxAppearances: number;
+  checkoutMessages: NinjaCheckoutMessage[];
+  checkoutCanRevealCoupon: boolean;
+
+  // Coupon delivery settings
+  couponDeliveryEnabled: boolean;
+  couponMaxPerSession: number;
+  couponMaxPerDay: number;
+  couponAutoCopy: boolean;
+  couponAutoApply: boolean;
+
+  // Visual settings
+  glowStrength: number; // 0-100
+  movementRange: number; // px
+  desktopSize: number;
+  mobileSize: number;
+
   stats: {
     totalAppearances: number;
     totalClicks: number;
     couponsGenerated: number;
     couponsRedeemed: number;
+    promoAlertsShown: number;
+    checkoutAppearances: number;
+    checkoutClicks: number;
   };
 }
 
@@ -417,11 +475,61 @@ export const defaultSettings: Settings = {
     ],
     rewardMessage: '🥷 Você encontrou o Ninja da C4SH!',
     showReward: true,
+
+    stateIdle: true,
+    statePromo: true,
+    stateCouponHunter: true,
+    stateCheckoutHelper: true,
+    stateRareEvent: true,
+    rareEventChance: 5,
+
+    showOnHomepage: true,
+    showOnProductPage: true,
+    showOnCheckout: true,
+
+    promoEnabled: true,
+    promoMessages: [
+      { id: '1', text: '🥷 Oferta especial liberada hoje.', active: true },
+      { id: '2', text: '🥷 Promoção ativa por tempo limitado.', active: true },
+      { id: '3', text: '🥷 Desconto secreto disponível agora.', active: true },
+      { id: '4', text: '🥷 Esse produto está com alta procura.', active: true },
+    ],
+    promoFrequencySeconds: 60,
+    promoCooldownMinutes: 30,
+    promoIncludesCoupon: false,
+    promoDisplayStyle: 'bubble',
+
+    checkoutEnabled: true,
+    checkoutDelaySeconds: 8,
+    checkoutInactivitySeconds: 15,
+    checkoutMaxAppearances: 2,
+    checkoutMessages: [
+      { id: '1', text: '🥷 Pagando agora você garante sua vaga.', active: true },
+      { id: '2', text: '🥷 Estoque limitado — finalize agora.', active: true },
+      { id: '3', text: '🥷 Confirmação instantânea após o pagamento.', active: true },
+      { id: '4', text: '🥷 Quer um incentivo? Tente me clicar.', active: true },
+    ],
+    checkoutCanRevealCoupon: true,
+
+    couponDeliveryEnabled: true,
+    couponMaxPerSession: 1,
+    couponMaxPerDay: 2,
+    couponAutoCopy: true,
+    couponAutoApply: false,
+
+    glowStrength: 60,
+    movementRange: 200,
+    desktopSize: 80,
+    mobileSize: 64,
+
     stats: {
       totalAppearances: 0,
       totalClicks: 0,
       couponsGenerated: 0,
       couponsRedeemed: 0,
+      promoAlertsShown: 0,
+      checkoutAppearances: 0,
+      checkoutClicks: 0,
     },
   },
 };

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { NinjaAssistant } from '@/components/site/NinjaAssistant';
 import { useSearchParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -568,6 +569,7 @@ export default function PixCheckoutPage() {
           </div>
         )}
       </motion.div>
+      <NinjaAssistant context="checkout" />
     </div>
   );
 }

@@ -160,8 +160,20 @@ export type StoreMode = 'online' | 'busy' | 'offline';
 
 export interface NinjaRewardTier {
   code: string;
-  weight: number; // 0-100, all weights summed = total pool
-  label: string;  // e.g. "5% desconto"
+  weight: number;
+  label: string;
+}
+
+export interface NinjaPromoMessage {
+  id: string;
+  text: string;
+  active: boolean;
+}
+
+export interface NinjaCheckoutMessage {
+  id: string;
+  text: string;
+  active: boolean;
 }
 
 export interface NinjaSettings {
@@ -171,17 +183,63 @@ export interface NinjaSettings {
   cooldownMinutes: number;
   maxPerSession: number;
   positionPreference: 'left' | 'right' | 'random';
-  ninjaSize: number; // px height, 60-90
-  animationSpeed: number; // seconds for run, 3-6
+  ninjaSize: number;
+  animationSpeed: number;
   discountCodes: string[];
   rewardTiers: NinjaRewardTier[];
   rewardMessage: string;
   showReward: boolean;
+
+  // States toggles
+  stateIdle: boolean;
+  statePromo: boolean;
+  stateCouponHunter: boolean;
+  stateCheckoutHelper: boolean;
+  stateRareEvent: boolean;
+  rareEventChance: number; // 0-100
+
+  // Page toggles
+  showOnHomepage: boolean;
+  showOnProductPage: boolean;
+  showOnCheckout: boolean;
+
+  // Promo alert settings
+  promoEnabled: boolean;
+  promoMessages: NinjaPromoMessage[];
+  promoFrequencySeconds: number;
+  promoCooldownMinutes: number;
+  promoIncludesCoupon: boolean;
+  promoDisplayStyle: 'floating' | 'bubble' | 'banner';
+
+  // Checkout assistant settings
+  checkoutEnabled: boolean;
+  checkoutDelaySeconds: number;
+  checkoutInactivitySeconds: number;
+  checkoutMaxAppearances: number;
+  checkoutMessages: NinjaCheckoutMessage[];
+  checkoutCanRevealCoupon: boolean;
+
+  // Coupon delivery settings
+  couponDeliveryEnabled: boolean;
+  couponMaxPerSession: number;
+  couponMaxPerDay: number;
+  couponAutoCopy: boolean;
+  couponAutoApply: boolean;
+
+  // Visual settings
+  glowStrength: number; // 0-100
+  movementRange: number; // px
+  desktopSize: number;
+  mobileSize: number;
+
   stats: {
     totalAppearances: number;
     totalClicks: number;
     couponsGenerated: number;
     couponsRedeemed: number;
+    promoAlertsShown: number;
+    checkoutAppearances: number;
+    checkoutClicks: number;
   };
 }
 

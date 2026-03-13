@@ -164,6 +164,55 @@
     animation: shimmer-slide 4s ease-in-out infinite;
   }
 
+  /* ── Premium text shimmer (for titles/branding) ── */
+  .shimmer-text {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+  }
+  .shimmer-text::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(18,181,255,0.08) 40%,
+      rgba(255,255,255,0.12) 50%,
+      rgba(18,181,255,0.08) 60%,
+      transparent 100%
+    );
+    animation: shimmer-slide 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ── Badge shimmer (for premium/best-seller badges) ── */
+  .shimmer-badge {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.15) 45%,
+      rgba(255,255,255,0.25) 50%,
+      rgba(255,255,255,0.15) 55%,
+      transparent 100%
+    );
+    animation: shimmer-slide 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
   /* ── Pulse glow for primary CTAs only ── */
   .pulse-glow {
     animation: pulse-neon 3s ease-in-out infinite;

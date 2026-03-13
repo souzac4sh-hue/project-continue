@@ -69,7 +69,7 @@ export default function ShopPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-8 w-1 rounded-full bg-primary" />
                   <div>
-                    <h2 className="font-serif text-lg font-bold flex items-center gap-2 text-foreground">
+                    <h2 className="font-serif text-lg font-bold flex items-center gap-2 text-foreground shimmer-text">
                       <Flame className="h-5 w-5 text-primary" /> Mais procurados
                     </h2>
                     <p className="text-[11px] text-muted-foreground mt-0.5">Os conteúdos mais acessados pelos clientes.</p>

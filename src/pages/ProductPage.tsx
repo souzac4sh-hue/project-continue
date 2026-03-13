@@ -357,19 +357,34 @@ export default function ProductPage() {
           <div className="space-y-4 pt-2">
             <div>
               <Label htmlFor="name">Nome ou nick</Label>
-              <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite seu nome ou nick" className="mt-1" />
+              <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite seu nome ou nick" className="mt-1" maxLength={100} />
             </div>
             <div>
               <Label htmlFor="phone">WhatsApp</Label>
-              <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Digite seu número com DDD" className="mt-1" />
+              <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" className="mt-1" maxLength={20} inputMode="tel" />
             </div>
-            <Button onClick={handlePurchase} disabled={isProcessing} className="w-full gold-gradient text-primary-foreground font-bold py-5 rounded-xl">
+
+            {/* Trust indicators inside dialog */}
+            <div className="flex items-center justify-center gap-3 py-1 flex-wrap">
+              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <ShieldCheck className="h-3 w-3 text-primary/70" /> Pagamento seguro
+              </span>
+              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <Zap className="h-3 w-3 text-primary/70" /> Confirmação automática
+              </span>
+            </div>
+
+            <Button onClick={handlePurchase} disabled={isProcessing} className="w-full gold-gradient text-primary-foreground font-bold py-6 rounded-xl text-sm">
               {isProcessing ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gerando Pix...</>
               ) : (
-                'Confirmar Pedido'
+                <>Confirmar Pedido — R$ {finalPrice.toFixed(2)}</>
               )}
             </Button>
+
+            <p className="text-[10px] text-center text-muted-foreground/60">
+              +1.000 pedidos realizados com sucesso
+            </p>
           </div>
         </DialogContent>
       </Dialog>

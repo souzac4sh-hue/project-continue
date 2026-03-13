@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Copy, Check, ArrowLeft, Loader2, ShieldCheck, Clock,
   ExternalLink, CheckCircle2, XCircle, MessageSquare,
-  AlertTriangle, Smartphone, RefreshCw, HelpCircle,
+  AlertTriangle, Smartphone, RefreshCw, HelpCircle, Zap, Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useStore } from '@/context/StoreContext';
@@ -14,8 +14,6 @@ import { toast } from '@/hooks/use-toast';
 import { trackCheckoutEvent, updateLeadStatus, markPixCopied, markAbandoned, markSupportContacted } from '@/lib/checkoutTracker';
 
 type CheckoutState = 'loading' | 'awaiting' | 'waiting_confirm' | 'paid' | 'error' | 'expired';
-
-// These are now derived from settings in the component
 
 const buildWhatsAppUrl = (whatsappNumber: string, orderId: string, productName: string) => {
   const msg = encodeURIComponent(
@@ -36,8 +34,6 @@ const buildSupportWhatsAppUrl = (
   );
   return `https://wa.me/${whatsappNumber}?text=${msg}`;
 };
-
-// Social proof names now come from settings
 
 export default function PixCheckoutPage() {
   const [searchParams] = useSearchParams();
@@ -76,8 +72,8 @@ export default function PixCheckoutPage() {
     navigator.clipboard.writeText(pixCode);
     setCopied(true);
     setState('waiting_confirm');
-    setTimeout(() => setCopied(false), 2500);
-    // Track pix copied
+    toast({ title: '✔ Código Pix copiado!', description: 'Cole no app do seu banco para pagar.' });
+    setTimeout(() => setCopied(false), 3000);
     if (orderId) {
       markPixCopied(orderId);
     }
@@ -144,7 +140,6 @@ export default function PixCheckoutPage() {
       setTimeout(() => setSocialProof(null), 4000);
     };
     const firstTimeout = setTimeout(show, 8000);
-    // Use recursive setTimeout for varying intervals
     let nextTimer: ReturnType<typeof setTimeout>;
     const scheduleNext = () => {
       nextTimer = setTimeout(() => {
@@ -190,7 +185,6 @@ export default function PixCheckoutPage() {
         return;
       }
 
-      // Track new Pix generation
       if (orderId) {
         trackCheckoutEvent(orderId, 'new_pix_generated', { new_order_id: data.orderId });
       }
@@ -210,6 +204,7 @@ export default function PixCheckoutPage() {
   const minutes = Math.floor(countdown / 60);
   const seconds = countdown % 60;
   const isUrgent = countdown <= URGENCY_THRESHOLD && countdown > 0;
+  const timerProgress = countdown / TIMER_SECONDS;
 
   const supportUrl = buildSupportWhatsAppUrl(
     settings.whatsappNumber,
@@ -234,7 +229,7 @@ export default function PixCheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 py-8 relative">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 py-6 relative">
       {/* Social Proof Notification */}
       <AnimatePresence>
         {socialProof && isActive && (
@@ -255,70 +250,89 @@ export default function PixCheckoutPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md space-y-4"
+        className="w-full max-w-md space-y-3"
       >
         {/* Header */}
-        <div className="text-center mb-2">
-          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-3 transition-colors">
+        <div className="text-center mb-1">
+          <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-2 transition-colors">
             <ArrowLeft className="h-4 w-4" /> Voltar à loja
           </Link>
           <h1 className="font-serif text-xl font-bold text-foreground">Pagamento Pix</h1>
         </div>
 
         {/* Main Card */}
-        <div className="glass-card rounded-2xl p-6 space-y-5">
+        <div className="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
           {/* Product Info */}
-          <div className="flex items-center justify-between border-b border-border/50 pb-4">
+          <div className="flex items-center justify-between border-b border-border/50 pb-3">
             <div>
-              <p className="text-xs text-muted-foreground">Produto</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Produto</p>
               <p className="font-semibold text-foreground text-sm">{productName}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Valor</p>
-              <p className="font-bold text-primary text-lg">R$ {amount.toFixed(2)}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Valor</p>
+              <p className="font-bold text-primary text-xl">R$ {amount.toFixed(2)}</p>
             </div>
           </div>
 
           <AnimatePresence mode="wait">
             {/* AWAITING / WAITING_CONFIRM */}
             {isActive && (
-              <motion.div key="awaiting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
-                {/* Status */}
+              <motion.div key="awaiting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+                {/* Status indicator */}
                 <div className="flex items-center justify-center gap-2">
                   {state === 'waiting_confirm' ? (
-                    <>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full"
+                    >
                       <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                      <span className="text-sm font-medium text-primary">{ct.waitingTitle}</span>
-                    </>
+                      <span className="text-sm font-semibold text-primary">{ct.waitingTitle}</span>
+                    </motion.div>
                   ) : (
-                    <>
-                      <span className="h-2.5 w-2.5 rounded-full bg-yellow-500 animate-pulse" />
+                    <div className="flex items-center gap-2 bg-yellow-500/10 px-4 py-2 rounded-full">
+                      <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
                       <span className="text-sm font-medium text-yellow-500">Aguardando pagamento</span>
-                    </>
+                    </div>
                   )}
                 </div>
 
                 {/* Waiting confirm helper text */}
                 {state === 'waiting_confirm' && (
-                  <motion.p
+                  <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="text-[11px] text-center text-muted-foreground/80"
+                    className="text-center space-y-1"
                   >
-                    {ct.waitingSubtitle}
-                  </motion.p>
+                    <p className="text-[11px] text-muted-foreground/80">
+                      {ct.waitingSubtitle}
+                    </p>
+                    <p className="text-[11px] text-primary/70 font-medium">
+                      O sistema detecta o pagamento automaticamente
+                    </p>
+                  </motion.div>
                 )}
 
-                {/* Timer */}
-                <div className={`flex items-center justify-center gap-1.5 text-xs transition-colors ${
-                  isUrgent ? 'text-destructive font-semibold' : 'text-muted-foreground'
-                }`}>
-                  <Clock className="h-3.5 w-3.5" />
-                  {isUrgent ? (
-                    <span>{ct.urgencyMessage} — {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
-                  ) : (
-                    <span>Este Pix expira em: {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
-                  )}
+                {/* Timer with progress bar */}
+                <div className="space-y-1.5">
+                  <div className={`flex items-center justify-center gap-1.5 text-xs transition-colors ${
+                    isUrgent ? 'text-destructive font-bold' : 'text-muted-foreground'
+                  }`}>
+                    <Clock className="h-3.5 w-3.5" />
+                    {isUrgent ? (
+                      <span>⚠️ {ct.urgencyMessage} — {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
+                    ) : (
+                      <span>Pix expira em {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</span>
+                    )}
+                  </div>
+                  {/* Progress bar */}
+                  <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${isUrgent ? 'bg-destructive' : 'bg-primary/60'}`}
+                      style={{ width: `${timerProgress * 100}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
+                  </div>
                 </div>
 
                 {/* Cent variation note */}
@@ -326,32 +340,51 @@ export default function PixCheckoutPage() {
                   {ct.centVariationNote}
                 </p>
 
-                {/* UX Tip */}
-                <p className="text-[11px] text-center text-muted-foreground">
-                  Use o QR Code ou copie o código abaixo para pagar
-                </p>
+                {/* Instruction */}
+                <div className="text-center space-y-0.5">
+                  <p className="text-xs font-medium text-foreground">
+                    Escaneie o QR Code ou copie o código abaixo
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Após o pagamento, a confirmação é automática
+                  </p>
+                </div>
 
                 {/* QR Code */}
                 <div className="flex justify-center">
-                  <div className="bg-white p-4 rounded-xl shadow-lg">
-                    <QRCodeSVG value={pixCode} size={200} level="M" />
+                  <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg">
+                    <QRCodeSVG value={pixCode} size={180} level="M" className="sm:w-[200px] sm:h-[200px]" />
                   </div>
                 </div>
 
                 {/* Pix Code */}
                 <div>
-                  <p className="text-xs text-muted-foreground mb-2 text-center">Pix Copia e Cola</p>
-                  <div className="bg-secondary/50 rounded-xl p-3 break-all text-xs text-muted-foreground font-mono max-h-20 overflow-y-auto">
+                  <p className="text-xs text-muted-foreground mb-1.5 text-center font-medium">Pix Copia e Cola</p>
+                  <div className="bg-secondary/50 rounded-xl p-3 break-all text-[11px] text-muted-foreground font-mono max-h-16 overflow-y-auto leading-relaxed">
                     {pixCode}
                   </div>
                 </div>
 
-                {/* Copy Button */}
-                <Button onClick={handleCopy} className="w-full py-5 rounded-xl font-bold text-sm gold-gradient text-primary-foreground">
-                  {copied
-                    ? <><Check className="h-4 w-4 mr-2" /> ✔ Código Pix copiado!</>
-                    : <><Copy className="h-4 w-4 mr-2" /> Copiar código Pix</>
-                  }
+                {/* Copy Button — large, prominent */}
+                <Button
+                  onClick={handleCopy}
+                  className={`w-full py-6 rounded-xl font-bold text-sm transition-all duration-300 ${
+                    copied
+                      ? 'bg-green-600 hover:bg-green-600 text-white scale-[1.02]'
+                      : 'gold-gradient text-primary-foreground pulse-glow shadow-lg shadow-primary/20'
+                  }`}
+                >
+                  {copied ? (
+                    <motion.span
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Check className="h-5 w-5" /> Código Pix copiado! Cole no app do banco
+                    </motion.span>
+                  ) : (
+                    <><Copy className="h-5 w-5 mr-2" /> Copiar código Pix</>
+                  )}
                 </Button>
 
                 {/* Generate New Pix */}
@@ -372,16 +405,19 @@ export default function PixCheckoutPage() {
                   </motion.div>
                 )}
 
-                {/* Trust indicators */}
-                <div className="flex flex-col items-center gap-1.5">
-                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <ShieldCheck className="h-3.5 w-3.5 text-primary/60" />
-                    {ct.paymentSecureText}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground/70 text-center">
+                {/* Trust strip */}
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <TrustPill icon={<ShieldCheck className="h-3 w-3" />} text="Pix seguro" />
+                  <TrustPill icon={<Zap className="h-3 w-3" />} text="Confirmação automática" />
+                  <TrustPill icon={<Lock className="h-3 w-3" />} text="Entrega rápida" />
+                </div>
+
+                {/* Gateway alert (subtle) */}
+                <div className="text-center space-y-1">
+                  <p className="text-[10px] text-muted-foreground/60">
                     {ct.gatewayAlertText}
                   </p>
-                  <p className="text-[10px] text-muted-foreground/70 text-center">
+                  <p className="text-[10px] text-muted-foreground/60">
                     {ct.transferAnywayText}
                   </p>
                 </div>
@@ -392,10 +428,18 @@ export default function PixCheckoutPage() {
             {state === 'paid' && (
               <motion.div key="paid" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-4 py-6">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}>
-                  <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+                  <div className="relative inline-block">
+                    <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+                    <motion.div
+                      className="absolute inset-0 rounded-full border-2 border-green-500/30"
+                      initial={{ scale: 1, opacity: 1 }}
+                      animate={{ scale: 1.8, opacity: 0 }}
+                      transition={{ duration: 1.2, repeat: 2 }}
+                    />
+                  </div>
                 </motion.div>
-                 <h2 className="font-serif text-lg font-bold text-foreground">{ct.paidTitle}</h2>
-                 <p className="text-sm text-muted-foreground">{ct.paidRedirectText}</p>
+                <h2 className="font-serif text-lg font-bold text-foreground">{ct.paidTitle}</h2>
+                <p className="text-sm text-muted-foreground">{ct.paidRedirectText}</p>
                 <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
                 <Button variant="outline" className="mt-4" onClick={() => {
                   const url = buildWhatsAppUrl(settings.whatsappNumber, orderId!, productName!);
@@ -410,8 +454,8 @@ export default function PixCheckoutPage() {
             {state === 'expired' && (
               <motion.div key="expired" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-4 py-6">
                 <XCircle className="h-12 w-12 text-destructive mx-auto" />
-                 <h2 className="font-serif text-lg font-bold text-foreground">{ct.expiredTitle}</h2>
-                 <p className="text-sm text-muted-foreground">{ct.expiredText}</p>
+                <h2 className="font-serif text-lg font-bold text-foreground">{ct.expiredTitle}</h2>
+                <p className="text-sm text-muted-foreground">{ct.expiredText}</p>
                 <div className="flex flex-col gap-2">
                   <Button onClick={handleRegeneratePix} disabled={isRegenerating} className="gold-gradient text-primary-foreground">
                     {isRegenerating ? (
@@ -453,24 +497,24 @@ export default function PixCheckoutPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="glass-card rounded-2xl p-5 border border-yellow-500/20"
+                className="glass-card rounded-2xl p-4 border border-yellow-500/20"
               >
                 <div className="flex items-start gap-3">
                   <div className="h-8 w-8 rounded-full bg-yellow-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <AlertTriangle className="h-4 w-4 text-yellow-500" />
                   </div>
                   <div className="space-y-2">
-                     <p className="text-sm font-semibold text-foreground">{ct.nudgeTitle}</p>
-                     <ul className="text-xs text-muted-foreground leading-relaxed space-y-1">
-                       <li>• {ct.nudgeTip1}</li>
-                       <li>• {ct.nudgeTip2}</li>
-                       <li>• {ct.nudgeTip3}</li>
-                     </ul>
+                    <p className="text-sm font-semibold text-foreground">{ct.nudgeTitle}</p>
+                    <ul className="text-xs text-muted-foreground leading-relaxed space-y-1">
+                      <li>• {ct.nudgeTip1}</li>
+                      <li>• {ct.nudgeTip2}</li>
+                      <li>• {ct.nudgeTip3}</li>
+                    </ul>
                     <Button
                       variant="outline"
                       size="sm"
                       className="h-8 text-xs border-primary/30 text-primary mt-1"
-                     onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
+                      onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
                     >
                       <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                       Falar com suporte
@@ -482,9 +526,9 @@ export default function PixCheckoutPage() {
           </AnimatePresence>
         )}
 
-        {/* ── Guidance Block ── */}
+        {/* ── Guidance Block (compact) ── */}
         {isActive && (
-          <div className="glass-card rounded-2xl p-5 space-y-4">
+          <div className="glass-card rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2">
               <HelpCircle className="h-4 w-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">{ct.guidanceTitle}</h3>
@@ -494,11 +538,7 @@ export default function PixCheckoutPage() {
               {ct.guidanceDescription}
             </p>
 
-            <p className="text-xs text-muted-foreground font-medium">
-              {ct.guidanceBlockedText}
-            </p>
-
-            <div className="space-y-3">
+            <div className="space-y-2">
               <GuidanceItem
                 icon={<CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
                 text={ct.guidanceTip1}
@@ -514,10 +554,7 @@ export default function PixCheckoutPage() {
             </div>
 
             {/* Support as last resort */}
-            <div className="border-t border-border/30 pt-3 space-y-2.5">
-              <p className="text-[11px] text-muted-foreground/70">
-                {ct.guidanceSupportText}
-              </p>
+            <div className="border-t border-border/30 pt-3">
               <Button
                 variant="outline"
                 size="sm"
@@ -535,7 +572,16 @@ export default function PixCheckoutPage() {
   );
 }
 
-/* ── Subcomponent ── */
+/* ── Subcomponents ── */
+
+function TrustPill({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1 py-1.5 px-1 rounded-lg bg-secondary/30">
+      <span className="text-primary/70">{icon}</span>
+      <span className="text-[9px] text-muted-foreground text-center leading-tight">{text}</span>
+    </div>
+  );
+}
 
 function GuidanceItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (

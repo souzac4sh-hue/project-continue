@@ -289,6 +289,7 @@ Deno.serve(async (req) => {
           lead_status: 'paid',
           paid_at: paidAt,
           last_step: 'payment_confirmed',
+          gateway_status: extracted.status || extracted.event || 'paid',
         })
         .eq('id', order.id)
 

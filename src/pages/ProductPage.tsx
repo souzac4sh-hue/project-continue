@@ -265,7 +265,7 @@ export default function ProductPage() {
             <ul className="space-y-2">
               {product.benefits.map((b, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 text-primary shrink-0" />
+                  <Check className="h-4 w-4 text-emerald-400/80 shrink-0" />
                   {b}
                 </li>
               ))}

@@ -534,5 +534,7 @@ export const defaultSettings: Settings = {
       checkoutAppearances: 0,
       checkoutClicks: 0,
     },
+
+    testMode: false,
   },
 };

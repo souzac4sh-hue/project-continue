@@ -1,5 +1,6 @@
-import { Star, MessageSquare, Calendar, ExternalLink, Radio, Users, Shield, ArrowRight, Zap } from 'lucide-react';
+import { Star, MessageSquare, Calendar, ExternalLink, Radio, Users, Shield, ArrowRight, ArrowLeft, Zap, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
+import { Link } from 'react-router-dom';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { FloatingButtons } from '@/components/site/FloatingButtons';
 import { SiteFooter } from '@/components/site/SiteFooter';
@@ -47,13 +48,19 @@ function ReferenceCard({ reference: r, index }: { reference: any; index: number 
           </div>
         </div>
 
-        {/* Image */}
+        {/* Image — large, prominent */}
         {r.image ? (
-          <div className="mx-4 mt-2 rounded-lg overflow-hidden aspect-video bg-secondary">
-            <img src={r.image} alt={r.shortText} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="mx-3 mt-2 rounded-lg overflow-hidden bg-secondary">
+            <img
+              src={r.image}
+              alt={r.shortText}
+              className="w-full h-auto object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         ) : (
-          <div className="mx-4 mt-2 rounded-lg aspect-[2/1] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center">
+          <div className="mx-3 mt-2 rounded-lg aspect-[2/1] bg-gradient-to-br from-secondary to-secondary/50 flex items-center justify-center">
             <MessageSquare className="h-8 w-8 text-primary/20" />
           </div>
         )}
@@ -62,6 +69,11 @@ function ReferenceCard({ reference: r, index }: { reference: any; index: number 
         <div className="p-4 pt-3">
           <p className="text-sm font-medium text-foreground mb-1">{r.shortText}</p>
           <p className="text-sm text-muted-foreground leading-relaxed">{r.comment}</p>
+          <div className="flex gap-0.5 mt-2">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="h-3 w-3 fill-primary text-primary" />
+            ))}
+          </div>
         </div>
       </div>
     </AnimatedSection>
@@ -80,9 +92,9 @@ export default function ReferencesPage() {
       <SiteHeader />
 
       <div className="container py-8 pb-24 max-w-2xl mx-auto">
-        {/* === HEADER === */}
+        {/* ═══ 1. HEADER ═══ */}
         <AnimatedSection>
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
               <Radio className="h-3 w-3 animate-pulse" /> Canal Oficial
             </div>
@@ -95,7 +107,7 @@ export default function ReferencesPage() {
           </div>
         </AnimatedSection>
 
-        {/* === SUPPORT TEXT + TOP CTA === */}
+        {/* ═══ 2. TRUST TEXT + TOP CTA ═══ */}
         <AnimatedSection delay={0.1}>
           <div className="glass-card rounded-xl p-5 mb-6 border border-primary/20">
             <div className="flex items-start gap-3">
@@ -112,7 +124,7 @@ export default function ReferencesPage() {
           </div>
         </AnimatedSection>
 
-        {/* === STATS BAR === */}
+        {/* ═══ 3. STATS BAR ═══ */}
         <AnimatedSection delay={0.15}>
           <div className="flex items-center justify-center gap-6 mb-8 text-center">
             <div>
@@ -136,14 +148,24 @@ export default function ReferencesPage() {
           </div>
         </AnimatedSection>
 
-        {/* === FEED === */}
+        {/* ═══ 4. SOCIAL PROOF LINE ═══ */}
+        <AnimatedSection delay={0.18}>
+          <div className="flex items-center gap-2 justify-center mb-6">
+            <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+            <p className="text-xs text-muted-foreground">
+              Centenas de clientes atendidos · Novas referências adicionadas regularmente
+            </p>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══ 5. FEED (first half) ═══ */}
         <div className="space-y-4">
           {activeRefs.slice(0, Math.ceil(activeRefs.length / 2)).map((r, i) => (
             <ReferenceCard key={r.id} reference={r} index={i} />
           ))}
         </div>
 
-        {/* === MID CTA === */}
+        {/* ═══ 6. MID CTA ═══ */}
         {activeRefs.length > 4 && (
           <AnimatedSection delay={0.1}>
             <div className="my-6 flex items-center gap-3">
@@ -154,27 +176,38 @@ export default function ReferencesPage() {
           </AnimatedSection>
         )}
 
-        {/* === FEED PART 2 === */}
+        {/* ═══ 7. FEED (second half) ═══ */}
         <div className="space-y-4">
           {activeRefs.slice(Math.ceil(activeRefs.length / 2)).map((r, i) => (
             <ReferenceCard key={r.id} reference={r} index={i} />
           ))}
         </div>
 
-        {/* === FADE OVERLAY hinting more content === */}
+        {/* ═══ 8. FADE OVERLAY ═══ */}
         <div className="relative h-16 -mt-16 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
 
-        {/* === FINAL BLOCK === */}
+        {/* ═══ 9. FINAL CTA BLOCK ═══ */}
         <AnimatedSection delay={0.1}>
-          <div className="glass-card rounded-xl p-6 mt-4 text-center border border-primary/20">
-            <div className="inline-flex items-center gap-2 mb-3">
+          <div className="glass-card rounded-xl p-6 mt-4 text-center border border-primary/20 space-y-4">
+            <div className="inline-flex items-center gap-2 mb-1">
               <Users className="h-5 w-5 text-primary" />
-              <h3 className="font-serif font-bold text-foreground">Canal Oficial de Referências</h3>
+              <h3 className="font-serif font-bold text-foreground">Quer ver todas as referências?</h3>
             </div>
-            <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto leading-relaxed">
+            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
               {channel.ctaFinalText}
             </p>
             <ChannelCTA text={channel.ctaButtonText} link={channel.channelLink} />
+          </div>
+        </AnimatedSection>
+
+        {/* ═══ 10. BACK TO STORE ═══ */}
+        <AnimatedSection delay={0.15}>
+          <div className="mt-4 flex justify-center">
+            <Link to="/">
+              <Button variant="outline" className="gap-2 border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors">
+                <ShoppingBag className="h-4 w-4" /> Voltar para a loja
+              </Button>
+            </Link>
           </div>
         </AnimatedSection>
       </div>

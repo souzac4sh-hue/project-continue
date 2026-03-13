@@ -141,6 +141,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           discount_amount: number | null
+          gateway_status: string | null
           id: string
           identifier: string
           last_step: string | null
@@ -172,6 +173,7 @@ export type Database = {
           customer_name: string
           customer_phone: string
           discount_amount?: number | null
+          gateway_status?: string | null
           id?: string
           identifier: string
           last_step?: string | null
@@ -205,6 +207,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           discount_amount?: number | null
+          gateway_status?: string | null
           id?: string
           identifier?: string
           last_step?: string | null
@@ -335,8 +338,10 @@ export type Database = {
       get_pix_order_status: {
         Args: { order_identifier: string }
         Returns: {
+          gateway_status: string
           paid_at: string
           payment_status: string
+          provider_identifier: string
         }[]
       }
       has_role: {

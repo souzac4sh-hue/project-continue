@@ -1,0 +1,1 @@
+ALTER TABLE public.pix_orders ADD COLUMN IF NOT EXISTS gateway_status text DEFAULT NULL;

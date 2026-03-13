@@ -59,6 +59,19 @@ export default function PixCheckoutPage() {
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 
+  // Debug state
+  const DEBUG_PIX = true;
+  const [debugInfo, setDebugInfo] = useState({
+    pollCount: 0,
+    lastCheck: '',
+    lastDbStatus: '',
+    lastEdgeStatus: '',
+    lastError: '',
+    gatewayStatus: '',
+    providerIdentifier: '',
+    webhookDetected: false,
+  });
+
   // Track screen opened
   useEffect(() => {
     if (orderId && !trackedScreenOpen.current) {
@@ -92,38 +105,54 @@ export default function PixCheckoutPage() {
           order_identifier: orderId,
         });
         if (error) {
-          console.error('[PIX-CHECKOUT] DB poll error:', error);
+          console.error('[PIX_FRONTEND] DB poll error:', error);
+          setDebugInfo(prev => ({ ...prev, lastError: `DB: ${error.message}` }));
           return false;
         }
         const row = Array.isArray(data) ? data[0] : data;
-        if (row?.payment_status === 'paid') {
-          console.log('[PIX-CHECKOUT] ✅ Payment confirmed via DB poll:', orderId);
+        const dbStatus = row?.payment_status || 'unknown';
+        console.log('[PIX_FRONTEND] DB poll result:', dbStatus, 'gateway:', row?.gateway_status, 'provider:', row?.provider_identifier);
+        setDebugInfo(prev => ({
+          ...prev,
+          lastDbStatus: dbStatus,
+          gatewayStatus: row?.gateway_status || '',
+          providerIdentifier: row?.provider_identifier || '',
+          webhookDetected: dbStatus === 'paid',
+          lastCheck: new Date().toLocaleTimeString(),
+        }));
+        if (dbStatus === 'paid') {
+          console.log('[PIX_FRONTEND] ✅ Payment confirmed via DB poll:', orderId);
           setState('paid');
           trackCheckoutEvent(orderId, 'payment_confirmed');
           return true;
         }
-        if (row?.payment_status === 'expired' || row?.payment_status === 'failed') {
-          setState(row.payment_status === 'expired' ? 'expired' : 'error');
+        if (dbStatus === 'expired' || dbStatus === 'failed') {
+          setState(dbStatus === 'expired' ? 'expired' : 'error');
           return true;
         }
-      } catch (err) {
-        console.error('[PIX-CHECKOUT] DB poll exception:', err);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[PIX_FRONTEND] DB poll exception:', msg);
+        setDebugInfo(prev => ({ ...prev, lastError: `DB exception: ${msg}` }));
       }
       return false;
     };
 
     const checkEdgeFunction = async (): Promise<boolean> => {
       try {
+        console.log('[PIX_FRONTEND] Calling check-pix-status edge function for:', orderId);
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
           body: { orderId },
         });
         if (error) {
-          console.error('[PIX-CHECKOUT] check-pix-status error:', error);
+          console.error('[PIX_FRONTEND] check-pix-status error:', error);
+          setDebugInfo(prev => ({ ...prev, lastError: `Edge: ${error.message}` }));
           return false;
         }
-        console.log('[PIX-CHECKOUT] check-pix-status response:', data);
+        console.log('[PIX_FRONTEND] check-pix-status response:', JSON.stringify(data));
+        setDebugInfo(prev => ({ ...prev, lastEdgeStatus: data?.status || 'unknown' }));
         if (data?.status === 'paid') {
-          console.log('[PIX-CHECKOUT] ✅ Payment confirmed via edge function:', orderId);
+          console.log('[PIX_FRONTEND] ✅ Payment confirmed via edge function:', orderId);
           setState('paid');
           trackCheckoutEvent(orderId, 'payment_confirmed');
           return true;
@@ -132,15 +161,18 @@ export default function PixCheckoutPage() {
           setState(data.status === 'expired' ? 'expired' : 'error');
           return true;
         }
-      } catch (err) {
-        console.error('[PIX-CHECKOUT] Edge function error:', err);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[PIX_FRONTEND] Edge function exception:', msg);
+        setDebugInfo(prev => ({ ...prev, lastError: `Edge exception: ${msg}` }));
       }
       return false;
     };
 
     const check = async () => {
       pollCount++;
-      console.log('[PIX-CHECKOUT] Poll #' + pollCount + ' for order:', orderId);
+      console.log('[PIX_FRONTEND] Poll #' + pollCount + ' for order:', orderId);
+      setDebugInfo(prev => ({ ...prev, pollCount }));
 
       // Fast path: check DB directly (instant, no external API call)
       const dbResult = await checkDb();
@@ -288,6 +320,22 @@ export default function PixCheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 py-6 relative">
+      {/* DEBUG PANEL */}
+      {DEBUG_PIX && (
+        <div className="fixed top-2 right-2 z-[9999] bg-black/90 text-green-400 font-mono text-[10px] p-3 rounded-lg max-w-xs shadow-xl border border-green-500/30 overflow-auto max-h-[50vh]">
+          <div className="font-bold text-green-300 mb-1">🐛 PIX DEBUG</div>
+          <div>Order: {orderId?.substring(0, 8)}...</div>
+          <div>Provider: {debugInfo.providerIdentifier?.substring(0, 12) || 'N/A'}</div>
+          <div>State: <span className={state === 'paid' ? 'text-green-300' : 'text-yellow-300'}>{state}</span></div>
+          <div>DB Status: <span className={debugInfo.lastDbStatus === 'paid' ? 'text-green-300' : 'text-yellow-300'}>{debugInfo.lastDbStatus || '...'}</span></div>
+          <div>Edge Status: {debugInfo.lastEdgeStatus || '...'}</div>
+          <div>Gateway: {debugInfo.gatewayStatus || 'N/A'}</div>
+          <div>Webhook: {debugInfo.webhookDetected ? '✅ YES' : '❌ NO'}</div>
+          <div>Polls: {debugInfo.pollCount}</div>
+          <div>Last Check: {debugInfo.lastCheck || '...'}</div>
+          {debugInfo.lastError && <div className="text-red-400 mt-1">Error: {debugInfo.lastError}</div>}
+        </div>
+      )}
       {/* Social Proof Notification */}
       <AnimatePresence>
         {socialProof && isActive && (

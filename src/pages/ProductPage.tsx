@@ -444,9 +444,10 @@ export default function ProductPage() {
               </div>
               <Button
                 onClick={() => setBuyOpen(true)}
-                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-primary/20"
+                disabled={settings.storeMode === 'offline'}
+                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-primary/20 disabled:opacity-50"
               >
-                <ShoppingBag className="h-4 w-4 mr-1.5" /> Comprar
+                <ShoppingBag className="h-4 w-4 mr-1.5" /> {settings.storeMode === 'offline' ? 'Offline' : 'Comprar'}
               </Button>
             </div>
           </motion.div>

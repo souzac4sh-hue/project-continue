@@ -232,6 +232,9 @@ export interface NinjaSettings {
   desktopSize: number;
   mobileSize: number;
 
+  // Testing
+  testMode: boolean;
+
   stats: {
     totalAppearances: number;
     totalClicks: number;

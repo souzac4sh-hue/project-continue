@@ -60,6 +60,16 @@ export default function PixCheckoutPage() {
   const [elapsed, setElapsed] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [socialProof, setSocialProof] = useState<string | null>(null);
+  const trackedScreenOpen = useRef(false);
+
+  // Track screen opened
+  useEffect(() => {
+    if (orderId && !trackedScreenOpen.current) {
+      trackedScreenOpen.current = true;
+      trackCheckoutEvent(orderId, 'pix_screen_opened');
+      updateLeadStatus(orderId, 'pix_generated', 'pix_screen_opened');
+    }
+  }, [orderId]);
 
   const handleCopy = useCallback(() => {
     if (!pixCode) return;

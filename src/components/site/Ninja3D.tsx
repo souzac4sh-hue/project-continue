@@ -172,11 +172,10 @@ export function Ninja3D() {
   // Single entry effect - runs once on mount
   useEffect(() => {
     mountedRef.current = true;
-    console.log('[Ninja3D] Effect running, enabled:', enabled, 'started:', startedRef.current);
     if (startedRef.current) return;
     if (!enabled) return;
 
-    // Check cooldowns
+    // Check cooldowns - ?ninja=1 bypasses for testing
     const urlParams = new URLSearchParams(window.location.search);
     const debugMode = urlParams.get('ninja') === '1';
     if (!debugMode) {
@@ -187,11 +186,9 @@ export function Ninja3D() {
 
     startedRef.current = true;
     const delay = 3000 + Math.random() * 3000;
-    console.log('[Ninja3D] Will appear in', Math.round(delay), 'ms, debug:', debugMode);
 
     const timer = setTimeout(() => {
-      if (!mountedRef.current) { console.log('[Ninja3D] Not mounted when timer fired'); return; }
-      console.log('[Ninja3D] Spawning now!');
+      if (!mountedRef.current) return;
       sessionStorage.setItem(SESSION_KEY, 'true');
       localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       incrementStat('totalAppearances');

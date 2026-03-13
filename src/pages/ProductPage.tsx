@@ -40,6 +40,17 @@ export default function ProductPage() {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
 
+  // Show sticky bar when main CTA scrolls out of view
+  useEffect(() => {
+    if (!ctaRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(ctaRef.current);
+    return () => observer.disconnect();
+  }, [product]);
+
   if (!product) {
     return (
       <div className="min-h-screen bg-background">

@@ -462,7 +462,7 @@ export default function ProductPage() {
                   className="flex-1 font-mono uppercase"
                   maxLength={30}
                 />
-                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-primary/30 text-primary">
+                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-border/50 text-foreground/70 hover:text-foreground hover:border-border">
                   Aplicar
                 </Button>
               </div>

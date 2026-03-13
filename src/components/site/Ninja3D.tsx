@@ -187,9 +187,11 @@ export function Ninja3D() {
 
     startedRef.current = true;
     const delay = 3000 + Math.random() * 3000;
+    console.log('[Ninja3D] Will appear in', Math.round(delay), 'ms, debug:', debugMode);
 
     const timer = setTimeout(() => {
-      if (!mountedRef.current) return;
+      if (!mountedRef.current) { console.log('[Ninja3D] Not mounted when timer fired'); return; }
+      console.log('[Ninja3D] Spawning now!');
       sessionStorage.setItem(SESSION_KEY, 'true');
       localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       incrementStat('totalAppearances');

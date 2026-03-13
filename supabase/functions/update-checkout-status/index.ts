@@ -16,8 +16,25 @@ Deno.serve(async (req) => {
   try {
     const { action, orderId, leadStatus, lastStep, extraFields } = await req.json()
 
-    if (!orderId || !action) {
-      return new Response(JSON.stringify({ error: 'Missing orderId or action' }), {
+    // Input validation
+    if (!orderId || typeof orderId !== 'string' || orderId.length > 100) {
+      return new Response(JSON.stringify({ error: 'Invalid orderId' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (!action || typeof action !== 'string') {
+      return new Response(JSON.stringify({ error: 'Missing action' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Validate orderId format (UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(orderId)) {
+      return new Response(JSON.stringify({ error: 'Invalid orderId format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

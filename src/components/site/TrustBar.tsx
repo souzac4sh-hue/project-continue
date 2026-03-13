@@ -8,7 +8,7 @@ export function TrustBar() {
   const items = settings.trustBarItems;
 
   return (
-    <div className="w-full overflow-hidden border-y border-primary/10 bg-card/60 backdrop-blur-sm">
+    <div className="w-full overflow-hidden border-y border-border/40 bg-card/50 backdrop-blur-sm">
       <div className="flex animate-trust-scroll" aria-label="Benefícios da loja">
         {[...items, ...items, ...items].map((item, i) => {
           const Icon = iconMap[i % iconMap.length];

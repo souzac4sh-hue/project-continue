@@ -158,14 +158,31 @@ export interface ColorSettings {
 
 export type StoreMode = 'online' | 'busy' | 'offline';
 
+export interface NinjaRewardTier {
+  code: string;
+  weight: number; // 0-100, all weights summed = total pool
+  label: string;  // e.g. "5% desconto"
+}
+
 export interface NinjaSettings {
   enabled: boolean;
   frequencyMin: number;
   frequencyMax: number;
   cooldownMinutes: number;
+  maxPerSession: number;
+  positionPreference: 'left' | 'right' | 'random';
+  ninjaSize: number; // px height, 60-90
+  animationSpeed: number; // seconds for run, 3-6
   discountCodes: string[];
+  rewardTiers: NinjaRewardTier[];
   rewardMessage: string;
   showReward: boolean;
+  stats: {
+    totalAppearances: number;
+    totalClicks: number;
+    couponsGenerated: number;
+    couponsRedeemed: number;
+  };
 }
 
 export interface Settings {

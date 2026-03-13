@@ -350,7 +350,7 @@ export function Ninja3D() {
         }
       }
     }, 700);
-  }, [phase, ninjaSize, incrementStat]);
+  }, [phase, ninjaSize, incrementStat, emitTrail]);
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(rewardCode);

@@ -36,6 +36,25 @@ const buildSupportWhatsAppUrl = (
   return `https://wa.me/${whatsappNumber}?text=${msg}`;
 };
 
+function PaidAutoRedirect({ whatsappUrl }: { whatsappUrl: string }) {
+  const [sec, setSec] = useState(5);
+  useEffect(() => {
+    const t = setInterval(() => setSec(p => {
+      if (p <= 1) { clearInterval(t); window.open(whatsappUrl, '_blank'); return 0; }
+      return p - 1;
+    }), 1000);
+    return () => clearInterval(t);
+  }, [whatsappUrl]);
+  return (
+    <div className="space-y-3 mt-2">
+      <p className="text-xs text-muted-foreground">Redirecionando em {sec}s...</p>
+      <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-base py-6" onClick={() => window.open(whatsappUrl, '_blank')}>
+        <MessageSquare className="h-5 w-5 mr-2" /> 📦 Receber meu produto
+      </Button>
+    </div>
+  );
+}
+
 export default function PixCheckoutPage() {
   const [searchParams] = useSearchParams();
   const { settings } = useStore();

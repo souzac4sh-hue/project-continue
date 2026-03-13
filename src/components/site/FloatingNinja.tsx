@@ -58,7 +58,7 @@ export default function FloatingNinja() {
   const [posY] = useState(window.innerHeight - 180);
   const [phrase, setPhrase] = useState<string | null>(null);
   const [escapeBubble, setEscapeBubble] = useState(false);
-  const [reward, setReward] = useState<{ code: string; discount: number; expiresAt: string } | null>(null);
+  const [reward, setReward] = useState<{ code: string; discount: number; expiresAt: string; isRare: boolean } | null>(null);
   const [rewardLoading, setRewardLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [countdown, setCountdown] = useState(ninjaConfig.couponDurationSeconds);

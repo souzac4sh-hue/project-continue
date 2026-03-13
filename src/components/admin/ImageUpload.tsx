@@ -26,9 +26,11 @@ export function ImageUpload({ value, onChange, folder, label = 'Imagem', aspectR
 
     const url = await upload(file, folder);
     if (url) {
+      console.log('[ImageUpload] Upload successful, URL:', url);
       onChange(url);
       toast({ title: '✅ Imagem enviada!' });
     } else {
+      console.error('[ImageUpload] Upload failed, no URL returned');
       toast({ title: 'Erro ao enviar imagem', variant: 'destructive' });
       setPreview(null);
     }

@@ -29,17 +29,25 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from('pix_orders')
-      .select('id, product_name, amount, payment_status, lead_status, copied_pix, support_contacted_at, created_at, paid_at, abandoned_at, recovered_at')
-      .order('created_at', { ascending: false })
-      .limit(1000)
-      .then(({ data, error }) => {
-        if (error) console.error('[ADMIN] Failed to load orders:', error);
-        console.log('[ADMIN] Orders loaded:', data?.length ?? 0);
-        setOrders((data as PixOrder[]) || []);
+    const loadOrders = async () => {
+      // Wait for session to be ready
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.warn('[ADMIN] No session, skipping orders load');
         setLoading(false);
-      });
+        return;
+      }
+      const { data, error } = await supabase
+        .from('pix_orders')
+        .select('id, product_name, amount, payment_status, lead_status, copied_pix, support_contacted_at, created_at, paid_at, abandoned_at, recovered_at')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) console.error('[ADMIN] Failed to load orders:', error);
+      console.log('[ADMIN] Orders loaded:', data?.length ?? 0);
+      setOrders((data as PixOrder[]) || []);
+      setLoading(false);
+    };
+    loadOrders();
   }, []);
 
   const stats = useMemo(() => {

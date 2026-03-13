@@ -108,7 +108,14 @@ export default function PixCheckoutPage() {
     if (state !== 'awaiting' && state !== 'waiting_confirm') return;
     const timer = setInterval(() => {
       setCountdown(prev => {
-        if (prev <= 1) { setState('expired'); return 0; }
+        if (prev <= 1) {
+          setState('expired');
+          if (orderId) {
+            markAbandoned(orderId);
+            trackCheckoutEvent(orderId, 'pix_expired');
+          }
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);

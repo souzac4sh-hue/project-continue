@@ -208,7 +208,7 @@ export default function ProductPage() {
           transition={{ duration: 0.3, delay: 0.05 }}
           className="flex items-center gap-3 mb-4 flex-wrap"
         >
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground bg-secondary px-2.5 py-1 rounded-full border border-border/30">
             <TrendingUp className="h-3 w-3" /> Alta demanda
           </span>
           <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">

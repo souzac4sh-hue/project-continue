@@ -37,7 +37,7 @@ interface NinjaAssistantProps {
   productId?: string;
 }
 
-export function NinjaAssistant({ context = 'homepage' }: NinjaAssistantProps) {
+export function NinjaAssistant({ context = 'homepage', productId }: NinjaAssistantProps) {
   const { settings, setSettings } = useStore();
   const ninja = settings.ninjaSettings;
 

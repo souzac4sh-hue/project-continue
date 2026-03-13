@@ -54,19 +54,9 @@ export default function AdminPage() {
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
-    const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
-
     const ordersToday = store.orders.filter(o => o.date >= today).length;
     const ordersWeek = store.orders.filter(o => o.date >= weekAgo).length;
-    const ordersMonth = store.orders.filter(o => o.date >= monthAgo).length;
-
-    const productCounts: Record<string, number> = {};
-    store.orders.forEach(o => {
-      productCounts[o.productName] = (productCounts[o.productName] || 0) + 1;
-    });
-    const topProduct = Object.entries(productCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
-
-    return { ordersToday, ordersWeek, ordersMonth, topProduct };
+    return { ordersToday, ordersWeek };
   }, [store.orders]);
 
   if (!isAdminAuthenticated()) {

@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from '@/hooks/use-toast';
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils';
 import {
   Copy, MessageSquare, RefreshCw, Loader2, DollarSign, Clock,
   CheckCircle2, XCircle, TrendingUp, ShoppingBag, Target,
-  CalendarIcon, BarChart3, AlertTriangle, Award,
+  CalendarIcon, BarChart3, AlertTriangle, Award, Search, Download,
 } from 'lucide-react';
 
 type PixOrder = {
@@ -71,6 +72,7 @@ export function AdminPixOrders() {
   const [loading, setLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
 
@@ -96,6 +98,17 @@ export function AdminPixOrders() {
   const filtered = useMemo(() => {
     let result = orders;
 
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(o =>
+        o.customer_name.toLowerCase().includes(q) ||
+        o.customer_phone.includes(q) ||
+        o.product_name.toLowerCase().includes(q) ||
+        o.identifier.toLowerCase().includes(q)
+      );
+    }
+
     // Period filter
     if (periodFilter === 'custom' && customFrom) {
       const from = new Date(customFrom); from.setHours(0, 0, 0, 0);
@@ -116,11 +129,10 @@ export function AdminPixOrders() {
     }
 
     return result;
-  }, [orders, periodFilter, statusFilter, customFrom, customTo]);
+  }, [orders, periodFilter, statusFilter, searchQuery, customFrom, customTo]);
 
-  // Stats (always from filtered period, revenue only from paid)
+  // Stats
   const stats = useMemo(() => {
-    // Period-scoped orders (before status filter)
     let periodOrders = orders;
     if (periodFilter === 'custom' && customFrom) {
       const from = new Date(customFrom); from.setHours(0, 0, 0, 0);
@@ -142,22 +154,18 @@ export function AdminPixOrders() {
     const totalRevenue = paid.reduce((s, o) => s + Number(o.amount), 0);
     const avgTicket = paid.length > 0 ? totalRevenue / paid.length : 0;
 
-    // Today revenue
     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
     const paidAll = orders.filter(o => o.payment_status === 'paid');
     const revenueToday = paidAll.filter(o => o.paid_at && new Date(o.paid_at) >= todayStart).reduce((s, o) => s + Number(o.amount), 0);
 
-    // 7d revenue
     const weekStart = new Date(Date.now() - 7 * 86400000);
     const revenue7d = paidAll.filter(o => o.paid_at && new Date(o.paid_at) >= weekStart).reduce((s, o) => s + Number(o.amount), 0);
 
-    // Month revenue
     const monthStart = new Date(Date.now() - 30 * 86400000);
     const revenueMonth = paidAll.filter(o => o.paid_at && new Date(o.paid_at) >= monthStart).reduce((s, o) => s + Number(o.amount), 0);
 
     const conversionRate = periodOrders.length > 0 ? (paid.length / periodOrders.length) * 100 : 0;
 
-    // Top products
     const productRevenue: Record<string, { count: number; revenue: number }> = {};
     paid.forEach(o => {
       if (!productRevenue[o.product_name]) productRevenue[o.product_name] = { count: 0, revenue: 0 };
@@ -168,15 +176,9 @@ export function AdminPixOrders() {
     const topByRevenue = Object.entries(productRevenue).sort((a, b) => b[1].revenue - a[1].revenue)[0];
 
     return {
-      totalRevenue,
-      revenueToday,
-      revenue7d,
-      revenueMonth,
-      paidCount: paid.length,
-      pendingCount: pending.length,
-      failedCount: failed.length,
-      avgTicket,
-      conversionRate,
+      totalRevenue, revenueToday, revenue7d, revenueMonth,
+      paidCount: paid.length, pendingCount: pending.length, failedCount: failed.length,
+      avgTicket, conversionRate,
       topProductByCount: topByCount ? `${topByCount[0]} (${topByCount[1].count})` : '—',
       topProductByRevenue: topByRevenue ? `${topByRevenue[0]} (${formatCurrency(topByRevenue[1].revenue)})` : '—',
       totalOrders: periodOrders.length,
@@ -189,9 +191,33 @@ export function AdminPixOrders() {
     toast({ title: '📋 Mensagem copiada!' });
   };
 
+  const exportCSV = () => {
+    const headers = ['Pedido', 'Produto', 'Cliente', 'Telefone', 'Valor', 'Status', 'Criado', 'Pago em'];
+    const rows = filtered.map(o => [
+      o.identifier,
+      o.product_name,
+      o.customer_name,
+      o.customer_phone,
+      Number(o.amount).toFixed(2),
+      statusConfig[o.payment_status]?.label || o.payment_status,
+      format(new Date(o.created_at), "dd/MM/yyyy HH:mm"),
+      o.paid_at ? format(new Date(o.paid_at), "dd/MM/yyyy HH:mm") : '',
+    ]);
+
+    const csv = [headers, ...rows].map(row => row.map(v => `"${v}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pedidos-pix-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: '📥 CSV exportado!' });
+  };
+
   return (
     <div className="space-y-6">
-      {/* ── Revenue Cards ── */}
+      {/* Revenue Cards */}
       <div>
         <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
           <DollarSign className="h-3.5 w-3.5" /> Faturamento
@@ -204,7 +230,7 @@ export function AdminPixOrders() {
         </div>
       </div>
 
-      {/* ── Metrics Cards ── */}
+      {/* Metrics Cards */}
       <div>
         <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
           <BarChart3 className="h-3.5 w-3.5" /> Métricas
@@ -222,8 +248,19 @@ export function AdminPixOrders() {
         </div>
       </div>
 
-      {/* ── Filters ── */}
+      {/* Search + Filters */}
       <div className="space-y-3">
+        {/* Search bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, telefone ou produto..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9 h-10"
+          />
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground mr-1">Período:</span>
           {periodFilters.map(f => (
@@ -240,9 +277,14 @@ export function AdminPixOrders() {
               {f.label}
             </button>
           ))}
-          <Button size="sm" variant="ghost" onClick={fetchOrders} className="ml-auto h-8 px-2" disabled={loading}>
-            <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
-          </Button>
+          <div className="flex gap-2 ml-auto">
+            <Button size="sm" variant="outline" onClick={exportCSV} className="h-8 px-3 text-xs border-primary/30 text-primary">
+              <Download className="h-3.5 w-3.5 mr-1" /> CSV
+            </Button>
+            <Button size="sm" variant="ghost" onClick={fetchOrders} className="h-8 px-2" disabled={loading}>
+              <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
+            </Button>
+          </div>
         </div>
 
         {periodFilter === 'custom' && (
@@ -276,7 +318,7 @@ export function AdminPixOrders() {
         </div>
       </div>
 
-      {/* ── Orders Table / Cards ── */}
+      {/* Orders */}
       {loading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />

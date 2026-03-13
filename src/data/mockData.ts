@@ -232,6 +232,9 @@ export interface NinjaSettings {
   desktopSize: number;
   mobileSize: number;
 
+  // Testing
+  testMode: boolean;
+
   stats: {
     totalAppearances: number;
     totalClicks: number;
@@ -531,5 +534,7 @@ export const defaultSettings: Settings = {
       checkoutAppearances: 0,
       checkoutClicks: 0,
     },
+
+    testMode: false,
   },
 };

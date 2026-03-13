@@ -1,13 +1,32 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, X, ShoppingBag, Sparkles } from 'lucide-react';
+import { Copy, Check, X, ShoppingBag, Sparkles, Loader2 } from 'lucide-react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '@/context/StoreContext';
-import { NinjaRewardTier } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 
 const COOLDOWN_KEY = 'ninja3d_cooldown_ts';
 const SESSION_KEY = 'ninja3d_session_done';
+const VISITOR_KEY = 'ninja_visitor_id';
+
+function getVisitorId(): string {
+  let id = localStorage.getItem(VISITOR_KEY);
+  if (!id) {
+    id = 'v_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
+    localStorage.setItem(VISITOR_KEY, id);
+  }
+  return id;
+}
+
+function getSessionId(): string {
+  let id = sessionStorage.getItem('ninja_session_id');
+  if (!id) {
+    id = 's_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('ninja_session_id', id);
+  }
+  return id;
+}
 
 /* ─── Procedural 3D Cyber Ninja Model ─── */
 function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean }) {
@@ -44,18 +63,16 @@ function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean 
     const t = timeRef.current;
 
     if (dodging) {
-      // Spinning jump: full Y rotation + vertical arc
-      spinRef.current += delta * 14; // fast spin
+      spinRef.current += delta * 14;
       groupRef.current.rotation.y = spinRef.current;
       groupRef.current.position.y = Math.sin(Math.min(spinRef.current / 3, Math.PI)) * 0.4;
     } else {
-      // Ease spin back to 0
       spinRef.current = 0;
       if (idle) {
         groupRef.current.position.y = Math.sin(t * 2) * 0.05;
         groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
       } else {
-        groupRef.current.position.y *= 0.9; // settle down
+        groupRef.current.position.y *= 0.9;
         groupRef.current.rotation.y *= 0.9;
       }
     }
@@ -119,10 +136,8 @@ function MotionTrail({ positions, size }: { positions: { x: number; y: number }[
           key={`trail-${i}`}
           className="fixed pointer-events-none z-[64] rounded-full"
           style={{
-            width: size * 0.5,
-            height: size * 0.5,
-            left: p.x - size * 0.25,
-            top: p.y - size * 0.25,
+            width: size * 0.5, height: size * 0.5,
+            left: p.x - size * 0.25, top: p.y - size * 0.25,
             background: 'radial-gradient(circle, rgba(18,181,255,0.2), transparent 70%)',
           }}
           initial={{ opacity: 0.5, scale: 1 }}
@@ -133,6 +148,7 @@ function MotionTrail({ positions, size }: { positions: { x: number; y: number }[
     </>
   );
 }
+
 function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
   return (
     <div className="fixed pointer-events-none z-[80]" style={{ left: x - size / 2, top: y - size / 2, width: size * 2, height: size * 2 }}>
@@ -150,13 +166,6 @@ function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
   );
 }
 
-function pickWeightedReward(tiers: NinjaRewardTier[]): NinjaRewardTier {
-  const totalWeight = tiers.reduce((sum, t) => sum + t.weight, 0);
-  let roll = Math.random() * totalWeight;
-  for (const tier of tiers) { roll -= tier.weight; if (roll <= 0) return tier; }
-  return tiers[tiers.length - 1];
-}
-
 function getRandomPosition(s: number) {
   const vw = window.innerWidth; const vh = window.innerHeight;
   return { x: s + Math.random() * (vw - s * 2), y: s + Math.random() * (vh - s * 2) };
@@ -169,11 +178,16 @@ function getDodgePosition(cx: number, cy: number, s: number) {
   return { x: Math.max(s, Math.min(vw - s, cx + ox)), y: Math.max(s, Math.min(vh - s, cy + oy)) };
 }
 
+interface Ninja3DProps {
+  productId?: string;
+}
+
 /* ─── Main Component ─── */
-export function Ninja3D() {
+export function Ninja3D({ productId }: Ninja3DProps) {
   const { settings, setSettings } = useStore();
   const ninja = settings.ninjaSettings;
   const enabled = ninja.enabled ?? true;
+  const testMode = ninja.testMode ?? false;
   const ninjaSize = ninja.ninjaSize || 80;
   const cooldownMinutes = ninja.cooldownMinutes ?? 2;
 
@@ -185,6 +199,7 @@ export function Ninja3D() {
   const [copied, setCopied] = useState(false);
   const [rewardCode, setRewardCode] = useState('');
   const [rewardLabel, setRewardLabel] = useState('');
+  const [rewardLoading, setRewardLoading] = useState(false);
   const [smokePos, setSmokePos] = useState({ x: 0, y: 0 });
   const [trailPositions, setTrailPositions] = useState<{ x: number; y: number }[]>([]);
   const [trailKey, setTrailKey] = useState(0);
@@ -196,9 +211,7 @@ export function Ninja3D() {
   const startedRef = useRef(false);
   const posRef = useRef(pos);
   posRef.current = pos;
-  const trailHistoryRef = useRef<{ x: number; y: number }[]>([]);
 
-  // Use ref to avoid re-triggering effect when settings load
   const settingsRef = useRef(ninja);
   settingsRef.current = ninja;
 
@@ -209,30 +222,24 @@ export function Ninja3D() {
     }));
   }, [setSettings]);
 
-  // Emit trail particles from a position
   const emitTrail = useCallback((from: { x: number; y: number }) => {
-    // Generate interpolated trail points
     const points: { x: number; y: number }[] = [];
     for (let i = 0; i < 5; i++) {
-      points.push({
-        x: from.x + (Math.random() - 0.5) * 15,
-        y: from.y + (Math.random() - 0.5) * 15,
-      });
+      points.push({ x: from.x + (Math.random() - 0.5) * 15, y: from.y + (Math.random() - 0.5) * 15 });
     }
-    trailHistoryRef.current = points;
     setTrailPositions(points);
     setTrailKey(k => k + 1);
   }, []);
 
-  // Single entry effect - runs once on mount
+  // Single entry effect
   useEffect(() => {
     mountedRef.current = true;
     if (startedRef.current) return;
     if (!enabled) return;
 
-    // Check cooldowns - ?ninja=1 bypasses for testing
+    // Check cooldowns — testMode or ?ninja=1 bypasses
     const urlParams = new URLSearchParams(window.location.search);
-    const debugMode = urlParams.get('ninja') === '1';
+    const debugMode = urlParams.get('ninja') === '1' || testMode;
     if (!debugMode) {
       if (sessionStorage.getItem(SESSION_KEY) === 'true') return;
       const lastTs = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10);
@@ -240,12 +247,14 @@ export function Ninja3D() {
     }
 
     startedRef.current = true;
-    const delay = 3000 + Math.random() * 3000;
+    const delay = testMode ? 1500 : (3000 + Math.random() * 3000);
 
     const timer = setTimeout(() => {
       if (!mountedRef.current) return;
-      sessionStorage.setItem(SESSION_KEY, 'true');
-      localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+      if (!testMode) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
+        localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+      }
       incrementStat('totalAppearances');
 
       const vw = window.innerWidth;
@@ -260,19 +269,15 @@ export function Ninja3D() {
       setPos(starts[side]);
       setPhase('active');
 
-      // Move to first visible position
       setTimeout(() => {
         if (!mountedRef.current) return;
         const first = getRandomPosition(ninjaSize);
         emitTrail(starts[side]);
         setPos(first);
         posRef.current = first;
-
-        // After arriving, become idle
         setTimeout(() => { if (mountedRef.current) setIsIdle(true); }, 1500);
       }, 50);
 
-      // Periodic movement
       moveIntervalRef.current = setInterval(() => {
         if (!mountedRef.current) return;
         setIsIdle(false);
@@ -283,7 +288,6 @@ export function Ninja3D() {
         setTimeout(() => { if (mountedRef.current) setIsIdle(true); }, 1200);
       }, 3500);
 
-      // Auto-disappear
       autoHideRef.current = setTimeout(() => {
         if (!mountedRef.current) return;
         if (moveIntervalRef.current) clearInterval(moveIntervalRef.current);
@@ -300,7 +304,40 @@ export function Ninja3D() {
       if (autoHideRef.current) clearTimeout(autoHideRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, testMode]);
+
+  const generateRewardFromBackend = useCallback(async () => {
+    setRewardLoading(true);
+    try {
+      const pid = productId || 'general';
+      const sessionId = getSessionId();
+      const visitorId = getVisitorId();
+
+      const { data, error } = await supabase.functions.invoke('generate-ninja-coupon', {
+        body: { product_id: pid, session_id: sessionId, visitor_id: visitorId },
+      });
+
+      if (error || !data?.code) {
+        // Fallback: show generic message if backend fails
+        console.error('Ninja coupon generation failed:', error || data?.error);
+        setRewardCode('');
+        setRewardLabel(data?.error || 'Tente novamente mais tarde');
+        setRewardOpen(true);
+        setTimeout(() => { if (mountedRef.current) setRewardOpen(false); }, 8000);
+        return;
+      }
+
+      setRewardCode(data.code);
+      setRewardLabel(data.label || `${data.discount_percentage}% OFF`);
+      setRewardOpen(true);
+      incrementStat('couponsGenerated');
+      setTimeout(() => { if (mountedRef.current) setRewardOpen(false); }, 20000);
+    } catch (err) {
+      console.error('Ninja reward error:', err);
+    } finally {
+      setRewardLoading(false);
+    }
+  }, [productId, incrementStat]);
 
   const handleClick = useCallback(() => {
     if (phase !== 'active') return;
@@ -316,7 +353,7 @@ export function Ninja3D() {
       return;
     }
 
-    // Caught
+    // Caught!
     if (moveIntervalRef.current) clearInterval(moveIntervalRef.current);
     if (autoHideRef.current) clearTimeout(autoHideRef.current);
     incrementStat('totalClicks');
@@ -330,29 +367,14 @@ export function Ninja3D() {
       const s = settingsRef.current;
       const showReward = s.showReward ?? true;
       if (showReward) {
-        let code = ''; let label = '';
-        if (s.rewardTiers?.length > 0) {
-          const tier = pickWeightedReward(s.rewardTiers);
-          code = tier.code; label = tier.label;
-        } else if (s.discountCodes?.length > 0) {
-          code = s.discountCodes[Math.floor(Math.random() * s.discountCodes.length)];
-        } else {
-          const isRare = Math.random() < 0.1;
-          code = isRare ? 'C4NINJA10' : 'C4NINJA5';
-          label = isRare ? '🔥 10% Raro!' : '5% desconto';
-        }
-        if (code) {
-          setRewardCode(code);
-          setRewardLabel(label);
-          setRewardOpen(true);
-          incrementStat('couponsGenerated');
-          setTimeout(() => { if (mountedRef.current) setRewardOpen(false); }, 15000);
-        }
+        // Generate reward from backend (secure)
+        generateRewardFromBackend();
       }
     }, 700);
-  }, [phase, ninjaSize, incrementStat, emitTrail]);
+  }, [phase, ninjaSize, incrementStat, emitTrail, generateRewardFromBackend]);
 
   const handleCopyCode = () => {
+    if (!rewardCode) return;
     navigator.clipboard.writeText(rewardCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -386,7 +408,6 @@ export function Ninja3D() {
         )}
       </AnimatePresence>
 
-      {/* Motion trail */}
       {phase === 'active' && trailPositions.length > 0 && (
         <MotionTrail key={trailKey} positions={trailPositions} size={ninjaSize} />
       )}
@@ -414,35 +435,46 @@ export function Ninja3D() {
                   className="w-16 h-16 mx-auto rounded-full flex items-center justify-center"
                   style={{ background: 'radial-gradient(circle, rgba(18,181,255,0.15), rgba(18,181,255,0.05))', border: '1px solid rgba(18,181,255,0.25)', boxShadow: '0 0 20px rgba(18,181,255,0.2)' }}
                 >
-                  <Sparkles className="h-7 w-7 text-primary" />
+                  {rewardLoading ? <Loader2 className="h-7 w-7 text-primary animate-spin" /> : <Sparkles className="h-7 w-7 text-primary" />}
                 </motion.div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{ninja.rewardMessage || '🥷 Ninja encontrado!'}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Você desbloqueou um desconto secreto.</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {rewardLoading ? 'Gerando recompensa...' : (ninja.rewardMessage || '🥷 Ninja capturado!')}
+                  </p>
+                  {!rewardLoading && rewardCode && (
+                    <p className="text-xs text-muted-foreground mt-1">Cupom válido por 30 minutos.</p>
+                  )}
+                  {!rewardLoading && !rewardCode && rewardLabel && (
+                    <p className="text-xs text-muted-foreground mt-1">{rewardLabel}</p>
+                  )}
                 </div>
-                {rewardLabel && (
+                {rewardLabel && rewardCode && !rewardLoading && (
                   <motion.span initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                     className="inline-block text-[10px] font-bold px-3 py-1 rounded-full"
                     style={{ color: 'hsl(200, 100%, 70%)', background: 'rgba(18,181,255,0.1)', border: '1px solid rgba(18,181,255,0.2)' }}
                   >{rewardLabel}</motion.span>
                 )}
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
-                  className="rounded-xl px-5 py-3.5 font-mono text-xl font-black tracking-[0.15em]"
-                  style={{ background: 'rgba(18,181,255,0.06)', border: '1px solid rgba(18,181,255,0.15)', color: 'hsl(200, 100%, 85%)' }}
-                >{rewardCode}</motion.div>
-                <div className="flex flex-col gap-2 pt-1">
-                  <button onClick={handleCopyCode}
-                    className="inline-flex items-center justify-center gap-2 font-bold text-sm px-6 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
-                    style={{ background: 'linear-gradient(135deg, hsl(200, 100%, 50%), hsl(200, 100%, 38%))', color: 'white', boxShadow: '0 0 20px rgba(18,181,255,0.3)' }}
-                  >
-                    {copied ? <><Check className="h-4 w-4" /> Código copiado!</> : <><Copy className="h-4 w-4" /> Copiar código</>}
-                  </button>
-                  <button onClick={() => { handleCopyCode(); setRewardOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                    className="inline-flex items-center justify-center gap-2 text-xs transition-colors py-1.5" style={{ color: 'hsl(200, 100%, 65%)' }}
-                  >
-                    <ShoppingBag className="h-3.5 w-3.5" /> Usar desconto agora
-                  </button>
-                </div>
+                {rewardCode && !rewardLoading && (
+                  <>
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
+                      className="rounded-xl px-5 py-3.5 font-mono text-xl font-black tracking-[0.15em]"
+                      style={{ background: 'rgba(18,181,255,0.06)', border: '1px solid rgba(18,181,255,0.15)', color: 'hsl(200, 100%, 85%)' }}
+                    >{rewardCode}</motion.div>
+                    <div className="flex flex-col gap-2 pt-1">
+                      <button onClick={handleCopyCode}
+                        className="inline-flex items-center justify-center gap-2 font-bold text-sm px-6 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
+                        style={{ background: 'linear-gradient(135deg, hsl(200, 100%, 50%), hsl(200, 100%, 38%))', color: 'white', boxShadow: '0 0 20px rgba(18,181,255,0.3)' }}
+                      >
+                        {copied ? <><Check className="h-4 w-4" /> Código copiado!</> : <><Copy className="h-4 w-4" /> Copiar código</>}
+                      </button>
+                      <button onClick={() => { handleCopyCode(); setRewardOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="inline-flex items-center justify-center gap-2 text-xs transition-colors py-1.5" style={{ color: 'hsl(200, 100%, 65%)' }}
+                      >
+                        <ShoppingBag className="h-3.5 w-3.5" /> Usar desconto agora
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

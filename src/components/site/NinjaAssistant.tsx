@@ -34,9 +34,10 @@ function incrementDayCount(key: string) {
 
 interface NinjaAssistantProps {
   context?: 'homepage' | 'product' | 'checkout';
+  productId?: string;
 }
 
-export function NinjaAssistant({ context = 'homepage' }: NinjaAssistantProps) {
+export function NinjaAssistant({ context = 'homepage', productId }: NinjaAssistantProps) {
   const { settings, setSettings } = useStore();
   const ninja = settings.ninjaSettings;
 
@@ -267,7 +268,7 @@ export function NinjaAssistant({ context = 'homepage' }: NinjaAssistantProps) {
   return (
     <>
       {/* Coupon Hunter (3D Ninja mascot) */}
-      {showCouponHunter && context !== 'checkout' && <Ninja3D />}
+      {showCouponHunter && context !== 'checkout' && <Ninja3D productId={productId} />}
 
       {/* Promo / Checkout bubble */}
       <NinjaBubble

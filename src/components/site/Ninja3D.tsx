@@ -187,7 +187,7 @@ export function Ninja3D({ productId }: Ninja3DProps) {
   const { settings, setSettings } = useStore();
   const ninja = settings.ninjaSettings;
   const enabled = ninja.enabled ?? true;
-  const testMode = (ninja as any).testMode ?? false;
+  const testMode = ninja.testMode ?? false;
   const ninjaSize = ninja.ninjaSize || 80;
   const cooldownMinutes = ninja.cooldownMinutes ?? 2;
 

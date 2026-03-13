@@ -1,8 +1,3 @@
-/**
- * ⚠️ TEMPORARY MVP AUTH GUARD - NOT FOR PRODUCTION ⚠️
- * Uses sessionStorage check only. Replace with real backend auth before launch.
- */
-
 import { useState, useMemo } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
@@ -11,8 +6,9 @@ import {
   TrendingUp, Calendar, Award, DollarSign, FileText,
   LayoutDashboard, RefreshCw, MessageSquare,
 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
-import { isAdminAuthenticated, clearAdminSession } from '@/lib/adminAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { AdminProducts } from '@/components/admin/AdminProducts';
 import { AdminCategories } from '@/components/admin/AdminCategories';
 import { AdminMethods } from '@/components/admin/AdminMethods';
@@ -50,6 +46,7 @@ const groups = ['Visão Geral', 'Loja', 'Operação', 'Marketing', 'Configuraç�
 export default function AdminPage() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const store = useStore();
+  const { user, isAdmin, loading, signOut } = useAuth();
 
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -59,17 +56,22 @@ export default function AdminPage() {
     return { ordersToday, ordersWeek };
   }, [store.orders]);
 
-  if (!isAdminAuthenticated()) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
     return <Navigate to="/admin/login" replace />;
   }
 
-  const handleLogout = () => {
-    clearAdminSession();
+  const handleLogout = async () => {
+    await signOut();
     window.location.href = '/admin/login';
   };
-
-
-
 
   const renderModule = () => {
     switch (activeModule) {
@@ -130,7 +132,6 @@ export default function AdminPage() {
       </header>
 
       <div className="container py-6">
-        {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
@@ -148,7 +149,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Grouped Modules */}
         {groups.map(group => {
           const groupModules = modules.filter(m => m.group === group);
           return (

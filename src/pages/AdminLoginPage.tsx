@@ -1,8 +1,3 @@
-/**
- * ⚠️ TEMPORARY MVP LOGIN - NOT FOR PRODUCTION ⚠️
- * Uses client-side validation only. Replace with real backend auth before launch.
- */
-
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,39 +5,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import {
-  validateAdminCredentials,
-  setAdminSession,
-  isAdminAuthenticated,
-} from '@/lib/adminAuth';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState('');
+  const { user, isAdmin, loading, signIn } = useAuth();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  if (isAdminAuthenticated()) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (user && isAdmin) {
     return <Navigate to="/admin" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       toast({ title: 'Preencha todos os campos', variant: 'destructive' });
       return;
     }
     setSubmitting(true);
-    const valid = await validateAdminCredentials(username.trim(), password.trim());
+    const { error } = await signIn(email.trim(), password.trim());
     setSubmitting(false);
-    if (valid) {
-      setAdminSession();
-      window.location.href = '/admin';
-    } else {
-      toast({
-        title: 'Usuário ou senha inválidos',
-        variant: 'destructive',
-      });
+    if (error) {
+      toast({ title: 'Credenciais inválidas', description: error, variant: 'destructive' });
     }
+    // If sign-in succeeds, onAuthStateChange will update user/isAdmin and trigger the redirect above
   };
 
   return (
@@ -57,17 +52,23 @@ export default function AdminLoginPage() {
             <p className="text-sm text-muted-foreground mt-1">Faça login para acessar</p>
           </div>
 
+          {user && !isAdmin && (
+            <div className="text-center p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+              <p className="text-sm text-destructive">Sua conta não tem permissão de administrador.</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="username">Usuário</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                placeholder="Usuário"
+                id="email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="admin@example.com"
                 className="mt-1"
-                autoComplete="username"
+                autoComplete="email"
               />
             </div>
             <div>

@@ -36,7 +36,6 @@ const App = () => (
           <BrowserRouter>
             <FloatingNinjaGuard />
             <Routes>
-            <Routes>
               <Route path="/" element={<ShopPage />} />
               <Route path="/produto/:id" element={<ProductPage />} />
               <Route path="/metodos" element={<MethodsPage />} />

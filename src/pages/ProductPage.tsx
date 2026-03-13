@@ -176,7 +176,7 @@ export default function ProductPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="aspect-video rounded-xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative"
+          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-primary/10 shadow-lg shadow-primary/5"
         >
           {product.image ? (
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />

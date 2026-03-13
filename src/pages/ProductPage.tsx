@@ -44,7 +44,9 @@ export default function ProductPage() {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
 
-  // Show sticky bar when main CTA scrolls out of view
+  // Scroll to top on mount / route change
+  useLayoutEffect(() => { window.scrollTo(0, 0); }, [id]);
+
   useEffect(() => {
     if (!ctaRef.current) return;
     const observer = new IntersectionObserver(

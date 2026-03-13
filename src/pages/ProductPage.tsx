@@ -381,7 +381,7 @@ export default function ProductPage() {
         {/* Customer Reviews */}
         <AnimatedSection className="mb-8">
           <h3 className="font-serif font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-            <MessageCircle className="h-4 w-4 text-primary" /> Avaliações de clientes
+            <MessageCircle className="h-4 w-4 text-foreground/60" /> Avaliações de clientes
           </h3>
           <div className="space-y-2.5">
             {settings.fakeReviews.map((review, i) => (

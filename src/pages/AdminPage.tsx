@@ -140,12 +140,12 @@ export default function AdminPage() {
       </header>
 
       <div className="container py-6">
-        {/* Statistics */}
+        {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Hoje</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Pedidos Hoje</p>
             </div>
             <p className="text-2xl font-bold text-primary">{stats.ordersToday}</p>
           </div>
@@ -156,38 +156,32 @@ export default function AdminPage() {
             </div>
             <p className="text-2xl font-bold text-primary">{stats.ordersWeek}</p>
           </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <CalendarDays className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Mês</p>
-            </div>
-            <p className="text-2xl font-bold text-primary">{stats.ordersMonth}</p>
-          </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Award className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Top produto</p>
-            </div>
-            <p className="text-sm font-bold text-primary truncate">{stats.topProduct}</p>
-          </div>
         </div>
 
-        <h2 className="font-serif text-lg font-semibold mb-4">Módulos</h2>
-        <div className="grid gap-2">
-          {modules.map(mod => (
-            <button
-              key={mod.id}
-              onClick={() => setActiveModule(mod.id)}
-              className="flex items-center justify-between p-4 rounded-xl glass-card hover:border-primary/30 transition-colors w-full text-left"
-            >
-              <div className="flex items-center gap-3">
-                <mod.icon className="h-5 w-5 text-primary" />
-                <span className="font-medium">{mod.label}</span>
+        {/* Grouped Modules */}
+        {groups.map(group => {
+          const groupModules = modules.filter(m => m.group === group);
+          return (
+            <div key={group} className="mb-6">
+              <h2 className="font-serif text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">{group}</h2>
+              <div className="grid gap-2">
+                {groupModules.map(mod => (
+                  <button
+                    key={mod.id}
+                    onClick={() => setActiveModule(mod.id)}
+                    className="flex items-center justify-between p-4 rounded-xl glass-card hover:border-primary/30 transition-colors w-full text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <mod.icon className="h-5 w-5 text-primary" />
+                      <span className="font-medium">{mod.label}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                ))}
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

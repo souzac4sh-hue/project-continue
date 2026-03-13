@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   try {
     const { productId, productName, amount, customerName, customerPhone, customerEmail, customerDocument, couponCode, discountAmount } = await req.json()
 
-    if (!productName || !amount || !customerName || !customerPhone) {
+    if (!productId || !customerName || !customerPhone) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -23,20 +23,70 @@ Deno.serve(async (req) => {
     // Sanitize inputs
     const cleanPhone = customerPhone.replace(/\D/g, '')
     const cleanName = customerName.trim().substring(0, 100)
-    let cleanAmount = Math.round(parseFloat(amount) * 100) / 100
 
-    if (cleanAmount <= 0 || cleanAmount > 50000) {
-      return new Response(JSON.stringify({ error: 'Invalid amount' }), {
+    // Initialize Supabase client
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+
+    // ── SERVER-SIDE PRICE VALIDATION ──
+    // Look up the real product price from site_config instead of trusting client
+    const { data: configData, error: configError } = await supabase
+      .from('site_config')
+      .select('settings')
+      .eq('id', 'main')
+      .maybeSingle()
+
+    if (configError || !configData?.settings) {
+      console.error('Failed to load site config for price validation:', configError)
+      return new Response(JSON.stringify({ error: 'Unable to validate product price' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const siteData = configData.settings as Record<string, unknown>
+    const products = (siteData.products as Array<Record<string, unknown>>) || []
+    const product = products.find((p) => p.id === productId)
+
+    if (!product) {
+      console.error('Product not found for price validation:', productId)
+      return new Response(JSON.stringify({ error: 'Product not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (product.status !== 'active') {
+      return new Response(JSON.stringify({ error: 'Product is not available' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Initialize Supabase client for coupon validation
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    )
+    // Determine the real price from DB (use promotion price if active)
+    const hasPromo = product.promotion && product.promotionPrice
+    const realPrice = hasPromo
+      ? Math.round(parseFloat(String(product.promotionPrice)) * 100) / 100
+      : Math.round(parseFloat(String(product.price)) * 100) / 100
+    const realProductName = String(product.name || productName)
+
+    if (realPrice <= 0 || realPrice > 50000) {
+      return new Response(JSON.stringify({ error: 'Invalid product price' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    let cleanAmount = realPrice
+    const originalAmount = realPrice
+
+    // Log if client sent a different amount (potential tampering attempt)
+    const clientAmount = Math.round(parseFloat(amount) * 100) / 100
+    if (Math.abs(clientAmount - realPrice) > 0.01) {
+      console.warn(`Price mismatch detected! Client sent ${clientAmount}, real price is ${realPrice} for product ${productId}`)
+    }
 
     // Validate and apply coupon server-side
     let validatedCouponCode: string | null = null
@@ -88,7 +138,7 @@ Deno.serve(async (req) => {
 
     // Call SigiloPay API to create Pix charge
     const apiUrl = 'https://app.sigilopay.com.br/api/v1/gateway/pix/receive'
-    console.log('Calling SigiloPay:', apiUrl, 'with amount:', cleanAmount)
+    console.log('Calling SigiloPay:', apiUrl, 'with validated amount:', cleanAmount, '(original price:', originalAmount, ')')
 
     const sigiloResponse = await fetch(apiUrl, {
       method: 'POST',
@@ -143,12 +193,11 @@ Deno.serve(async (req) => {
     }
 
     const pixAmount = (pixData?.amount as number) || (sigiloData?.amount as number) || cleanAmount
-    const originalAmount = parseFloat(amount)
 
     const { error: dbError } = await supabase.from('pix_orders').insert({
       identifier,
-      product_id: productId || 'unknown',
-      product_name: productName,
+      product_id: productId,
+      product_name: realProductName,
       product_price: originalAmount,
       amount: cleanAmount,
       pix_amount: pixAmount,
@@ -183,7 +232,7 @@ Deno.serve(async (req) => {
       orderId: identifier,
       pixCode,
       amount: pixAmount,
-      productName,
+      productName: realProductName,
       productPrice: originalAmount,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -270,7 +270,7 @@ export default function PixCheckoutPage() {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Valor</p>
-              <p className="font-bold text-primary text-xl">R$ {amount.toFixed(2)}</p>
+              <p className="font-bold text-foreground text-xl">R$ {amount.toFixed(2)}</p>
             </div>
           </div>
 

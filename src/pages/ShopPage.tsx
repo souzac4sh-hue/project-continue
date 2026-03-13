@@ -103,7 +103,7 @@ export default function ShopPage() {
       <SiteFooter />
       <FloatingButtons />
       <FloatingNotifications />
-      <NinjaMascot />
+      <Ninja3D />
     </div>
   );
 }

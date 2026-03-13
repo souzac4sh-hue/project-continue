@@ -59,8 +59,8 @@ export default function PixCheckoutPage() {
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 
-  // Debug state
-  const DEBUG_PIX = true;
+  // Debug only with ?debug=1
+  const DEBUG_PIX = searchParams.get('debug') === '1';
   const [debugInfo, setDebugInfo] = useState({
     pollCount: 0,
     lastCheck: '',

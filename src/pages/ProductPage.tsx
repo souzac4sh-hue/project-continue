@@ -344,7 +344,7 @@ export default function ProductPage() {
           <Button
             onClick={() => setBuyOpen(true)}
             disabled={settings.storeMode === 'offline'}
-            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-black/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
           </Button>

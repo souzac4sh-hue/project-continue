@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, Play, Users, Check, ShieldCheck, Zap, Clock, TrendingUp, MessageCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { trackCheckoutEvent } from '@/lib/checkoutTracker';
 import { useStore } from '@/context/StoreContext';

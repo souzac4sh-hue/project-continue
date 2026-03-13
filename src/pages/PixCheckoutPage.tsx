@@ -162,6 +162,7 @@ export default function PixCheckoutPage() {
   // Auto redirect to WhatsApp on payment
   useEffect(() => {
     if (state !== 'paid' || !orderId || !productName) return;
+    trackCheckoutEvent(orderId, 'whatsapp_redirected');
     const whatsappUrl = buildWhatsAppUrl(settings.whatsappNumber, orderId, productName);
     const timer = setTimeout(() => { window.open(whatsappUrl, '_blank'); }, 4000);
     return () => clearTimeout(timer);

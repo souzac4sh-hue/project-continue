@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/context/StoreContext';
+import { HeroParticles } from './HeroParticles';
 
 export function HeroCarousel() {
   const { heroBanners, settings } = useStore();

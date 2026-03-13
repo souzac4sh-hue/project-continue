@@ -6,19 +6,22 @@ const trustItems = [
     icon: Zap,
     title: 'Entrega imediata',
     description: 'Receba seu pacote rapidamente após confirmação.',
-    color: '#f59e0b',
+    color: 'hsl(200, 100%, 50%)',
+    bg: 'hsl(200, 100%, 50%, 0.12)',
   },
   {
     icon: Shield,
     title: 'Segurança total',
     description: 'Seus dados são protegidos durante todo o processo.',
-    color: '#10b981',
+    color: 'hsl(160, 70%, 45%)',
+    bg: 'hsl(160, 70%, 45%, 0.12)',
   },
   {
     icon: CreditCard,
     title: 'Pagamento via Pix',
     description: 'Pagamento simples, rápido e sem complicação.',
-    color: '#3b82f6',
+    color: 'hsl(210, 100%, 55%)',
+    bg: 'hsl(210, 100%, 55%, 0.12)',
   },
 ];
 

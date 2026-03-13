@@ -540,15 +540,15 @@ export default function PixCheckoutPage() {
 
             <div className="space-y-2">
               <GuidanceItem
-                icon={<CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                icon={<CheckCircle2 className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip1}
               />
               <GuidanceItem
-                icon={<Smartphone className="h-3.5 w-3.5 text-primary" />}
+                icon={<Smartphone className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip2}
               />
               <GuidanceItem
-                icon={<RefreshCw className="h-3.5 w-3.5 text-primary" />}
+                icon={<RefreshCw className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip3}
               />
             </div>

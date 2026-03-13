@@ -9,15 +9,7 @@ import { useState } from 'react';
 
 export function AdminNinja() {
   const { settings, setSettings, saveAll } = useStore();
-  const ninja = (settings as any).ninjaSettings || {
-    enabled: true,
-    frequencyMin: 3,
-    frequencyMax: 5,
-    cooldownMinutes: 10,
-    discountCodes: ['NINJA5'],
-    rewardMessage: '🥷 Você capturou o Ninja! Aqui está seu cupom de desconto:',
-    showReward: true,
-  };
+  const ninja = settings.ninjaSettings;
 
   const [saving, setSaving] = useState(false);
   const [newCode, setNewCode] = useState('');

@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
     // Generate the reward server-side
     const discount = pickDiscount();
     const code = generateCode();
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min
 
     const { data: coupon, error: insertError } = await supabase
       .from("ninja_coupons")

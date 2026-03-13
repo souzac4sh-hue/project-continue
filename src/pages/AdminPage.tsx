@@ -52,13 +52,27 @@ export default function AdminPage() {
   const store = useStore();
   const { user, isAdmin, loading, signOut } = useAuth();
 
-  const stats = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
-    const ordersToday = store.orders.filter(o => o.date >= today).length;
-    const ordersWeek = store.orders.filter(o => o.date >= weekAgo).length;
-    return { ordersToday, ordersWeek };
-  }, [store.orders]);
+  const [stats, setStats] = useState({ ordersToday: 0, ordersWeek: 0 });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data } = await supabase
+        .from('pix_orders')
+        .select('created_at')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (!data) return;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const weekAgo = new Date(Date.now() - 7 * 86400000);
+      setStats({
+        ordersToday: data.filter(o => new Date(o.created_at) >= today).length,
+        ordersWeek: data.filter(o => new Date(o.created_at) >= weekAgo).length,
+      });
+    };
+    loadStats();
+  }, []);
 
   if (loading) {
     return (

@@ -475,11 +475,61 @@ export const defaultSettings: Settings = {
     ],
     rewardMessage: '🥷 Você encontrou o Ninja da C4SH!',
     showReward: true,
+
+    stateIdle: true,
+    statePromo: true,
+    stateCouponHunter: true,
+    stateCheckoutHelper: true,
+    stateRareEvent: true,
+    rareEventChance: 5,
+
+    showOnHomepage: true,
+    showOnProductPage: true,
+    showOnCheckout: true,
+
+    promoEnabled: true,
+    promoMessages: [
+      { id: '1', text: '🥷 Oferta especial liberada hoje.', active: true },
+      { id: '2', text: '🥷 Promoção ativa por tempo limitado.', active: true },
+      { id: '3', text: '🥷 Desconto secreto disponível agora.', active: true },
+      { id: '4', text: '🥷 Esse produto está com alta procura.', active: true },
+    ],
+    promoFrequencySeconds: 60,
+    promoCooldownMinutes: 30,
+    promoIncludesCoupon: false,
+    promoDisplayStyle: 'bubble',
+
+    checkoutEnabled: true,
+    checkoutDelaySeconds: 8,
+    checkoutInactivitySeconds: 15,
+    checkoutMaxAppearances: 2,
+    checkoutMessages: [
+      { id: '1', text: '🥷 Pagando agora você garante sua vaga.', active: true },
+      { id: '2', text: '🥷 Estoque limitado — finalize agora.', active: true },
+      { id: '3', text: '🥷 Confirmação instantânea após o pagamento.', active: true },
+      { id: '4', text: '🥷 Quer um incentivo? Tente me clicar.', active: true },
+    ],
+    checkoutCanRevealCoupon: true,
+
+    couponDeliveryEnabled: true,
+    couponMaxPerSession: 1,
+    couponMaxPerDay: 2,
+    couponAutoCopy: true,
+    couponAutoApply: false,
+
+    glowStrength: 60,
+    movementRange: 200,
+    desktopSize: 80,
+    mobileSize: 64,
+
     stats: {
       totalAppearances: 0,
       totalClicks: 0,
       couponsGenerated: 0,
       couponsRedeemed: 0,
+      promoAlertsShown: 0,
+      checkoutAppearances: 0,
+      checkoutClicks: 0,
     },
   },
 };

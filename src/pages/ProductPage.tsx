@@ -176,23 +176,26 @@ export default function ProductPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-primary/10 shadow-lg shadow-primary/5"
+          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-border/30 shadow-lg shadow-black/30"
         >
           {product.image ? (
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
           ) : (
-            <ShoppingBag className="h-16 w-16 text-muted-foreground/20" />
+            <div className="flex flex-col items-center gap-3">
+              <ShoppingBag className="h-16 w-16 text-muted-foreground/10" />
+              <span className="text-xs text-muted-foreground/30">Imagem do produto</span>
+            </div>
           )}
-          {/* Live badge - reflects store mode */}
-          <div className={`absolute top-3 right-3 flex items-center gap-1.5 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-full border ${
+          {/* Live badge */}
+          <div className={`absolute top-3 right-3 flex items-center gap-1.5 bg-background/70 backdrop-blur-md px-2.5 py-1 rounded-full border ${
             settings.storeMode === 'offline' ? 'border-destructive/30' :
-            settings.storeMode === 'busy' ? 'border-yellow-500/30' : 'border-primary/20'
+            settings.storeMode === 'busy' ? 'border-yellow-500/30' : 'border-border/30'
           }`}>
             <span className={`h-2 w-2 rounded-full ${
               settings.storeMode === 'offline' ? 'bg-destructive' :
-              settings.storeMode === 'busy' ? 'bg-yellow-500' : 'bg-green-500 animate-pulse'
+              settings.storeMode === 'busy' ? 'bg-yellow-500' : 'bg-emerald-400 animate-pulse'
             }`} />
-            <span className="text-[10px] font-bold text-foreground/80">
+            <span className="text-[10px] font-bold text-foreground/70">
               {settings.storeMode === 'offline' ? 'OFFLINE' : settings.storeMode === 'busy' ? 'OCUPADO' : 'ONLINE'}
             </span>
           </div>

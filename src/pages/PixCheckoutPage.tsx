@@ -522,7 +522,7 @@ export default function PixCheckoutPage() {
                 variant="outline"
                 size="sm"
                 className="w-full h-9 text-xs border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => window.open(supportUrl, '_blank')}
+                onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
               >
                 <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                 Falar com suporte no WhatsApp

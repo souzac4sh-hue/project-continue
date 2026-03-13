@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, password, replace_user_id } = await req.json();
+    const { email, password } = await req.json();
 
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email and password required" }), {
@@ -26,24 +26,18 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // If replacing, delete old admin role and user
-    if (replace_user_id) {
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", replace_user_id).eq("role", "admin");
-      await supabaseAdmin.auth.admin.deleteUser(replace_user_id);
-    } else {
-      // Check if any admin already exists
-      const { data: existingAdmins } = await supabaseAdmin
-        .from("user_roles")
-        .select("id")
-        .eq("role", "admin")
-        .limit(1);
+    // Check if any admin already exists
+    const { data: existingAdmins } = await supabaseAdmin
+      .from("user_roles")
+      .select("id")
+      .eq("role", "admin")
+      .limit(1);
 
-      if (existingAdmins && existingAdmins.length > 0) {
-        return new Response(JSON.stringify({ error: "Admin already exists" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    if (existingAdmins && existingAdmins.length > 0) {
+      return new Response(JSON.stringify({ error: "Admin already exists" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Create user

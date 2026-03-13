@@ -32,7 +32,7 @@ const modules = [
   { id: 'products', label: 'Produtos', icon: ShoppingBag, group: 'Loja' },
   { id: 'categories', label: 'Categorias', icon: Layers, group: 'Loja' },
   { id: 'banners', label: 'Banners Hero', icon: Image, group: 'Loja' },
-  { id: 'orders', label: 'Pedidos', icon: ClipboardList, group: 'Operação' },
+  
   { id: 'pix_orders', label: 'Financeiro Pix', icon: DollarSign, group: 'Operação' },
   { id: 'recovery', label: 'Recuperação', icon: RefreshCw, group: 'Operação' },
   { id: 'recovery_settings', label: 'Config. Recuperação', icon: MessageSquare, group: 'Operação' },

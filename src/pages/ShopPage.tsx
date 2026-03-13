@@ -98,6 +98,7 @@ export default function ShopPage() {
       <SiteFooter />
       <FloatingButtons />
       <FloatingNotifications />
+      <NinjaMascot />
     </div>
   );
 }

@@ -158,6 +158,16 @@ export interface ColorSettings {
 
 export type StoreMode = 'online' | 'busy' | 'offline';
 
+export interface NinjaSettings {
+  enabled: boolean;
+  frequencyMin: number;
+  frequencyMax: number;
+  cooldownMinutes: number;
+  discountCodes: string[];
+  rewardMessage: string;
+  showReward: boolean;
+}
+
 export interface Settings {
   purchaseMode: 'manual' | 'automatic';
   pixEnabled: boolean;
@@ -186,6 +196,7 @@ export interface Settings {
   telegramLink: string;
   instagramLink: string;
   colors: ColorSettings;
+  ninjaSettings: NinjaSettings;
 }
 
 export const BADGE_OPTIONS = [

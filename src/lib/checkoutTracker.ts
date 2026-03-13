@@ -1,13 +1,12 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database, Json } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
 
 type CheckoutEventType = Database['public']['Enums']['checkout_event_type'];
-type LeadStatus = Database['public']['Enums']['lead_status'];
 
 export async function trackCheckoutEvent(
   orderId: string,
   eventType: CheckoutEventType,
-  metadata?: Json,
+  metadata?: Record<string, unknown>,
   identifier?: string,
 ) {
   try {
@@ -24,21 +23,20 @@ export async function trackCheckoutEvent(
 
 export async function updateLeadStatus(
   orderId: string,
-  leadStatus: LeadStatus,
+  leadStatus: string,
   lastStep?: string,
   extraFields?: Record<string, unknown>,
 ) {
   try {
-    const updateData: Record<string, unknown> = {
-      lead_status: leadStatus,
-    };
-    if (lastStep) updateData.last_step = lastStep;
-    if (extraFields) Object.assign(updateData, extraFields);
-
-    await supabase
-      .from('pix_orders')
-      .update(updateData)
-      .eq('identifier', orderId);
+    await supabase.functions.invoke('update-checkout-status', {
+      body: {
+        action: 'update_lead_status',
+        orderId,
+        leadStatus,
+        lastStep,
+        extraFields,
+      },
+    });
   } catch (err) {
     console.error('Failed to update lead status:', err);
   }
@@ -46,16 +44,9 @@ export async function updateLeadStatus(
 
 export async function markPixCopied(orderId: string) {
   try {
-    await supabase
-      .from('pix_orders')
-      .update({
-        copied_pix: true,
-        copied_at: new Date().toISOString(),
-        lead_status: 'pix_copied' as LeadStatus,
-        last_step: 'pix_copied',
-      })
-      .eq('identifier', orderId);
-    await trackCheckoutEvent(orderId, 'pix_copied');
+    await supabase.functions.invoke('update-checkout-status', {
+      body: { action: 'pix_copied', orderId },
+    });
   } catch (err) {
     console.error('Failed to mark pix copied:', err);
   }
@@ -63,15 +54,9 @@ export async function markPixCopied(orderId: string) {
 
 export async function markAbandoned(orderId: string) {
   try {
-    await supabase
-      .from('pix_orders')
-      .update({
-        lead_status: 'abandoned' as LeadStatus,
-        abandoned_at: new Date().toISOString(),
-        last_step: 'abandoned',
-      })
-      .eq('identifier', orderId);
-    await trackCheckoutEvent(orderId, 'order_abandoned');
+    await supabase.functions.invoke('update-checkout-status', {
+      body: { action: 'abandoned', orderId },
+    });
   } catch (err) {
     console.error('Failed to mark abandoned:', err);
   }
@@ -79,15 +64,9 @@ export async function markAbandoned(orderId: string) {
 
 export async function markSupportContacted(orderId: string) {
   try {
-    await supabase
-      .from('pix_orders')
-      .update({
-        support_contacted_at: new Date().toISOString(),
-        lead_status: 'support_requested' as LeadStatus,
-        last_step: 'support_clicked',
-      })
-      .eq('identifier', orderId);
-    await trackCheckoutEvent(orderId, 'support_clicked');
+    await supabase.functions.invoke('update-checkout-status', {
+      body: { action: 'support_contacted', orderId },
+    });
   } catch (err) {
     console.error('Failed to mark support contacted:', err);
   }

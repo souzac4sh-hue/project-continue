@@ -40,7 +40,7 @@ function NinjaSVG() {
 
 export function NinjaMascot() {
   const { settings } = useStore();
-  const ninja = (settings as any).ninjaSettings;
+  const ninja = settings.ninjaSettings;
   const [visible, setVisible] = useState(false);
   const [rewardOpen, setRewardOpen] = useState(false);
   const [copied, setCopied] = useState(false);

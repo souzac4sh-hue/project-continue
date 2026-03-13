@@ -17,8 +17,8 @@ export function AdminNinja() {
   const update = (key: string, value: any) => {
     setSettings(prev => ({
       ...prev,
-      ninjaSettings: { ...ninja, [key]: value },
-    } as any));
+      ninjaSettings: { ...prev.ninjaSettings, [key]: value },
+    }));
   };
 
   const addCode = () => {

@@ -378,7 +378,7 @@ export function Ninja3D() {
             }}
             onClick={handleClick}
           >
-            <NinjaCanvas size={ninjaSize} idle={isIdle} />
+            <NinjaCanvas size={ninjaSize} idle={isIdle} dodging={isDodging} />
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
               style={{ width: ninjaSize * 0.6, height: ninjaSize * 0.12, background: 'radial-gradient(ellipse, rgba(18,181,255,0.35) 0%, transparent 70%)', filter: 'blur(3px)' }}
             />
@@ -386,8 +386,10 @@ export function Ninja3D() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {phase === 'smoke' && <SmokeEffect x={smokePos.x} y={smokePos.y} size={ninjaSize} />}
+      {/* Motion trail */}
+      {phase === 'active' && trailPositions.length > 0 && (
+        <MotionTrail key={trailKey} positions={trailPositions} size={ninjaSize} />
+      )}
       </AnimatePresence>
 
       <AnimatePresence>

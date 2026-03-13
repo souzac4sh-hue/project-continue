@@ -4,7 +4,7 @@ import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,
   Bell, Settings, ArrowLeft, ChevronRight, Image, LogOut,
   TrendingUp, Calendar, Award, DollarSign, FileText,
-  LayoutDashboard, RefreshCw, MessageSquare,
+  LayoutDashboard, RefreshCw, MessageSquare, Tag, Sword,
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
@@ -23,6 +23,8 @@ import { AdminSiteTexts } from '@/components/admin/AdminSiteTexts';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { AdminRecovery } from '@/components/admin/AdminRecovery';
 import { AdminRecoverySettings } from '@/components/admin/AdminRecoverySettings';
+import { AdminCoupons } from '@/components/admin/AdminCoupons';
+import { AdminNinja } from '@/components/admin/AdminNinja';
 
 const modules = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'Visão Geral' },
@@ -36,6 +38,8 @@ const modules = [
   { id: 'methods', label: 'Métodos', icon: BookOpen, group: 'Marketing' },
   { id: 'references', label: 'Referências', icon: Star, group: 'Marketing' },
   { id: 'activities', label: 'Prova Social', icon: Bell, group: 'Marketing' },
+  { id: 'coupons', label: 'Cupons', icon: Tag, group: 'Marketing' },
+  { id: 'ninja', label: 'Mascote Ninja', icon: Sword, group: 'Marketing' },
   { id: 'branding', label: 'Branding', icon: Award, group: 'Configurações' },
   { id: 'site_texts', label: 'Textos do Site', icon: FileText, group: 'Configurações' },
   { id: 'settings', label: 'Configurações', icon: Settings, group: 'Configurações' },
@@ -86,6 +90,8 @@ export default function AdminPage() {
       case 'recovery': return <AdminRecovery />;
       case 'recovery_settings': return <AdminRecoverySettings />;
       case 'activities': return <AdminActivities />;
+      case 'coupons': return <AdminCoupons />;
+      case 'ninja': return <AdminNinja />;
       case 'branding': return <AdminBranding />;
       case 'site_texts': return <AdminSiteTexts />;
       case 'settings': return <AdminSettings />;

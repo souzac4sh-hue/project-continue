@@ -158,6 +158,16 @@ export interface ColorSettings {
 
 export type StoreMode = 'online' | 'busy' | 'offline';
 
+export interface NinjaSettings {
+  enabled: boolean;
+  frequencyMin: number;
+  frequencyMax: number;
+  cooldownMinutes: number;
+  discountCodes: string[];
+  rewardMessage: string;
+  showReward: boolean;
+}
+
 export interface Settings {
   purchaseMode: 'manual' | 'automatic';
   pixEnabled: boolean;
@@ -186,6 +196,7 @@ export interface Settings {
   telegramLink: string;
   instagramLink: string;
   colors: ColorSettings;
+  ninjaSettings: NinjaSettings;
 }
 
 export const BADGE_OPTIONS = [
@@ -365,11 +376,20 @@ export const defaultSettings: Settings = {
   telegramLink: '',
   instagramLink: '',
   colors: {
-    primaryHue: 43,
-    primarySaturation: 74,
-    primaryLightness: 49,
-    accentHue: 43,
-    accentSaturation: 74,
-    accentLightness: 49,
+    primaryHue: 200,
+    primarySaturation: 100,
+    primaryLightness: 50,
+    accentHue: 200,
+    accentSaturation: 100,
+    accentLightness: 50,
+  },
+  ninjaSettings: {
+    enabled: true,
+    frequencyMin: 3,
+    frequencyMax: 5,
+    cooldownMinutes: 10,
+    discountCodes: ['NINJA5', 'NINJA10'],
+    rewardMessage: '🥷 Você capturou o Ninja! Aqui está seu cupom de desconto:',
+    showReward: true,
   },
 };

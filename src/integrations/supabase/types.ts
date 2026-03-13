@@ -41,17 +41,55 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          active: boolean | null
+          code: string
+          created_at: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          times_used: number | null
+          usage_limit: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          created_at?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          times_used?: number | null
+          usage_limit?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          created_at?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          times_used?: number | null
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
       pix_orders: {
         Row: {
           abandoned_at: string | null
           amount: number
           copied_at: string | null
           copied_pix: boolean | null
+          coupon_code: string | null
           created_at: string
           customer_document: string | null
           customer_email: string | null
           customer_name: string
           customer_phone: string
+          discount_amount: number | null
           id: string
           identifier: string
           last_step: string | null
@@ -76,11 +114,13 @@ export type Database = {
           amount: number
           copied_at?: string | null
           copied_pix?: boolean | null
+          coupon_code?: string | null
           created_at?: string
           customer_document?: string | null
           customer_email?: string | null
           customer_name: string
           customer_phone: string
+          discount_amount?: number | null
           id?: string
           identifier: string
           last_step?: string | null
@@ -107,11 +147,13 @@ export type Database = {
           amount?: number
           copied_at?: string | null
           copied_pix?: boolean | null
+          coupon_code?: string | null
           created_at?: string
           customer_document?: string | null
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string
+          discount_amount?: number | null
           id?: string
           identifier?: string
           last_step?: string | null

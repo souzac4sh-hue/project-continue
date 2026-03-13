@@ -14,6 +14,7 @@ import { PaymentMethods } from '@/components/site/PaymentMethods';
 import { SimilarProducts } from '@/components/site/SimilarProducts';
 import { AnimatedSection } from '@/components/site/AnimatedSection';
 import { StarRating } from '@/components/site/StarRating';
+import { NinjaMascot } from '@/components/site/NinjaMascot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,6 +37,9 @@ export default function ProductPage() {
   const [buyOpen, setBuyOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState<{ type: string; value: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showStickyBar, setShowStickyBar] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -64,9 +68,41 @@ export default function ProductPage() {
   }
 
   const finalPrice = product.promotion && product.promotionPrice ? product.promotionPrice : product.price;
+  const discountedPrice = couponDiscount
+    ? couponDiscount.type === 'percentage'
+      ? Math.max(finalPrice * (1 - couponDiscount.value / 100), 0.01)
+      : Math.max(finalPrice - couponDiscount.value, 0.01)
+    : finalPrice;
   const seed = product.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const reviewCount = 40 + (seed % 160);
   const recentBuyers = 15 + (seed % 30);
+
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) { setCouponDiscount(null); setCouponError(''); return; }
+    const { data, error } = await (supabase as any)
+      .from('coupons')
+      .select('*')
+      .eq('code', couponCode.trim().toUpperCase())
+      .eq('active', true)
+      .maybeSingle();
+    if (error || !data) {
+      setCouponError('Cupom inválido');
+      setCouponDiscount(null);
+      return;
+    }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      setCouponError('Cupom expirado');
+      setCouponDiscount(null);
+      return;
+    }
+    if (data.usage_limit && data.times_used >= data.usage_limit) {
+      setCouponError('Cupom esgotado');
+      setCouponDiscount(null);
+      return;
+    }
+    setCouponDiscount({ type: data.discount_type, value: data.discount_value });
+    setCouponError('');
+  };
 
   const handlePurchase = async () => {
     if (!name.trim() || !phone.trim()) {
@@ -84,6 +120,8 @@ export default function ProductPage() {
           amount: finalPrice,
           customerName: name.trim(),
           customerPhone: phone.trim(),
+          couponCode: couponDiscount ? couponCode.trim().toUpperCase() : undefined,
+          discountAmount: couponDiscount ? Math.round((finalPrice - discountedPrice) * 100) / 100 : undefined,
         },
       });
 
@@ -93,17 +131,17 @@ export default function ProductPage() {
         return;
       }
 
-      // Track form submitted event
       if (data.orderId) {
-        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: finalPrice } as Record<string, string | number>);
+        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: discountedPrice } as Record<string, string | number>);
         trackCheckoutEvent(data.orderId, 'pix_generated');
       }
 
       setBuyOpen(false);
       setName('');
       setPhone('');
+      setCouponCode('');
+      setCouponDiscount(null);
 
-      // Navigate to checkout page
       const params = new URLSearchParams({
         orderId: data.orderId,
         pixCode: data.pixCode,
@@ -390,7 +428,14 @@ export default function ProductPage() {
         <DialogContent className="sm:max-w-md bg-card border-border">
           <DialogHeader>
             <DialogTitle className="font-serif">Finalizar Compra</DialogTitle>
-            <DialogDescription>{product.name} — R$ {finalPrice.toFixed(2)}</DialogDescription>
+            <DialogDescription>
+              {product.name} — {couponDiscount ? (
+                <><span className="line-through text-muted-foreground">R$ {finalPrice.toFixed(2)}</span>{' '}
+                <span className="text-primary font-bold">R$ {discountedPrice.toFixed(2)}</span></>
+              ) : (
+                <>R$ {finalPrice.toFixed(2)}</>
+              )}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
@@ -400,6 +445,26 @@ export default function ProductPage() {
             <div>
               <Label htmlFor="phone">WhatsApp</Label>
               <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" className="mt-1" maxLength={20} inputMode="tel" />
+            </div>
+
+            {/* Coupon */}
+            <div>
+              <Label htmlFor="coupon" className="text-xs">Cupom de desconto</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  id="coupon"
+                  value={couponCode}
+                  onChange={e => { setCouponCode(e.target.value); setCouponError(''); setCouponDiscount(null); }}
+                  placeholder="NINJA10"
+                  className="flex-1 font-mono uppercase"
+                  maxLength={30}
+                />
+                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-primary/30 text-primary">
+                  Aplicar
+                </Button>
+              </div>
+              {couponError && <p className="text-[10px] text-destructive mt-1">{couponError}</p>}
+              {couponDiscount && <p className="text-[10px] text-green-500 mt-1">✓ Cupom aplicado! Desconto de {couponDiscount.type === 'percentage' ? `${couponDiscount.value}%` : `R$ ${couponDiscount.value.toFixed(2)}`}</p>}
             </div>
 
             {/* Trust indicators inside dialog */}
@@ -416,7 +481,7 @@ export default function ProductPage() {
               {isProcessing ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gerando Pix...</>
               ) : (
-                <>Confirmar Pedido — R$ {finalPrice.toFixed(2)}</>
+                <>Confirmar Pedido — R$ {discountedPrice.toFixed(2)}</>
               )}
             </Button>
 
@@ -456,6 +521,7 @@ export default function ProductPage() {
 
       <FloatingButtons />
       <FloatingNotifications />
+      <NinjaMascot />
     </div>
   );
 }

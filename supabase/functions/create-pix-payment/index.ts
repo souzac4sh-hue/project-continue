@@ -47,7 +47,10 @@ Deno.serve(async (req) => {
     const identifier = crypto.randomUUID()
 
     // Call SigiloPay API to create Pix charge
-    const sigiloResponse = await fetch('https://api.sigilopay.com/v1/charges', {
+    const apiUrl = 'https://api.sigilopay.com/v1/charges'
+    console.log('Calling SigiloPay:', apiUrl, 'with amount:', cleanAmount)
+
+    const sigiloResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,17 +70,30 @@ Deno.serve(async (req) => {
       }),
     })
 
+    const responseText = await sigiloResponse.text()
+    console.log('SigiloPay response status:', sigiloResponse.status, 'body preview:', responseText.substring(0, 500))
+
     if (!sigiloResponse.ok) {
-      const errorBody = await sigiloResponse.text()
-      console.error('SigiloPay API error:', sigiloResponse.status, errorBody)
-      return new Response(JSON.stringify({ error: 'Failed to generate Pix payment' }), {
+      console.error('SigiloPay API error:', sigiloResponse.status, responseText.substring(0, 1000))
+      return new Response(JSON.stringify({ error: 'Failed to generate Pix payment', details: responseText.substring(0, 200) }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    const sigiloData = await sigiloResponse.json()
-    const pixCode = sigiloData?.pix?.code || sigiloData?.pixCode || sigiloData?.qrcode
+    let sigiloData: Record<string, unknown>
+    try {
+      sigiloData = JSON.parse(responseText)
+    } catch {
+      console.error('SigiloPay returned non-JSON:', responseText.substring(0, 500))
+      return new Response(JSON.stringify({ error: 'Invalid payment provider response' }), {
+        status: 502,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const pixData = sigiloData?.pix as Record<string, unknown> | undefined
+    const pixCode = pixData?.code || (sigiloData?.pixCode as string) || (sigiloData?.qrcode as string)
 
     if (!pixCode) {
       console.error('No pix code in SigiloPay response:', JSON.stringify(sigiloData))
@@ -93,7 +109,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    const pixAmount = sigiloData?.pix?.amount || sigiloData?.amount || cleanAmount
+    const pixAmount = (pixData?.amount as number) || (sigiloData?.amount as number) || cleanAmount
 
     const { error: dbError } = await supabase.from('pix_orders').insert({
       identifier,
@@ -111,8 +127,8 @@ Deno.serve(async (req) => {
       lead_status: 'pix_generated',
       last_step: 'pix_generated',
       provider: 'sigilopay',
-      provider_identifier: sigiloData?.id || null,
-      provider_response: sigiloData,
+      provider_identifier: (sigiloData?.id as string) || null,
+      provider_response: sigiloData as Record<string, unknown>,
     })
 
     if (dbError) {

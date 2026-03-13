@@ -23,7 +23,7 @@ export function DynamicColors() {
     root.style.setProperty('--gold-dark', `${h} ${Math.max(s - 4, 0)}% ${Math.max(l - 14, 15)}%`);
     root.style.setProperty('--border', `${h} 40% 16%`);
     root.style.setProperty('--sidebar-primary', `${h} ${s}% ${l}%`);
-    root.style.setProperty('--sidebar-border', `${h} 20% 18%`);
+    root.style.setProperty('--sidebar-border', `${h} 40% 16%`);
     root.style.setProperty('--sidebar-ring', `${h} ${s}% ${l}%`);
 
     return () => {

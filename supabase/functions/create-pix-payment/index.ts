@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { productId, productName, amount, customerName, customerPhone, customerEmail, customerDocument } = await req.json()
+    const { productId, productName, amount, customerName, customerPhone, customerEmail, customerDocument, couponCode, discountAmount } = await req.json()
 
     if (!productName || !amount || !customerName || !customerPhone) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
@@ -23,13 +23,53 @@ Deno.serve(async (req) => {
     // Sanitize inputs
     const cleanPhone = customerPhone.replace(/\D/g, '')
     const cleanName = customerName.trim().substring(0, 100)
-    const cleanAmount = Math.round(parseFloat(amount) * 100) / 100
+    let cleanAmount = Math.round(parseFloat(amount) * 100) / 100
 
     if (cleanAmount <= 0 || cleanAmount > 50000) {
       return new Response(JSON.stringify({ error: 'Invalid amount' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
+    }
+
+    // Initialize Supabase client for coupon validation
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+
+    // Validate and apply coupon server-side
+    let validatedCouponCode: string | null = null
+    let validatedDiscount = 0
+
+    if (couponCode) {
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase())
+        .eq('active', true)
+        .maybeSingle()
+
+      if (coupon) {
+        const notExpired = !coupon.expires_at || new Date(coupon.expires_at) > new Date()
+        const notExhausted = !coupon.usage_limit || coupon.times_used < coupon.usage_limit
+
+        if (notExpired && notExhausted) {
+          if (coupon.discount_type === 'percentage') {
+            validatedDiscount = Math.round(cleanAmount * coupon.discount_value / 100 * 100) / 100
+          } else {
+            validatedDiscount = Math.min(coupon.discount_value, cleanAmount - 0.01)
+          }
+          cleanAmount = Math.round((cleanAmount - validatedDiscount) * 100) / 100
+          validatedCouponCode = coupon.code
+
+          // Increment usage
+          await supabase
+            .from('coupons')
+            .update({ times_used: (coupon.times_used || 0) + 1 })
+            .eq('id', coupon.id)
+        }
+      }
     }
 
     const SIGILOPAY_PUBLIC_KEY = Deno.env.get('SIGILOPAY_PUBLIC_KEY')
@@ -102,19 +142,14 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Save order to database using service role
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    )
-
     const pixAmount = (pixData?.amount as number) || (sigiloData?.amount as number) || cleanAmount
+    const originalAmount = parseFloat(amount)
 
     const { error: dbError } = await supabase.from('pix_orders').insert({
       identifier,
       product_id: productId || 'unknown',
       product_name: productName,
-      product_price: cleanAmount,
+      product_price: originalAmount,
       amount: cleanAmount,
       pix_amount: pixAmount,
       pix_code: pixCode,
@@ -128,11 +163,12 @@ Deno.serve(async (req) => {
       provider: 'sigilopay',
       provider_identifier: (sigiloData?.transactionId as string) || (sigiloData?.id as string) || null,
       provider_response: sigiloData as Record<string, unknown>,
+      coupon_code: validatedCouponCode,
+      discount_amount: validatedDiscount,
     })
 
     if (dbError) {
       console.error('Failed to save order:', dbError)
-      // Still return the pix code even if DB save fails
     }
 
     // Track checkout event
@@ -140,13 +176,15 @@ Deno.serve(async (req) => {
       order_id: identifier,
       event_type: 'pix_generated',
       identifier,
-      metadata: { product_id: productId, amount: cleanAmount },
+      metadata: { product_id: productId, amount: cleanAmount, coupon: validatedCouponCode },
     })
 
     return new Response(JSON.stringify({
       orderId: identifier,
       pixCode,
       amount: pixAmount,
+      productName,
+      productPrice: originalAmount,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

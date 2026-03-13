@@ -38,6 +38,8 @@ const modules = [
   { id: 'methods', label: 'Métodos', icon: BookOpen, group: 'Marketing' },
   { id: 'references', label: 'Referências', icon: Star, group: 'Marketing' },
   { id: 'activities', label: 'Prova Social', icon: Bell, group: 'Marketing' },
+  { id: 'coupons', label: 'Cupons', icon: Tag, group: 'Marketing' },
+  { id: 'ninja', label: 'Mascote Ninja', icon: Sword, group: 'Marketing' },
   { id: 'branding', label: 'Branding', icon: Award, group: 'Configurações' },
   { id: 'site_texts', label: 'Textos do Site', icon: FileText, group: 'Configurações' },
   { id: 'settings', label: 'Configurações', icon: Settings, group: 'Configurações' },

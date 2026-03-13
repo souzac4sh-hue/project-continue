@@ -145,10 +145,18 @@ export default function ProductPage() {
           ) : (
             <ShoppingBag className="h-16 w-16 text-muted-foreground/20" />
           )}
-          {/* Live badge */}
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/20">
-            <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-foreground/80">ONLINE</span>
+          {/* Live badge - reflects store mode */}
+          <div className={`absolute top-3 right-3 flex items-center gap-1.5 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-full border ${
+            settings.storeMode === 'offline' ? 'border-destructive/30' :
+            settings.storeMode === 'busy' ? 'border-yellow-500/30' : 'border-primary/20'
+          }`}>
+            <span className={`h-2 w-2 rounded-full ${
+              settings.storeMode === 'offline' ? 'bg-destructive' :
+              settings.storeMode === 'busy' ? 'bg-yellow-500' : 'bg-green-500 animate-pulse'
+            }`} />
+            <span className="text-[10px] font-bold text-foreground/80">
+              {settings.storeMode === 'offline' ? 'OFFLINE' : settings.storeMode === 'busy' ? 'OCUPADO' : 'ONLINE'}
+            </span>
           </div>
         </motion.div>
 

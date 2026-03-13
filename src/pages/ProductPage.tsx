@@ -403,6 +403,32 @@ export default function ProductPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Sticky bottom CTA for mobile */}
+      <AnimatePresence>
+        {showStickyBar && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border/50 px-4 py-3 md:hidden"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-foreground truncate">{product.name}</p>
+                <p className="text-sm font-bold text-primary">R$ {finalPrice.toFixed(2)}</p>
+              </div>
+              <Button
+                onClick={() => setBuyOpen(true)}
+                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-primary/20"
+              >
+                <ShoppingBag className="h-4 w-4 mr-1.5" /> Comprar
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <FloatingButtons />
       <FloatingNotifications />
     </div>

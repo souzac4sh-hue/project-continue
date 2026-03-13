@@ -530,7 +530,7 @@ export default function PixCheckoutPage() {
         {isActive && (
           <div className="glass-card rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-primary" />
+              <HelpCircle className="h-4 w-4 text-foreground/60" />
               <h3 className="text-sm font-semibold text-foreground">{ct.guidanceTitle}</h3>
             </div>
 

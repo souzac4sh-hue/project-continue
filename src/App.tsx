@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +16,12 @@ import AdminPage from "./pages/AdminPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import NotFound from "./pages/NotFound";
 import FloatingNinja from "./components/site/FloatingNinja";
+
+function FloatingNinjaGuard() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith('/admin')) return null;
+  return <FloatingNinja />;
+}
 
 const queryClient = new QueryClient();
 

@@ -53,10 +53,6 @@ function randBetween(min: number, max: number) {
 type NinjaPhase = "waiting" | "active" | "escaped" | "captured" | "reward" | "cooldown";
 
 export default function FloatingNinja() {
-  // Hide on admin routes
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
-    return null;
-  }
 
   const [phase, setPhase] = useState<NinjaPhase>("waiting");
   const [posX, setPosX] = useState(window.innerWidth - 110);

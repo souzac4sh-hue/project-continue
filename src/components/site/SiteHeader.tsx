@@ -139,5 +139,6 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
     </header>
+    </>
   );
 }

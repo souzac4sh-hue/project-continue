@@ -91,7 +91,11 @@ export default function PixCheckoutPage() {
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
           body: { orderId },
         });
-        if (!error && data?.status === 'paid') setState('paid');
+        if (!error && data?.status === 'paid') {
+          setState('paid');
+          trackCheckoutEvent(orderId, 'payment_confirmed');
+          updateLeadStatus(orderId, 'paid', 'payment_confirmed', { paid_at: new Date().toISOString() });
+        }
       } catch { /* silently retry */ }
     };
     const interval = setInterval(check, 5000);

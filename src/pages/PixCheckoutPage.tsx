@@ -59,6 +59,19 @@ export default function PixCheckoutPage() {
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 
+  // Debug state
+  const DEBUG_PIX = true;
+  const [debugInfo, setDebugInfo] = useState({
+    pollCount: 0,
+    lastCheck: '',
+    lastDbStatus: '',
+    lastEdgeStatus: '',
+    lastError: '',
+    gatewayStatus: '',
+    providerIdentifier: '',
+    webhookDetected: false,
+  });
+
   // Track screen opened
   useEffect(() => {
     if (orderId && !trackedScreenOpen.current) {

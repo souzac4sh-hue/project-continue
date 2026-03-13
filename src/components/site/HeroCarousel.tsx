@@ -70,6 +70,7 @@ export function HeroCarousel() {
       onTouchEnd={onTouchEnd}
     >
       <div className="relative aspect-[16/7] md:aspect-[21/8] w-full overflow-hidden">
+        <HeroParticles />
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.a
             key={current}

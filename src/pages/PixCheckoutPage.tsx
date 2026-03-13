@@ -36,6 +36,25 @@ const buildSupportWhatsAppUrl = (
   return `https://wa.me/${whatsappNumber}?text=${msg}`;
 };
 
+function PaidAutoRedirect({ whatsappUrl }: { whatsappUrl: string }) {
+  const [sec, setSec] = useState(5);
+  useEffect(() => {
+    const t = setInterval(() => setSec(p => {
+      if (p <= 1) { clearInterval(t); window.open(whatsappUrl, '_blank'); return 0; }
+      return p - 1;
+    }), 1000);
+    return () => clearInterval(t);
+  }, [whatsappUrl]);
+  return (
+    <div className="space-y-3 mt-2">
+      <p className="text-xs text-muted-foreground">Redirecionando em {sec}s...</p>
+      <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-base py-6" onClick={() => window.open(whatsappUrl, '_blank')}>
+        <MessageSquare className="h-5 w-5 mr-2" /> 📦 Receber meu produto
+      </Button>
+    </div>
+  );
+}
+
 export default function PixCheckoutPage() {
   const [searchParams] = useSearchParams();
   const { settings } = useStore();
@@ -59,8 +78,8 @@ export default function PixCheckoutPage() {
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 
-  // Debug state
-  const DEBUG_PIX = true;
+  // Debug only with ?debug=1
+  const DEBUG_PIX = searchParams.get('debug') === '1';
   const [debugInfo, setDebugInfo] = useState({
     pollCount: 0,
     lastCheck: '',
@@ -545,14 +564,8 @@ export default function PixCheckoutPage() {
                   </div>
                 </motion.div>
                 <h2 className="font-serif text-lg font-bold text-foreground">{ct.paidTitle}</h2>
-                <p className="text-sm text-muted-foreground">{ct.paidRedirectText}</p>
-                <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
-                <Button variant="outline" className="mt-4" onClick={() => {
-                  const url = buildWhatsAppUrl(settings.whatsappNumber, orderId!, productName!);
-                  window.open(url, '_blank');
-                }}>
-                  <ExternalLink className="h-4 w-4 mr-2" /> Abrir WhatsApp agora
-                </Button>
+                <p className="text-sm text-muted-foreground">Clique no botão abaixo para receber seu produto via WhatsApp</p>
+                <PaidAutoRedirect whatsappUrl={buildWhatsAppUrl(settings.whatsappNumber, orderId!, productName!)} />
               </motion.div>
             )}
 

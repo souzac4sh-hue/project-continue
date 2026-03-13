@@ -338,8 +338,10 @@ export type Database = {
       get_pix_order_status: {
         Args: { order_identifier: string }
         Returns: {
+          gateway_status: string
           paid_at: string
           payment_status: string
+          provider_identifier: string
         }[]
       }
       has_role: {

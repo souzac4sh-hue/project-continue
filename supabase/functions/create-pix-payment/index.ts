@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
       lead_status: 'pix_generated',
       last_step: 'pix_generated',
       provider: 'sigilopay',
-      provider_identifier: (sigiloData?.id as string) || null,
+      provider_identifier: (sigiloData?.transactionId as string) || (sigiloData?.id as string) || null,
       provider_response: sigiloData as Record<string, unknown>,
     })
 

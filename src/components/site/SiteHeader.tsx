@@ -30,7 +30,7 @@ export function SiteHeader() {
       {/* Top notification bar */}
       {showTopNotif && (
         <div className="w-full bg-primary/10 border-b border-primary/20 py-1.5 text-center">
-          <p className="text-xs font-medium text-primary">{(settings as any).topNotificationText}</p>
+          <p className="text-xs font-medium text-primary">{settings.topNotificationText}</p>
         </div>
       )}
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">

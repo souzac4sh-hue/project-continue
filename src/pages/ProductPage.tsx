@@ -513,7 +513,7 @@ export default function ProductPage() {
               <Button
                 onClick={() => setBuyOpen(true)}
                 disabled={settings.storeMode === 'offline'}
-                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-primary/20 disabled:opacity-50"
+                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-black/30 disabled:opacity-50"
               >
                 <ShoppingBag className="h-4 w-4 mr-1.5" /> {settings.storeMode === 'offline' ? 'Offline' : 'Comprar'}
               </Button>

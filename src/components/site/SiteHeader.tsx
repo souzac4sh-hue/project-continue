@@ -16,7 +16,14 @@ export function SiteHeader() {
   const { settings } = useStore();
   const { brand } = settings;
 
-  const showTopNotif = (settings as any).showTopNotification && (settings as any).topNotificationText;
+  const showTopNotif = settings.showTopNotification && settings.topNotificationText;
+
+  // Show store mode indicator in header
+  const storeModeLabel = settings.storeMode === 'online'
+    ? null
+    : settings.storeMode === 'busy'
+      ? { text: 'Ocupado', color: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20' }
+      : { text: 'Offline', color: 'text-destructive bg-destructive/10 border-destructive/20' };
 
   return (
     <>

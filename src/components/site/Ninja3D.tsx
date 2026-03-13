@@ -308,10 +308,11 @@ export function Ninja3D() {
     if (dodgeCountRef.current < maxDodgesRef.current) {
       dodgeCountRef.current++;
       setIsDodging(true);
+      emitTrail(posRef.current);
       const dodge = getDodgePosition(posRef.current.x, posRef.current.y, ninjaSize);
       setPos(dodge);
       posRef.current = dodge;
-      setTimeout(() => setIsDodging(false), 400);
+      setTimeout(() => setIsDodging(false), 600);
       return;
     }
 

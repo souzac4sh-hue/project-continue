@@ -324,6 +324,7 @@ Deno.serve(async (req) => {
           payment_status: normalizedStatus === 'expired' ? 'expired' : 'failed',
           lead_status: 'expired',
           last_step: 'pix_expired',
+          gateway_status: extracted.status || extracted.event || normalizedStatus,
         })
         .eq('id', order.id)
 

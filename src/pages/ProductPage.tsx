@@ -285,11 +285,27 @@ export default function ProductPage() {
           className="flex flex-col gap-3 mb-4"
           id="comprar"
         >
+          {/* Offline warning */}
+          {settings.storeMode === 'offline' && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-3 mb-3">
+              <p className="text-xs text-destructive font-medium text-center">
+                🔴 {settings.storeModeMessage || 'Loja offline no momento. Compras temporariamente indisponíveis.'}
+              </p>
+            </div>
+          )}
+          {settings.storeMode === 'busy' && (
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-3">
+              <p className="text-xs text-yellow-600 font-medium text-center">
+                🟡 {settings.storeModeMessage || 'Alta demanda. Entregas podem demorar mais que o normal.'}
+              </p>
+            </div>
+          )}
           <Button
             onClick={() => setBuyOpen(true)}
-            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-primary/20"
+            disabled={settings.storeMode === 'offline'}
+            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ShoppingBag className="h-5 w-5 mr-2" /> Comprar Agora — R$ {finalPrice.toFixed(2)}
+            <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
           </Button>
           <a href={settings.vipGroupLink} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-primary/30 text-primary hover:bg-primary/10">

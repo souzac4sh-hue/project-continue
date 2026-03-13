@@ -370,8 +370,8 @@ export default function PixCheckoutPage() {
                   onClick={handleCopy}
                   className={`w-full py-6 rounded-xl font-bold text-sm transition-all duration-300 ${
                     copied
-                      ? 'bg-green-600 hover:bg-green-600 text-white scale-[1.02]'
-                      : 'gold-gradient text-primary-foreground pulse-glow shadow-lg shadow-primary/20'
+                      ? 'bg-emerald-600 hover:bg-emerald-600 text-white scale-[1.02]'
+                      : 'gold-gradient text-primary-foreground pulse-glow shadow-lg shadow-black/30'
                   }`}
                 >
                   {copied ? (

@@ -341,13 +341,15 @@ export default function ProductPage() {
               </p>
             </div>
           )}
-          <Button
-            onClick={() => setBuyOpen(true)}
-            disabled={settings.storeMode === 'offline'}
-            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-black/30 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
-          </Button>
+          <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.01 }}>
+            <Button
+              onClick={() => setBuyOpen(true)}
+              disabled={settings.storeMode === 'offline'}
+              className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl pulse-glow shadow-lg shadow-black/30 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_30px_rgba(10,132,255,0.15)] transition-shadow duration-300"
+            >
+              <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
+            </Button>
+          </motion.div>
           <a href={settings.vipGroupLink} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-border/50 text-foreground/70 hover:text-foreground hover:bg-secondary hover:border-border">
               <Users className="h-4 w-4 mr-2" /> Entrar no Grupo VIP

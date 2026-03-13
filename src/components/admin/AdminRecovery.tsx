@@ -98,14 +98,24 @@ function getDateRange(period: string): { start: Date | null; end: Date | null } 
   }
 }
 
+const priorityTabs = [
+  { id: 'all', label: 'Todos' },
+  { id: 'hot', label: '🔥 Quentes' },
+  { id: 'recent', label: '⏰ Recentes' },
+  { id: 'abandoned_today', label: '📉 Abandonos Hoje' },
+  { id: 'awaiting', label: '⏳ Aguardando' },
+];
+
 export function AdminRecovery() {
   const { settings } = useStore();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [messages, setMessages] = useState<RecoveryMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState('7d');
-  const [leadStatusFilter, setLeadStatusFilter] = useState('abandoned');
+  const [leadStatusFilter, setLeadStatusFilter] = useState('all');
   const [productFilter, setProductFilter] = useState('all');
+  const [priorityTab, setPriorityTab] = useState('all');
+  const [phoneSearch, setPhoneSearch] = useState('');
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);

@@ -209,6 +209,21 @@ export function Ninja3D() {
     }));
   }, [setSettings]);
 
+  // Emit trail particles from a position
+  const emitTrail = useCallback((from: { x: number; y: number }) => {
+    // Generate interpolated trail points
+    const points: { x: number; y: number }[] = [];
+    for (let i = 0; i < 5; i++) {
+      points.push({
+        x: from.x + (Math.random() - 0.5) * 15,
+        y: from.y + (Math.random() - 0.5) * 15,
+      });
+    }
+    trailHistoryRef.current = points;
+    setTrailPositions(points);
+    setTrailKey(k => k + 1);
+  }, []);
+
   // Single entry effect - runs once on mount
   useEffect(() => {
     mountedRef.current = true;

@@ -249,6 +249,7 @@ export function Ninja3D() {
       setTimeout(() => {
         if (!mountedRef.current) return;
         const first = getRandomPosition(ninjaSize);
+        emitTrail(starts[side]);
         setPos(first);
         posRef.current = first;
 
@@ -260,6 +261,7 @@ export function Ninja3D() {
       moveIntervalRef.current = setInterval(() => {
         if (!mountedRef.current) return;
         setIsIdle(false);
+        emitTrail(posRef.current);
         const next = getRandomPosition(ninjaSize);
         setPos(next);
         posRef.current = next;

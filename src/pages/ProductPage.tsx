@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, Play, Users, Check, ShieldCheck, Zap, Clock, TrendingUp, MessageCircle, Loader2 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { trackCheckoutEvent } from '@/lib/checkoutTracker';
@@ -44,7 +44,9 @@ export default function ProductPage() {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const ctaRef = useRef<HTMLDivElement>(null);
 
-  // Show sticky bar when main CTA scrolls out of view
+  // Scroll to top on mount / route change
+  useLayoutEffect(() => { window.scrollTo(0, 0); }, [id]);
+
   useEffect(() => {
     if (!ctaRef.current) return;
     const observer = new IntersectionObserver(

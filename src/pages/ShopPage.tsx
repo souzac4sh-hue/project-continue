@@ -15,12 +15,19 @@ import { VipCTA } from '@/components/site/VipCTA';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { FloatingButtons } from '@/components/site/FloatingButtons';
 import { FloatingNotifications } from '@/components/site/FloatingNotifications';
+import { StoreModeBanner } from '@/components/site/StoreModeBanner';
+import { MaintenanceScreen } from '@/components/site/MaintenanceScreen';
 import { AnimatedSection } from '@/components/site/AnimatedSection';
 import { Flame } from 'lucide-react';
 
 export default function ShopPage() {
-  const { products, categories } = useStore();
+  const { products, categories, settings, settingsLoaded } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Show maintenance screen if enabled
+  if (settingsLoaded && settings.maintenanceMode) {
+    return <MaintenanceScreen />;
+  }
 
   const activeProducts = products.filter(p => p.status === 'active');
   const bestSellers = activeProducts.filter(p => p.bestSeller || p.featured);
@@ -35,6 +42,7 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
+      <StoreModeBanner />
       <HeroCarousel />
       <HeroCTAButtons />
       <TrustBar />

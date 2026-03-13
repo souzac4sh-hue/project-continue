@@ -53,11 +53,18 @@ export function SiteHeader() {
             >
               {brand.brandName}
             </motion.span>
-            {/* Online badge */}
-            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[8px] font-bold text-green-500/90 uppercase tracking-wider">Online</span>
-            </span>
+            {/* Online/Status badge */}
+            {storeModeLabel ? (
+              <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full border ${storeModeLabel.color}`}>
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                <span className="text-[8px] font-bold uppercase tracking-wider">{storeModeLabel.text}</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[8px] font-bold text-green-500/90 uppercase tracking-wider">Online</span>
+              </span>
+            )}
           </div>
         </Link>
 

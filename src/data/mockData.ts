@@ -158,14 +158,31 @@ export interface ColorSettings {
 
 export type StoreMode = 'online' | 'busy' | 'offline';
 
+export interface NinjaRewardTier {
+  code: string;
+  weight: number; // 0-100, all weights summed = total pool
+  label: string;  // e.g. "5% desconto"
+}
+
 export interface NinjaSettings {
   enabled: boolean;
   frequencyMin: number;
   frequencyMax: number;
   cooldownMinutes: number;
+  maxPerSession: number;
+  positionPreference: 'left' | 'right' | 'random';
+  ninjaSize: number; // px height, 60-90
+  animationSpeed: number; // seconds for run, 3-6
   discountCodes: string[];
+  rewardTiers: NinjaRewardTier[];
   rewardMessage: string;
   showReward: boolean;
+  stats: {
+    totalAppearances: number;
+    totalClicks: number;
+    couponsGenerated: number;
+    couponsRedeemed: number;
+  };
 }
 
 export interface Settings {
@@ -388,8 +405,23 @@ export const defaultSettings: Settings = {
     frequencyMin: 3,
     frequencyMax: 5,
     cooldownMinutes: 10,
-    discountCodes: ['NINJA5', 'NINJA10'],
-    rewardMessage: '🥷 Você capturou o Ninja! Aqui está seu cupom de desconto:',
+    maxPerSession: 1,
+    positionPreference: 'random',
+    ninjaSize: 72,
+    animationSpeed: 4,
+    discountCodes: ['NINJA5', 'NINJA10', 'PIXNINJA'],
+    rewardTiers: [
+      { code: 'NINJA5', weight: 70, label: '5% desconto' },
+      { code: 'NINJA10', weight: 25, label: '10% desconto' },
+      { code: 'PIXNINJA', weight: 5, label: '15% desconto' },
+    ],
+    rewardMessage: '🥷 Você encontrou o Ninja da C4SH!',
     showReward: true,
+    stats: {
+      totalAppearances: 0,
+      totalClicks: 0,
+      couponsGenerated: 0,
+      couponsRedeemed: 0,
+    },
   },
 };

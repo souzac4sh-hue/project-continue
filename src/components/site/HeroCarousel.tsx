@@ -90,7 +90,9 @@ export function HeroCarousel() {
             {/* Deeper gradient overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
             <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
-            {!banner.image && <div className="absolute inset-0 gold-gradient opacity-[0.08]" />}
+            {!banner.image && <div className="absolute inset-0 gold-gradient opacity-[0.06]" />}
+            {/* Ambient radial glow */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 80%, rgba(10,132,255,0.07), transparent 70%)' }} />
 
             {(banner.title || banner.subtitle) && (
               <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 md:pb-14 text-center px-6">
@@ -100,7 +102,7 @@ export function HeroCarousel() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.6, delay: 0.15 }}
                     className="font-serif text-xl sm:text-2xl md:text-4xl font-bold gold-text leading-tight"
-                    style={{ textShadow: '0 2px 20px hsl(200 100% 50% / 0.3), 0 4px 40px hsl(0 0% 0% / 0.5)' }}
+                    style={{ textShadow: '0 2px 20px rgba(10,132,255,0.25), 0 4px 40px rgba(0,0,0,0.5)' }}
                   >
                     {banner.title}
                   </motion.h2>

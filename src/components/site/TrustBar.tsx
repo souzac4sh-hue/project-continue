@@ -17,7 +17,7 @@ export function TrustBar() {
               key={i}
               className="shrink-0 px-5 py-3 text-xs font-medium tracking-wide text-muted-foreground whitespace-nowrap inline-flex items-center gap-1.5"
             >
-              <Icon className="h-3 w-3 text-primary/60" />
+              <Icon className="h-3 w-3 text-primary/50" />
               {item.text}
             </span>
           );

@@ -569,6 +569,7 @@ export default function PixCheckoutPage() {
           </div>
         )}
       </motion.div>
+      <NinjaAssistant context="checkout" />
     </div>
   );
 }

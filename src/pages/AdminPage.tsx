@@ -23,6 +23,8 @@ import { AdminSiteTexts } from '@/components/admin/AdminSiteTexts';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { AdminRecovery } from '@/components/admin/AdminRecovery';
 import { AdminRecoverySettings } from '@/components/admin/AdminRecoverySettings';
+import { AdminCoupons } from '@/components/admin/AdminCoupons';
+import { AdminNinja } from '@/components/admin/AdminNinja';
 
 const modules = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'Visão Geral' },

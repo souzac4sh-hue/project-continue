@@ -147,6 +147,17 @@ export interface CheckoutTexts {
   pixUrgencyMinutes: number;
 }
 
+export interface ColorSettings {
+  primaryHue: number;
+  primarySaturation: number;
+  primaryLightness: number;
+  accentHue: number;
+  accentSaturation: number;
+  accentLightness: number;
+}
+
+export type StoreMode = 'online' | 'busy' | 'offline';
+
 export interface Settings {
   purchaseMode: 'manual' | 'automatic';
   pixEnabled: boolean;
@@ -166,6 +177,15 @@ export interface Settings {
   socialProofNames: string[];
   checkoutTexts: CheckoutTexts;
   fakeReviews: { name: string; text: string; rating: number; time: string }[];
+  storeMode: StoreMode;
+  storeModeMessage: string;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
+  showTopNotification: boolean;
+  topNotificationText: string;
+  telegramLink: string;
+  instagramLink: string;
+  colors: ColorSettings;
 }
 
 export const BADGE_OPTIONS = [

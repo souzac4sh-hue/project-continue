@@ -308,7 +308,7 @@ export default function ProductPage() {
               'Pedido finalizado com agilidade',
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <span className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0 text-[10px] font-bold text-primary mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center shrink-0 text-[10px] font-bold text-foreground/70 mt-0.5 border border-border/30">
                   {i + 1}
                 </span>
                 {step}

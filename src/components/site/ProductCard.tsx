@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: Product }) {
     >
       <Link
         to={`/produto/${product.slug || product.id}`}
-        className="glass-card rounded-xl overflow-hidden group block focus-visible:ring-2 focus-visible:ring-primary hover:border-primary/30 hover:shadow-[0_8px_32px_hsl(43_74%_49%/0.12)] transition-all duration-300 hover:-translate-y-1"
+        className="glass-card rounded-xl overflow-hidden group block focus-visible:ring-2 focus-visible:ring-primary hover:border-primary/30 hover:shadow-[0_8px_32px_rgba(10,132,255,0.08)] transition-all duration-300 hover:-translate-y-1"
         aria-label={`Ver produto ${product.name} por R$ ${(hasPromo ? product.promotionPrice! : product.price).toFixed(2)}`}
       >
         <div className="aspect-[16/10] bg-secondary flex items-center justify-center relative overflow-hidden">

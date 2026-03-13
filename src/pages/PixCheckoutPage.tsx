@@ -352,7 +352,7 @@ export default function PixCheckoutPage() {
 
                 {/* QR Code */}
                 <div className="flex justify-center">
-                  <div className="bg-white p-4 rounded-2xl shadow-xl ring-2 ring-primary/15 shadow-primary/10">
+                  <div className="bg-white p-4 rounded-2xl shadow-xl ring-2 ring-primary/12 shadow-primary/8">
                     <QRCodeSVG value={pixCode} size={180} level="M" className="sm:w-[200px] sm:h-[200px]" />
                   </div>
                 </div>

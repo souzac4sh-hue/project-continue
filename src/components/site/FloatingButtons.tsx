@@ -36,7 +36,7 @@ export function FloatingButtons() {
         className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
         aria-label="Navegação principal"
       >
-        <div className="border-t border-primary/15 bg-background/95 backdrop-blur-xl" style={{ boxShadow: '0 -4px 20px hsl(43 74% 49% / 0.08)' }}>
+        <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl" style={{ boxShadow: '0 -4px 20px rgba(10,132,255,0.06)' }}>
           <div className="flex items-center justify-around px-1 py-2">
             {buttons.map((btn) => {
               const isActive = btn.path && location.pathname === btn.path;

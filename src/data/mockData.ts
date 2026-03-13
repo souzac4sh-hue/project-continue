@@ -393,10 +393,10 @@ export const defaultSettings: Settings = {
   telegramLink: '',
   instagramLink: '',
   colors: {
-    primaryHue: 200,
+    primaryHue: 213,
     primarySaturation: 100,
-    primaryLightness: 50,
-    accentHue: 200,
+    primaryLightness: 52,
+    accentHue: 197,
     accentSaturation: 100,
     accentLightness: 50,
   },

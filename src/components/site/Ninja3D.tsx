@@ -91,7 +91,7 @@ function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean 
   );
 }
 
-function NinjaCanvas({ size, idle }: { size: number; idle?: boolean }) {
+function NinjaCanvas({ size, idle, dodging }: { size: number; idle?: boolean; dodging?: boolean }) {
   return (
     <div style={{ width: size, height: size, pointerEvents: 'none' }}>
       <Canvas
@@ -104,13 +104,35 @@ function NinjaCanvas({ size, idle }: { size: number; idle?: boolean }) {
         <directionalLight position={[3, 5, 4]} intensity={0.8} color="#ffffff" />
         <pointLight position={[0, 1, 2]} intensity={0.6} color="hsl(200, 100%, 55%)" distance={5} />
         <pointLight position={[-1, 0, 1]} intensity={0.3} color="hsl(200, 100%, 40%)" distance={4} />
-        <CyberNinjaModel idle={idle} />
+        <CyberNinjaModel idle={idle} dodging={dodging} />
       </Canvas>
     </div>
   );
 }
 
-function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
+/* ─── Motion Trail ─── */
+function MotionTrail({ positions, size }: { positions: { x: number; y: number }[]; size: number }) {
+  return (
+    <>
+      {positions.map((p, i) => (
+        <motion.div
+          key={`trail-${i}`}
+          className="fixed pointer-events-none z-[64] rounded-full"
+          style={{
+            width: size * 0.5,
+            height: size * 0.5,
+            left: p.x - size * 0.25,
+            top: p.y - size * 0.25,
+            background: 'radial-gradient(circle, rgba(18,181,255,0.2), transparent 70%)',
+          }}
+          initial={{ opacity: 0.5, scale: 1 }}
+          animate={{ opacity: 0, scale: 0.3 }}
+          transition={{ duration: 0.6, delay: i * 0.02, ease: 'easeOut' }}
+        />
+      ))}
+    </>
+  );
+}
   return (
     <div className="fixed pointer-events-none z-[80]" style={{ left: x - size / 2, top: y - size / 2, width: size * 2, height: size * 2 }}>
       {[...Array(10)].map((_, i) => (

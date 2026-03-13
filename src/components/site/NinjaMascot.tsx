@@ -389,7 +389,7 @@ export function NinjaMascot() {
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="fixed bottom-24 left-4 right-4 z-[70] max-w-sm mx-auto"
           >
-            <div className="glass-card rounded-2xl p-6 border border-primary/25 neon-glow relative overflow-hidden">
+            <div className="glass-card rounded-2xl p-6 border border-primary/20 relative overflow-hidden" style={{ boxShadow: '0 0 30px rgba(10,132,255,0.10), 0 8px 32px rgba(0,0,0,0.4)' }}>
               {/* Decorative glow circle */}
               <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/5 blur-2xl" />
 

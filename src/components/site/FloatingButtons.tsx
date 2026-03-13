@@ -36,8 +36,13 @@ export function FloatingButtons() {
         className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
         aria-label="Navegação principal"
       >
-        <div className="border-t border-border/30 bg-background/98 backdrop-blur-xl" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.4)' }}>
-          <div className="flex items-center justify-around px-1 py-2">
+        {/* Top glow line */}
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <div
+          className="bg-background/98 backdrop-blur-xl"
+          style={{ boxShadow: '0 -8px 32px rgba(0,0,0,0.5), 0 -1px 0 rgba(75,130,190,0.08)' }}
+        >
+          <div className="flex items-center justify-around px-1 py-1.5">
             {buttons.map((btn) => {
               const isActive = btn.path && location.pathname === btn.path;
 
@@ -45,11 +50,11 @@ export function FloatingButtons() {
                 return (
                   <motion.a
                     key={btn.label}
-                    whileTap={{ scale: 0.88 }}
+                    whileTap={{ scale: 0.85 }}
                     href={btn.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-foreground/70"
+                    className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl text-muted-foreground"
                     aria-label={btn.label}
                   >
                     <btn.icon className="h-5 w-5" />
@@ -59,21 +64,32 @@ export function FloatingButtons() {
               }
 
               return (
-                <motion.div key={btn.label} whileTap={{ scale: 0.88 }}>
+                <motion.div key={btn.label} whileTap={{ scale: 0.85 }}>
                   <Link
                     to={btn.path!}
-                    className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors relative ${
+                    className={`flex flex-col items-center gap-0.5 px-4 py-2 rounded-xl transition-all duration-300 relative ${
                       isActive ? 'text-foreground' : 'text-muted-foreground'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                     aria-label={btn.label}
                   >
-                    <btn.icon className="h-5 w-5" />
-                    <span className="text-[10px] font-medium">{btn.label}</span>
+                    {/* Active glow pill behind icon */}
                     {isActive && (
                       <motion.div
-                        layoutId="mobile-nav-indicator"
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 h-0.5 w-5 rounded-full bg-primary/60"
+                        layoutId="mobile-nav-glow"
+                        className="absolute inset-0 rounded-xl bg-primary/[0.06] border border-primary/10"
+                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                      />
+                    )}
+                    <div className="relative z-10 flex flex-col items-center gap-0.5">
+                      <btn.icon className={`h-5 w-5 transition-colors duration-200 ${isActive ? 'text-foreground' : ''}`} />
+                      <span className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-foreground' : ''}`}>{btn.label}</span>
+                    </div>
+                    {/* Active indicator dot */}
+                    {isActive && (
+                      <motion.div
+                        layoutId="mobile-nav-dot"
+                        className="absolute -top-1 left-1/2 -translate-x-1/2 h-0.5 w-4 rounded-full bg-primary/50"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}

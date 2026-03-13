@@ -169,10 +169,10 @@ export function NinjaMascot() {
 
   const {
     enabled = true,
-    frequencyMin = 3,
-    frequencyMax = 5,
-    cooldownMinutes = 10,
-    maxPerSession = 1,
+    frequencyMin = 1.5,
+    frequencyMax = 3,
+    cooldownMinutes = 2,
+    maxPerSession = 2,
     positionPreference = 'random',
     ninjaSize = 72,
     animationSpeed = 4,
@@ -231,14 +231,14 @@ export function NinjaMascot() {
       if (!mountedRef.current) return;
       setPhase('idle');
 
-      // Auto-disappear after idle
+      // Auto-disappear after idle — longer pause for visibility
       hideTimerRef.current = setTimeout(() => {
         if (!mountedRef.current) return;
         setPhase('smoke');
         setTimeout(() => {
           if (mountedRef.current) setPhase('hidden');
         }, 700);
-      }, 3000);
+      }, 5000);
     }, animationSpeed * 1000 * 0.6); // stop at ~60% across screen
   }, [canAppear, getDirection, animationSpeed, incrementStat]);
 
@@ -257,8 +257,8 @@ export function NinjaMascot() {
     mountedRef.current = true;
     if (!enabled) return;
 
-    // First appearance after 30-60s
-    const initialDelay = (30 + Math.random() * 30) * 1000;
+    // First appearance after 15-30s for better discoverability
+    const initialDelay = (15 + Math.random() * 15) * 1000;
     timerRef.current = setTimeout(() => {
       triggerAppearance();
       scheduleNext();
@@ -389,7 +389,7 @@ export function NinjaMascot() {
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="fixed bottom-24 left-4 right-4 z-[70] max-w-sm mx-auto"
           >
-            <div className="glass-card rounded-2xl p-6 border border-primary/25 neon-glow relative overflow-hidden">
+            <div className="glass-card rounded-2xl p-6 border border-primary/20 relative overflow-hidden" style={{ boxShadow: '0 0 30px rgba(10,132,255,0.10), 0 8px 32px rgba(0,0,0,0.4)' }}>
               {/* Decorative glow circle */}
               <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/5 blur-2xl" />
 
@@ -431,7 +431,7 @@ export function NinjaMascot() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-secondary/80 rounded-xl px-5 py-3.5 font-mono text-xl font-black text-primary tracking-[0.15em] border border-primary/10"
+                  className="bg-secondary/80 rounded-xl px-5 py-3.5 font-mono text-xl font-black text-foreground tracking-[0.15em] border border-border/30"
                 >
                   {rewardCode}
                 </motion.div>

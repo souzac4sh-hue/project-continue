@@ -4,7 +4,7 @@ import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,
   Bell, Settings, ArrowLeft, ChevronRight, Image, LogOut,
   TrendingUp, Calendar, Award, DollarSign, FileText,
-  LayoutDashboard, RefreshCw, MessageSquare,
+  LayoutDashboard, RefreshCw, MessageSquare, Tag, Sword,
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';

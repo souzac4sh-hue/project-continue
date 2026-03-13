@@ -85,7 +85,7 @@ export default function AdminPage() {
       case 'banners': return <AdminBanners />;
       case 'methods': return <AdminMethods />;
       case 'references': return <AdminReferences />;
-      case 'orders': return <AdminOrders />;
+      case 'orders': return <AdminPixOrders />;
       case 'pix_orders': return <AdminPixOrders />;
       case 'recovery': return <AdminRecovery />;
       case 'recovery_settings': return <AdminRecoverySettings />;

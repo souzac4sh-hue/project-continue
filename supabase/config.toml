@@ -1,1 +1,10 @@
 project_id = "zbxgsogsiscxxefkucqk"
+
+[functions.create-pix-payment]
+verify_jwt = false
+
+[functions.check-pix-status]
+verify_jwt = false
+
+[functions.sigilopay-webhook]
+verify_jwt = false

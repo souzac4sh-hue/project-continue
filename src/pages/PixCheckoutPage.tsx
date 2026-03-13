@@ -77,7 +77,11 @@ export default function PixCheckoutPage() {
     setCopied(true);
     setState('waiting_confirm');
     setTimeout(() => setCopied(false), 2500);
-  }, [pixCode]);
+    // Track pix copied
+    if (orderId) {
+      markPixCopied(orderId);
+    }
+  }, [pixCode, orderId]);
 
   // Poll for payment status
   useEffect(() => {

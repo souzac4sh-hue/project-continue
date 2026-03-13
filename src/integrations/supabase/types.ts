@@ -77,6 +77,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ninja_coupons: {
+        Row: {
+          code: string
+          created_at: string
+          current_uses: number
+          discount_percentage: number
+          expires_at: string
+          id: string
+          is_used: boolean
+          max_uses: number
+          product_id: string | null
+          session_id: string | null
+          source: string
+          status: string
+          used_at: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_uses?: number
+          discount_percentage: number
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          max_uses?: number
+          product_id?: string | null
+          session_id?: string | null
+          source?: string
+          status?: string
+          used_at?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_uses?: number
+          discount_percentage?: number
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          max_uses?: number
+          product_id?: string | null
+          session_id?: string | null
+          source?: string
+          status?: string
+          used_at?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       pix_orders: {
         Row: {
           abandoned_at: string | null

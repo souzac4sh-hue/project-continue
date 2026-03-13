@@ -51,11 +51,11 @@ export default function ShopPage() {
       <ProductSearch />
       <CategoryGrid onSelectCategory={setSelectedCategory} selectedCategory={selectedCategory} />
 
-      <div className="container pb-24" id="loja">
+      <div className="container pb-24 space-y-10" id="loja">
         {selectedCategory && selectedCat ? (
-          <AnimatedSection className="mb-10">
+          <AnimatedSection>
             <CategorySectionHeader category={selectedCat} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3.5">
               {filteredProducts?.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
             {filteredProducts?.length === 0 && (
@@ -65,12 +65,17 @@ export default function ShopPage() {
         ) : (
           <>
             {bestSellers.length > 0 && (
-              <AnimatedSection className="mb-8">
-                <h2 className="font-serif text-lg font-bold mb-1 flex items-center gap-2 text-foreground">
-                  <Flame className="h-5 w-5 text-orange-500" /> Mais procurados da C4SH STORE
-                </h2>
-                <p className="text-xs text-muted-foreground mb-4">Os conteúdos e métodos mais acessados pelos clientes.</p>
-                <div className="grid grid-cols-2 gap-3">
+              <AnimatedSection>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-8 w-1 rounded-full bg-primary" />
+                  <div>
+                    <h2 className="font-serif text-lg font-bold flex items-center gap-2 text-foreground">
+                      <Flame className="h-5 w-5 text-primary" /> Mais procurados
+                    </h2>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Os conteúdos mais acessados pelos clientes.</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3.5">
                   {bestSellers.map(p => <ProductCard key={p.id} product={p} />)}
                 </div>
               </AnimatedSection>
@@ -80,9 +85,9 @@ export default function ShopPage() {
               const catProducts = activeProducts.filter(p => p.categoryId === cat.id);
               if (catProducts.length === 0) return null;
               return (
-                <AnimatedSection key={cat.id} className="mb-8">
+                <AnimatedSection key={cat.id}>
                   <CategorySectionHeader category={cat} />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-3.5">
                     {catProducts.map(p => <ProductCard key={p.id} product={p} />)}
                   </div>
                 </AnimatedSection>

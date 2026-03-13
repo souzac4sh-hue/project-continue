@@ -352,7 +352,7 @@ export default function PixCheckoutPage() {
 
                 {/* QR Code */}
                 <div className="flex justify-center">
-                  <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg">
+                  <div className="bg-white p-4 rounded-2xl shadow-xl ring-2 ring-primary/15 shadow-primary/10">
                     <QRCodeSVG value={pixCode} size={180} level="M" className="sm:w-[200px] sm:h-[200px]" />
                   </div>
                 </div>
@@ -576,9 +576,9 @@ export default function PixCheckoutPage() {
 
 function TrustPill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 py-1.5 px-1 rounded-lg bg-secondary/30">
+    <div className="flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-xl bg-secondary/40 border border-primary/8">
       <span className="text-primary/70">{icon}</span>
-      <span className="text-[9px] text-muted-foreground text-center leading-tight">{text}</span>
+      <span className="text-[9px] text-muted-foreground text-center leading-tight font-medium">{text}</span>
     </div>
   );
 }

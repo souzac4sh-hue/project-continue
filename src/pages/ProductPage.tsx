@@ -176,7 +176,7 @@ export default function ProductPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="aspect-video rounded-xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative"
+          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-primary/10 shadow-lg shadow-primary/5"
         >
           {product.image ? (
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
@@ -256,7 +256,7 @@ export default function ProductPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="glass-card rounded-xl p-4 mb-6"
+            className="glass-card rounded-xl p-4 mb-6 border border-primary/10"
           >
             <h3 className="font-serif font-semibold text-sm mb-3 text-foreground">O que está incluso</h3>
             <ul className="space-y-2">

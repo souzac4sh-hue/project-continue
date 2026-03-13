@@ -133,6 +133,7 @@ function MotionTrail({ positions, size }: { positions: { x: number; y: number }[
     </>
   );
 }
+function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
   return (
     <div className="fixed pointer-events-none z-[80]" style={{ left: x - size / 2, top: y - size / 2, width: size * 2, height: size * 2 }}>
       {[...Array(10)].map((_, i) => (

@@ -147,7 +147,9 @@ Deno.serve(async (req) => {
 
     // Call SigiloPay API to create Pix charge
     const apiUrl = 'https://app.sigilopay.com.br/api/v1/gateway/pix/receive'
+    const webhookUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sigilopay-webhook`
     console.log('[CREATE-PIX] Calling SigiloPay:', apiUrl, 'with validated amount:', cleanAmount, '(original price:', originalAmount, ')')
+    console.log('[CREATE-PIX] Sending webhook URL to SigiloPay:', webhookUrl)
 
     const sigiloResponse = await fetch(apiUrl, {
       method: 'POST',
@@ -159,6 +161,12 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         identifier,
         amount: cleanAmount,
+        // Send webhook URL in multiple field names for maximum compatibility
+        postbackUrl: webhookUrl,
+        webhookUrl: webhookUrl,
+        notificationUrl: webhookUrl,
+        callbackUrl: webhookUrl,
+        webhook: webhookUrl,
         client: {
           name: cleanName,
           email: customerEmail || 'deposito@deposito.com',

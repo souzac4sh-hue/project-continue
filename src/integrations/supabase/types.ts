@@ -332,6 +332,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_pix_order_status: {
+        Args: { order_identifier: string }
+        Returns: {
+          paid_at: string
+          payment_status: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

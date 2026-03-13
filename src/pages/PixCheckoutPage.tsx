@@ -80,41 +80,79 @@ export default function PixCheckoutPage() {
     }
   }, [pixCode, orderId]);
 
-  // Poll for payment status
+  // Poll for payment status - dual strategy: fast DB poll + edge function fallback
   useEffect(() => {
     if (!orderId || state === 'paid' || state === 'error' || state === 'expired') return;
 
-    const check = async () => {
+    let pollCount = 0;
+
+    const checkDb = async (): Promise<boolean> => {
       try {
-        console.log('[PIX-CHECKOUT] Checking payment status for order:', orderId);
+        const { data, error } = await supabase.rpc('get_pix_order_status', {
+          order_identifier: orderId,
+        });
+        if (error) {
+          console.error('[PIX-CHECKOUT] DB poll error:', error);
+          return false;
+        }
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row?.payment_status === 'paid') {
+          console.log('[PIX-CHECKOUT] ✅ Payment confirmed via DB poll:', orderId);
+          setState('paid');
+          trackCheckoutEvent(orderId, 'payment_confirmed');
+          return true;
+        }
+        if (row?.payment_status === 'expired' || row?.payment_status === 'failed') {
+          setState(row.payment_status === 'expired' ? 'expired' : 'error');
+          return true;
+        }
+      } catch (err) {
+        console.error('[PIX-CHECKOUT] DB poll exception:', err);
+      }
+      return false;
+    };
+
+    const checkEdgeFunction = async (): Promise<boolean> => {
+      try {
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
           body: { orderId },
         });
-
         if (error) {
-          console.error('[PIX-CHECKOUT] check-pix-status returned error:', error);
-          return;
+          console.error('[PIX-CHECKOUT] check-pix-status error:', error);
+          return false;
         }
-
         console.log('[PIX-CHECKOUT] check-pix-status response:', data);
-
         if (data?.status === 'paid') {
-          console.log('[PIX-CHECKOUT] Payment confirmed, moving UI to paid state:', orderId);
+          console.log('[PIX-CHECKOUT] ✅ Payment confirmed via edge function:', orderId);
           setState('paid');
           trackCheckoutEvent(orderId, 'payment_confirmed');
-          return;
+          return true;
         }
-
         if (data?.status === 'expired' || data?.status === 'failed') {
-          console.warn('[PIX-CHECKOUT] Terminal status received:', data.status, 'order:', orderId);
           setState(data.status === 'expired' ? 'expired' : 'error');
+          return true;
         }
       } catch (err) {
-        console.error('[PIX-CHECKOUT] Polling error:', err);
+        console.error('[PIX-CHECKOUT] Edge function error:', err);
+      }
+      return false;
+    };
+
+    const check = async () => {
+      pollCount++;
+      console.log('[PIX-CHECKOUT] Poll #' + pollCount + ' for order:', orderId);
+
+      // Fast path: check DB directly (instant, no external API call)
+      const dbResult = await checkDb();
+      if (dbResult) return;
+
+      // Every 3rd poll, also try edge function (which probes SigiloPay API)
+      if (pollCount % 3 === 0) {
+        await checkEdgeFunction();
       }
     };
 
-    const interval = setInterval(check, 5000);
+    const interval = setInterval(check, 3000);
     check();
     return () => clearInterval(interval);
   }, [orderId, state]);

@@ -56,11 +56,11 @@ export function AuthoritySection() {
           const Icon = iconMap[i % iconMap.length];
           return (
             <AnimatedSection key={i} delay={i * 0.1}>
-              <div className="glass-card rounded-xl p-4 text-center group shimmer hover:border-primary/20 hover:shadow-[0_4px_20px_rgba(10,132,255,0.06)] transition-all duration-300">
-                <div className="h-10 w-10 rounded-full bg-primary/8 flex items-center justify-center mx-auto mb-2.5 group-hover:bg-primary/15 group-hover:shadow-[0_0_15px_rgba(10,132,255,0.1)] transition-all duration-300">
-                  <Icon className="h-5 w-5 text-primary" />
+              <div className="glass-card rounded-xl p-4 text-center group transition-all duration-300">
+                <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center mx-auto mb-2.5 group-hover:bg-muted transition-all duration-300">
+                  <Icon className="h-5 w-5 text-foreground/60 group-hover:text-foreground/80 transition-colors" />
                 </div>
-                <p className="font-serif text-lg font-bold gold-text leading-tight">
+                <p className="font-serif text-lg font-bold text-foreground leading-tight">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} format={stat.format} />
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-1 leading-tight">{stat.label}</p>
@@ -69,7 +69,7 @@ export function AuthoritySection() {
           );
         })}
       </div>
-      <p className="text-[11px] text-muted-foreground text-center mt-4 italic">Resultados construídos com consistência.</p>
+      <p className="text-[11px] text-muted-foreground/60 text-center mt-4 italic">Resultados construídos com consistência.</p>
     </AnimatedSection>
   );
 }

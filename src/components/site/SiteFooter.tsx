@@ -7,13 +7,13 @@ export function SiteFooter() {
   const { brand } = settings;
 
   return (
-    <footer className="border-t border-border/30 bg-card/40 pb-24" role="contentinfo">
+    <footer className="border-t border-border/20 bg-secondary/20 pb-24" role="contentinfo">
       <div className="container py-10">
         <div className="flex flex-col items-center text-center gap-5">
           {brand.logoUrl ? (
             <img src={brand.logoUrl} alt={brand.brandName} className="h-10 w-10 rounded-xl object-cover" />
           ) : (
-            <div className="h-10 w-10 rounded-xl gold-gradient flex items-center justify-center shadow-sm shadow-primary/20">
+            <div className="h-10 w-10 rounded-xl gold-gradient flex items-center justify-center shadow-sm shadow-black/30">
               <span className="text-[11px] font-black text-primary-foreground tracking-tight">C4</span>
             </div>
           )}
@@ -36,15 +36,15 @@ export function SiteFooter() {
               href={settings.vipGroupLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
             >
               <Users className="h-3 w-3" /> Grupo VIP
             </a>
           </nav>
 
-          <div className="h-px w-24 bg-border/50" />
+          <div className="h-px w-24 bg-border/30" />
 
-          <p className="text-[10px] text-muted-foreground/50">
+          <p className="text-[10px] text-muted-foreground/40">
             © 2025 {brand.brandName}. Todos os direitos reservados.
           </p>
         </div>

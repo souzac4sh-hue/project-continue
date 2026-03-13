@@ -15,22 +15,21 @@ export function VipCTA() {
 
   return (
     <AnimatedSection className="container py-8">
-      <div className="relative overflow-hidden rounded-2xl gold-gradient p-7 text-center shimmer">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-black/30" />
+      <div className="relative overflow-hidden rounded-2xl gold-gradient p-7 text-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/15 to-black/40" />
         {/* Decorative elements */}
-        <div className="absolute top-3 left-3 w-16 h-16 rounded-full border border-primary-foreground/10" />
-        <div className="absolute bottom-3 right-3 w-24 h-24 rounded-full border border-primary-foreground/10" />
+        <div className="absolute top-3 left-3 w-16 h-16 rounded-full border border-white/5" />
+        <div className="absolute bottom-3 right-3 w-24 h-24 rounded-full border border-white/5" />
 
         <div className="relative z-10">
-          <div className="h-12 w-12 rounded-full bg-primary-foreground/15 flex items-center justify-center mx-auto mb-4 animate-float">
+          <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4 animate-float">
             <Crown className="h-6 w-6 text-primary-foreground" />
           </div>
           <h2 className="font-serif text-xl font-bold text-primary-foreground mb-2">Grupo VIP C4SH STORE</h2>
-          <p className="text-xs text-primary-foreground/80 max-w-xs mx-auto mb-5 leading-relaxed">
+          <p className="text-xs text-primary-foreground/70 max-w-xs mx-auto mb-5 leading-relaxed">
             Entre no grupo e receba novidades, oportunidades e atualizações primeiro.
           </p>
 
-          {/* Benefits list */}
           <div className="grid grid-cols-2 gap-2.5 max-w-sm mx-auto mb-6">
             {benefits.map((b, i) => (
               <motion.div
@@ -39,10 +38,10 @@ export function VipCTA() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 + i * 0.08 }}
-                className="flex items-center gap-2 bg-primary-foreground/10 rounded-lg px-3 py-2 text-left"
+                className="flex items-center gap-2 bg-white/8 rounded-lg px-3 py-2 text-left"
               >
-                <b.icon className="h-3.5 w-3.5 text-primary-foreground/80 shrink-0" />
-                <span className="text-[10px] text-primary-foreground/90 font-medium leading-tight">{b.text}</span>
+                <b.icon className="h-3.5 w-3.5 text-primary-foreground/70 shrink-0" />
+                <span className="text-[10px] text-primary-foreground/85 font-medium leading-tight">{b.text}</span>
               </motion.div>
             ))}
           </div>
@@ -51,7 +50,7 @@ export function VipCTA() {
             href={settings.vipGroupLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-primary-foreground text-primary font-bold text-sm px-7 py-3.5 rounded-xl shadow-lg pulse-glow"
+            className="inline-flex items-center gap-2 bg-white text-background font-bold text-sm px-7 py-3.5 rounded-xl shadow-lg"
             whileHover={{ scale: 1.03, y: -1 }}
             whileTap={{ scale: 0.97 }}
             aria-label="Entrar no Grupo VIP via WhatsApp"

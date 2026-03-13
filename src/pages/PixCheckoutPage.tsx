@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useStore } from '@/context/StoreContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { trackCheckoutEvent, updateLeadStatus, markPixCopied, markAbandoned, markSupportContacted } from '@/lib/checkoutTracker';
 
 type CheckoutState = 'loading' | 'awaiting' | 'waiting_confirm' | 'paid' | 'error' | 'expired';
 

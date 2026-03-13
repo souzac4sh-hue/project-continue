@@ -14,7 +14,6 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const timeRef = useRef(0);
 
-  // Neon blue emissive material
   const neonMat = useMemo(() => new THREE.MeshStandardMaterial({
     color: new THREE.Color('hsl(200, 100%, 50%)'),
     emissive: new THREE.Color('hsl(200, 100%, 40%)'),
@@ -51,8 +50,6 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
     if (!groupRef.current) return;
     timeRef.current += delta;
     const t = timeRef.current;
-
-    // Idle breathing / bobbing
     if (idle) {
       groupRef.current.position.y = Math.sin(t * 2) * 0.05;
       groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
@@ -61,102 +58,70 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
 
   return (
     <group ref={groupRef} scale={0.9}>
-      {/* Body / Torso */}
       <mesh position={[0, 0.2, 0]} material={bodyMat}>
         <boxGeometry args={[0.6, 0.7, 0.35]} />
       </mesh>
-
-      {/* Chest armor plate */}
       <mesh position={[0, 0.25, 0.18]} material={armorMat}>
         <boxGeometry args={[0.45, 0.5, 0.05]} />
       </mesh>
-
-      {/* Center neon line on chest */}
       <mesh position={[0, 0.25, 0.21]} material={neonMat}>
         <boxGeometry args={[0.03, 0.4, 0.02]} />
       </mesh>
-
-      {/* Belt */}
       <mesh position={[0, -0.12, 0]} material={armorMat}>
         <boxGeometry args={[0.65, 0.1, 0.38]} />
       </mesh>
-      {/* Belt buckle (neon) */}
       <mesh position={[0, -0.12, 0.2]} material={neonMat}>
         <boxGeometry args={[0.18, 0.07, 0.03]} />
       </mesh>
-
-      {/* Head */}
       <mesh position={[0, 0.8, 0]} material={bodyMat}>
         <sphereGeometry args={[0.28, 16, 16]} />
       </mesh>
-
-      {/* Headband (neon) */}
       <mesh position={[0, 0.82, 0]} material={neonMat}>
         <cylinderGeometry args={[0.29, 0.29, 0.08, 16]} />
       </mesh>
-
-      {/* Eyes */}
       <mesh position={[-0.1, 0.78, 0.22]} material={eyeMat}>
         <sphereGeometry args={[0.055, 8, 8]} />
       </mesh>
       <mesh position={[0.1, 0.78, 0.22]} material={eyeMat}>
         <sphereGeometry args={[0.055, 8, 8]} />
       </mesh>
-
-      {/* Mask tail ribbons */}
       <mesh position={[-0.35, 0.85, -0.1]} rotation={[0, 0, -0.5]} material={neonMat}>
         <boxGeometry args={[0.3, 0.04, 0.02]} />
       </mesh>
       <mesh position={[-0.42, 0.82, -0.12]} rotation={[0, 0, -0.7]} material={neonMat}>
         <boxGeometry args={[0.22, 0.03, 0.02]} />
       </mesh>
-
-      {/* Left Arm */}
       <mesh position={[-0.42, 0.2, 0]} rotation={[0, 0, 0.3]} material={bodyMat}>
         <boxGeometry args={[0.15, 0.5, 0.15]} />
       </mesh>
-      {/* Left hand */}
       <mesh position={[-0.5, -0.02, 0]} material={armorMat}>
         <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-
-      {/* Right Arm */}
       <mesh position={[0.42, 0.2, 0]} rotation={[0, 0, -0.3]} material={bodyMat}>
         <boxGeometry args={[0.15, 0.5, 0.15]} />
       </mesh>
-      {/* Right hand */}
       <mesh position={[0.5, -0.02, 0]} material={armorMat}>
         <sphereGeometry args={[0.08, 8, 8]} />
       </mesh>
-
-      {/* Left Leg */}
       <mesh position={[-0.15, -0.5, 0]} material={bodyMat}>
         <boxGeometry args={[0.17, 0.55, 0.17]} />
       </mesh>
-      {/* Left leg neon strip */}
       <mesh position={[-0.15, -0.5, 0.09]} material={neonMat}>
         <boxGeometry args={[0.03, 0.4, 0.02]} />
       </mesh>
-
-      {/* Right Leg */}
       <mesh position={[0.15, -0.5, 0]} material={bodyMat}>
         <boxGeometry args={[0.17, 0.55, 0.17]} />
       </mesh>
-      {/* Right leg neon strip */}
       <mesh position={[0.15, -0.5, 0.09]} material={neonMat}>
         <boxGeometry args={[0.03, 0.4, 0.02]} />
       </mesh>
-
-      {/* Sword on back */}
       <group position={[0.2, 0.4, -0.2]} rotation={[0, 0, -0.35]}>
         <mesh material={swordMat}>
           <boxGeometry args={[0.04, 0.7, 0.02]} />
         </mesh>
-        {/* Sword guard (neon) */}
         <mesh position={[0, -0.35, 0]} material={neonMat}>
           <boxGeometry args={[0.15, 0.04, 0.06]} />
         </mesh>
-        {/* Sword handle */}
         <mesh position={[0, -0.45, 0]} material={armorMat}>
           <boxGeometry args={[0.05, 0.15, 0.05]} />
         </mesh>
@@ -197,9 +162,7 @@ function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
           initial={{
             x: size / 2 + (Math.random() - 0.5) * 20,
             y: size / 2 + (Math.random() - 0.5) * 20,
-            width: 8,
-            height: 8,
-            opacity: 0.8,
+            width: 8, height: 8, opacity: 0.8,
           }}
           animate={{
             x: size / 2 + (Math.random() - 0.5) * size,
@@ -215,7 +178,7 @@ function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
   );
 }
 
-/* ─── Weighted random pick ─── */
+/* ─── Helpers ─── */
 function pickWeightedReward(tiers: NinjaRewardTier[]): NinjaRewardTier {
   const totalWeight = tiers.reduce((sum, t) => sum + t.weight, 0);
   let roll = Math.random() * totalWeight;
@@ -226,25 +189,24 @@ function pickWeightedReward(tiers: NinjaRewardTier[]): NinjaRewardTier {
   return tiers[tiers.length - 1];
 }
 
-/* ─── Movement targets ─── */
 function getRandomPosition(ninjaSize: number) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const margin = ninjaSize;
+  const m = ninjaSize;
   return {
-    x: margin + Math.random() * (vw - margin * 2),
-    y: margin + Math.random() * (vh - margin * 2),
+    x: m + Math.random() * (vw - m * 2),
+    y: m + Math.random() * (vh - m * 2),
   };
 }
 
-function getDodgePosition(currentX: number, currentY: number, ninjaSize: number) {
+function getDodgePosition(cx: number, cy: number, ninjaSize: number) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const offsetX = (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 150);
-  const offsetY = (Math.random() > 0.5 ? 1 : -1) * (80 + Math.random() * 120);
+  const ox = (Math.random() > 0.5 ? 1 : -1) * (100 + Math.random() * 150);
+  const oy = (Math.random() > 0.5 ? 1 : -1) * (80 + Math.random() * 120);
   return {
-    x: Math.max(ninjaSize, Math.min(vw - ninjaSize, currentX + offsetX)),
-    y: Math.max(ninjaSize, Math.min(vh - ninjaSize, currentY + offsetY)),
+    x: Math.max(ninjaSize, Math.min(vw - ninjaSize, cx + ox)),
+    y: Math.max(ninjaSize, Math.min(vh - ninjaSize, cy + oy)),
   };
 }
 
@@ -255,7 +217,7 @@ export function Ninja3D() {
 
   const {
     enabled = true,
-    cooldownMinutes = 1440, // 24 hours
+    cooldownMinutes = 2,
     ninjaSize = 80,
     rewardTiers = [],
     discountCodes = [],
@@ -263,16 +225,19 @@ export function Ninja3D() {
     showReward = true,
   } = ninja;
 
-  const [phase, setPhase] = useState<'hidden' | 'entering' | 'moving' | 'idle' | 'dodging' | 'smoke' | 'caught'>('hidden');
+  const [phase, setPhase] = useState<'hidden' | 'active' | 'smoke' | 'caught'>('hidden');
   const [pos, setPos] = useState({ x: -200, y: 300 });
+  const [isIdle, setIsIdle] = useState(false);
   const [rewardOpen, setRewardOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [rewardCode, setRewardCode] = useState('');
   const [rewardLabel, setRewardLabel] = useState('');
   const [smokePos, setSmokePos] = useState({ x: 0, y: 0 });
+  const [isDodging, setIsDodging] = useState(false);
   const dodgeCountRef = useRef(0);
-  const maxDodges = 2 + Math.floor(Math.random() * 3); // 2-4
-  const moveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxDodgesRef = useRef(2 + Math.floor(Math.random() * 3));
+  const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoHideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
   const canAppear = useCallback(() => {
@@ -283,116 +248,94 @@ export function Ninja3D() {
     return true;
   }, [enabled, cooldownMinutes]);
 
-  // Increment ninja stats
   const incrementStat = useCallback((key: 'totalAppearances' | 'totalClicks' | 'couponsGenerated') => {
     setSettings(prev => ({
       ...prev,
       ninjaSettings: {
         ...prev.ninjaSettings,
-        stats: {
-          ...prev.ninjaSettings.stats,
-          [key]: (prev.ninjaSettings.stats[key] || 0) + 1,
-        },
+        stats: { ...prev.ninjaSettings.stats, [key]: (prev.ninjaSettings.stats[key] || 0) + 1 },
       },
     }));
   }, [setSettings]);
 
-  // Start moving to random positions
-  const startMoving = useCallback(() => {
-    if (!mountedRef.current) return;
-    const target = getRandomPosition(ninjaSize);
-    setPos(target);
-    setPhase('moving');
-
-    moveTimerRef.current = setTimeout(() => {
-      if (!mountedRef.current) return;
-      setPhase('idle');
-
-      // After idle pause, move again
-      moveTimerRef.current = setTimeout(() => {
-        if (mountedRef.current && phase !== 'caught') startMoving();
-      }, 1500 + Math.random() * 2000);
-    }, 1200 + Math.random() * 800);
-  }, [ninjaSize]);
-
-  // Entry sequence
+  // Entry logic
   useEffect(() => {
     mountedRef.current = true;
     if (!canAppear()) return;
 
-    const delay = 3000 + Math.random() * 3000; // 3-6s
+    const delay = 3000 + Math.random() * 3000;
     const timer = setTimeout(() => {
       if (!mountedRef.current) return;
       sessionStorage.setItem(SESSION_KEY, 'true');
       localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       incrementStat('totalAppearances');
 
-      // Enter from a random edge
-      const side = Math.floor(Math.random() * 4);
+      // Start at random edge
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      let startPos = { x: -ninjaSize, y: vh / 2 };
-      if (side === 1) startPos = { x: vw + ninjaSize, y: vh / 2 };
-      if (side === 2) startPos = { x: vw / 2, y: -ninjaSize };
-      if (side === 3) startPos = { x: vw / 2, y: vh + ninjaSize };
+      const side = Math.floor(Math.random() * 4);
+      const starts = [
+        { x: -ninjaSize, y: vh / 2 },
+        { x: vw + ninjaSize, y: vh / 2 },
+        { x: vw / 2, y: -ninjaSize },
+        { x: vw / 2, y: vh + ninjaSize },
+      ];
+      setPos(starts[side]);
+      setPhase('active');
+      setIsIdle(false);
 
-      setPos(startPos);
-      setPhase('entering');
+      // Move to first position after a tick
+      requestAnimationFrame(() => {
+        setPos(getRandomPosition(ninjaSize));
+      });
 
-      // Move to first position
-      setTimeout(() => {
+      // Set up periodic movement
+      let moveCount = 0;
+      moveIntervalRef.current = setInterval(() => {
         if (!mountedRef.current) return;
-        const target = getRandomPosition(ninjaSize);
-        setPos(target);
+        moveCount++;
+        setIsIdle(false);
+        setPos(getRandomPosition(ninjaSize));
 
+        // Idle pause after move
         setTimeout(() => {
-          if (mountedRef.current) startMoving();
-        }, 1000);
-      }, 100);
+          if (mountedRef.current) setIsIdle(true);
+        }, 1200);
+      }, 3000);
+
+      // Auto-disappear after 25s
+      autoHideRef.current = setTimeout(() => {
+        if (!mountedRef.current) return;
+        if (moveIntervalRef.current) clearInterval(moveIntervalRef.current);
+        setSmokePos(getRandomPosition(ninjaSize));
+        setPhase('smoke');
+        setTimeout(() => { if (mountedRef.current) setPhase('hidden'); }, 800);
+      }, 25000);
     }, delay);
 
     return () => {
       mountedRef.current = false;
       clearTimeout(timer);
-      if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+      if (moveIntervalRef.current) clearInterval(moveIntervalRef.current);
+      if (autoHideRef.current) clearTimeout(autoHideRef.current);
     };
-  }, [canAppear, incrementStat, ninjaSize, startMoving]);
-
-  // Auto-disappear after 20s
-  useEffect(() => {
-    if (phase === 'hidden' || phase === 'caught' || phase === 'smoke') return;
-    if (phase === 'entering') return;
-
-    const autoHide = setTimeout(() => {
-      if (!mountedRef.current) return;
-      setSmokePos(pos);
-      setPhase('smoke');
-      setTimeout(() => {
-        if (mountedRef.current) setPhase('hidden');
-      }, 800);
-    }, 20000);
-
-    return () => clearTimeout(autoHide);
-  }, [phase]);
+  }, [canAppear, incrementStat, ninjaSize]);
 
   const handleClick = useCallback(() => {
-    if (phase === 'hidden' || phase === 'smoke' || phase === 'caught') return;
-    if (moveTimerRef.current) clearTimeout(moveTimerRef.current);
+    if (phase !== 'active') return;
 
     // Dodge mechanic
-    if (dodgeCountRef.current < maxDodges) {
+    if (dodgeCountRef.current < maxDodgesRef.current) {
       dodgeCountRef.current++;
-      const dodgeTarget = getDodgePosition(pos.x, pos.y, ninjaSize);
-      setPos(dodgeTarget);
-      setPhase('dodging');
-
-      setTimeout(() => {
-        if (mountedRef.current) startMoving();
-      }, 600);
+      setIsDodging(true);
+      setPos(prev => getDodgePosition(prev.x, prev.y, ninjaSize));
+      setTimeout(() => setIsDodging(false), 400);
       return;
     }
 
     // Caught!
+    if (moveIntervalRef.current) clearInterval(moveIntervalRef.current);
+    if (autoHideRef.current) clearTimeout(autoHideRef.current);
     incrementStat('totalClicks');
     setSmokePos(pos);
     setPhase('caught');
@@ -400,7 +343,6 @@ export function Ninja3D() {
     setTimeout(() => {
       if (!mountedRef.current) return;
       setPhase('smoke');
-
       setTimeout(() => {
         if (!mountedRef.current) return;
         setPhase('hidden');
@@ -408,7 +350,6 @@ export function Ninja3D() {
         if (showReward) {
           let code = '';
           let label = '';
-
           if (rewardTiers.length > 0) {
             const tier = pickWeightedReward(rewardTiers);
             code = tier.code;
@@ -416,12 +357,10 @@ export function Ninja3D() {
           } else if (discountCodes.length > 0) {
             code = discountCodes[Math.floor(Math.random() * discountCodes.length)];
           } else {
-            // Default codes
             const isRare = Math.random() < 0.1;
             code = isRare ? 'C4NINJA10' : 'C4NINJA5';
             label = isRare ? '🔥 10% Raro!' : '5% desconto';
           }
-
           if (code) {
             setRewardCode(code);
             setRewardLabel(label);
@@ -432,7 +371,7 @@ export function Ninja3D() {
         }
       }, 700);
     }, 300);
-  }, [phase, pos, ninjaSize, maxDodges, showReward, rewardTiers, discountCodes, startMoving, incrementStat]);
+  }, [phase, pos, ninjaSize, showReward, rewardTiers, discountCodes, incrementStat]);
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(rewardCode);
@@ -442,54 +381,38 @@ export function Ninja3D() {
 
   if (!enabled) return null;
 
-  const isVisible = phase !== 'hidden';
-  const isMoving = phase === 'entering' || phase === 'moving' || phase === 'dodging';
-
   return (
     <>
-      {/* Ninja character */}
       <AnimatePresence>
-        {isVisible && phase !== 'smoke' && phase !== 'caught' && (
+        {phase === 'active' && (
           <motion.div
             className="fixed z-[65] cursor-pointer"
             style={{
-              width: ninjaSize,
-              height: ninjaSize,
+              width: ninjaSize, height: ninjaSize,
               pointerEvents: 'auto',
               filter: 'drop-shadow(0 0 12px rgba(18,181,255,0.4))',
             }}
             initial={{ opacity: 0, scale: 0.3 }}
             animate={{
               opacity: 1,
-              scale: phase === 'dodging' ? 1.15 : 1,
+              scale: isDodging ? 1.15 : 1,
               x: pos.x - ninjaSize / 2,
               y: pos.y - ninjaSize / 2,
             }}
             exit={{ opacity: 0, scale: 0 }}
             transition={{
-              x: {
-                type: 'spring',
-                stiffness: phase === 'dodging' ? 300 : 120,
-                damping: phase === 'dodging' ? 15 : 20,
-              },
-              y: {
-                type: 'spring',
-                stiffness: phase === 'dodging' ? 300 : 120,
-                damping: phase === 'dodging' ? 15 : 20,
-              },
+              x: { type: 'spring', stiffness: isDodging ? 300 : 120, damping: isDodging ? 15 : 20 },
+              y: { type: 'spring', stiffness: isDodging ? 300 : 120, damping: isDodging ? 15 : 20 },
               scale: { type: 'spring', stiffness: 200, damping: 15 },
               opacity: { duration: 0.3 },
             }}
             onClick={handleClick}
           >
-            <NinjaCanvas size={ninjaSize} idle={phase === 'idle'} />
-
-            {/* Neon glow ring underneath */}
+            <NinjaCanvas size={ninjaSize} idle={isIdle} />
             <div
               className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
               style={{
-                width: ninjaSize * 0.6,
-                height: ninjaSize * 0.12,
+                width: ninjaSize * 0.6, height: ninjaSize * 0.12,
                 background: 'radial-gradient(ellipse, rgba(18,181,255,0.35) 0%, transparent 70%)',
                 filter: 'blur(3px)',
               }}
@@ -498,14 +421,12 @@ export function Ninja3D() {
         )}
       </AnimatePresence>
 
-      {/* Smoke effect */}
       <AnimatePresence>
         {(phase === 'smoke' || phase === 'caught') && (
           <SmokeEffect x={smokePos.x} y={smokePos.y} size={ninjaSize} />
         )}
       </AnimatePresence>
 
-      {/* Reward popup */}
       <AnimatePresence>
         {rewardOpen && (
           <motion.div
@@ -523,18 +444,13 @@ export function Ninja3D() {
                 boxShadow: '0 0 40px rgba(18,181,255,0.12), 0 12px 40px rgba(0,0,0,0.5)',
               }}
             >
-              {/* Decorative glow */}
               <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full" style={{ background: 'radial-gradient(circle, rgba(18,181,255,0.08), transparent)' }} />
 
-              <button
-                onClick={() => setRewardOpen(false)}
-                className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-secondary text-muted-foreground z-10"
-              >
+              <button onClick={() => setRewardOpen(false)} className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-secondary text-muted-foreground z-10">
                 <X className="h-4 w-4" />
               </button>
 
               <div className="text-center space-y-3 relative z-10">
-                {/* Sparkle icon */}
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
@@ -560,11 +476,7 @@ export function Ninja3D() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                     className="inline-block text-[10px] font-bold px-3 py-1 rounded-full"
-                    style={{
-                      color: 'hsl(200, 100%, 70%)',
-                      background: 'rgba(18,181,255,0.1)',
-                      border: '1px solid rgba(18,181,255,0.2)',
-                    }}
+                    style={{ color: 'hsl(200, 100%, 70%)', background: 'rgba(18,181,255,0.1)', border: '1px solid rgba(18,181,255,0.2)' }}
                   >
                     {rewardLabel}
                   </motion.span>
@@ -575,11 +487,7 @@ export function Ninja3D() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
                   className="rounded-xl px-5 py-3.5 font-mono text-xl font-black tracking-[0.15em]"
-                  style={{
-                    background: 'rgba(18,181,255,0.06)',
-                    border: '1px solid rgba(18,181,255,0.15)',
-                    color: 'hsl(200, 100%, 85%)',
-                  }}
+                  style={{ background: 'rgba(18,181,255,0.06)', border: '1px solid rgba(18,181,255,0.15)', color: 'hsl(200, 100%, 85%)' }}
                 >
                   {rewardCode}
                 </motion.div>
@@ -588,11 +496,7 @@ export function Ninja3D() {
                   <button
                     onClick={handleCopyCode}
                     className="inline-flex items-center justify-center gap-2 font-bold text-sm px-6 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
-                    style={{
-                      background: 'linear-gradient(135deg, hsl(200, 100%, 50%), hsl(200, 100%, 38%))',
-                      color: 'white',
-                      boxShadow: '0 0 20px rgba(18,181,255,0.3)',
-                    }}
+                    style={{ background: 'linear-gradient(135deg, hsl(200, 100%, 50%), hsl(200, 100%, 38%))', color: 'white', boxShadow: '0 0 20px rgba(18,181,255,0.3)' }}
                   >
                     {copied ? <><Check className="h-4 w-4" /> Código copiado!</> : <><Copy className="h-4 w-4" /> Copiar código</>}
                   </button>

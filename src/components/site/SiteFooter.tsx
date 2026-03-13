@@ -45,7 +45,7 @@ export function SiteFooter() {
           <div className="h-px w-24 bg-border/50" />
 
           <p className="text-[10px] text-muted-foreground/50">
-            © {new Date().getFullYear()} {brand.brandName}. Todos os direitos reservados.
+            © 2025 {brand.brandName}. Todos os direitos reservados.
           </p>
         </div>
       </div>

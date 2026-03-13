@@ -242,6 +242,9 @@ export function Ninja3D() {
 
   const canAppear = useCallback(() => {
     if (!enabled) return false;
+    // Allow debug override via URL param ?ninja=1
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('ninja') === '1') return true;
     if (sessionStorage.getItem(SESSION_KEY) === 'true') return false;
     const lastTs = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10);
     if (Date.now() - lastTs < cooldownMinutes * 60 * 1000) return false;

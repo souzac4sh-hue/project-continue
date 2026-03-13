@@ -513,7 +513,7 @@ export default function PixCheckoutPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 text-xs border-primary/30 text-primary mt-1"
+                      className="h-8 text-xs border-border/50 text-foreground/70 mt-1"
                       onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
                     >
                       <MessageSquare className="h-3.5 w-3.5 mr-1.5" />

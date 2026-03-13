@@ -58,9 +58,12 @@ export function AdminProducts() {
     setCurrent(c => ({ ...c, benefits: (c.benefits || []).filter((_, i) => i !== index) }));
   };
 
-  const save = () => {
+  const save = async () => {
     if (!current.name?.trim()) { toast({ title: 'Nome obrigatório', variant: 'destructive' }); return; }
     const slug = current.slug || generateSlug(current.name!);
+    
+    console.log('[AdminProducts] Saving product:', current.name, 'image:', current.image ? current.image.substring(0, 80) + '...' : '(empty)');
+    
     if (current.id) {
       setProducts(prev => prev.map(p => p.id === current.id ? { ...p, ...current, slug } as Product : p));
     } else {
@@ -68,7 +71,19 @@ export function AdminProducts() {
       setProducts(prev => [...prev, newP]);
     }
     setEditOpen(false);
-    toast({ title: '✅ Produto salvo!' });
+    toast({ title: '✅ Produto salvo! Persistindo...' });
+    
+    // Auto-persist to DB after a short delay to let state update
+    setTimeout(async () => {
+      try {
+        await saveAll();
+        console.log('[AdminProducts] Auto-persisted to DB successfully');
+        toast({ title: '✅ Salvo no banco!' });
+      } catch (err) {
+        console.error('[AdminProducts] Auto-persist failed:', err);
+        toast({ title: '⚠️ Salvo localmente, clique em Salvar para persistir', variant: 'destructive' });
+      }
+    }, 500);
   };
 
   const remove = (id: string) => {

@@ -34,6 +34,7 @@ function incrementDayCount(key: string) {
 
 interface NinjaAssistantProps {
   context?: 'homepage' | 'product' | 'checkout';
+  productId?: string;
 }
 
 export function NinjaAssistant({ context = 'homepage' }: NinjaAssistantProps) {

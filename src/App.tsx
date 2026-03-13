@@ -15,6 +15,7 @@ import PixCheckoutPage from "./pages/PixCheckoutPage";
 import AdminPage from "./pages/AdminPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import NotFound from "./pages/NotFound";
+import FloatingNinja from "./components/site/FloatingNinja";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <DynamicColors />
           <Toaster />
           <Sonner />
+          <FloatingNinja />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<ShopPage />} />

@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.sigilopay-webhook]
 verify_jwt = false
+
+[functions.update-checkout-status]
+verify_jwt = false

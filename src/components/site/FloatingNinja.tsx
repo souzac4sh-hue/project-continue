@@ -478,10 +478,6 @@ export default function FloatingNinja() {
           50% { opacity: 0.7; transform: scale(1.05); }
         }
       `}</style>
-          from { transform: scale(0) rotate(-180deg); }
-          to { transform: scale(1) rotate(0deg); }
-        }
-      `}</style>
     </>
   );
 }

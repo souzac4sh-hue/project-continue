@@ -394,7 +394,7 @@ export default function PixCheckoutPage() {
                       variant="outline"
                       onClick={handleRegeneratePix}
                       disabled={isRegenerating}
-                      className="w-full h-10 text-xs border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors"
+                      className="w-full h-10 text-xs border-border/50 hover:border-border text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {isRegenerating ? (
                         <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Gerando novo Pix...</>

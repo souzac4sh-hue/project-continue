@@ -8,7 +8,8 @@ import { Link, Navigate } from 'react-router-dom';
 import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,
   Bell, Settings, ArrowLeft, ChevronRight, Image, LogOut,
-  TrendingUp, Calendar, CalendarDays, Award, DollarSign, FileText,
+  TrendingUp, Calendar, Award, DollarSign, FileText,
+  LayoutDashboard, RefreshCw, MessageSquare,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { isAdminAuthenticated, clearAdminSession } from '@/lib/adminAuth';
@@ -23,20 +24,28 @@ import { AdminBanners } from '@/components/admin/AdminBanners';
 import { AdminBranding } from '@/components/admin/AdminBranding';
 import { AdminPixOrders } from '@/components/admin/AdminPixOrders';
 import { AdminSiteTexts } from '@/components/admin/AdminSiteTexts';
+import { AdminDashboard } from '@/components/admin/AdminDashboard';
+import { AdminRecovery } from '@/components/admin/AdminRecovery';
+import { AdminRecoverySettings } from '@/components/admin/AdminRecoverySettings';
 
 const modules = [
-  { id: 'products', label: 'Produtos', icon: ShoppingBag },
-  { id: 'categories', label: 'Categorias', icon: Layers },
-  { id: 'banners', label: 'Banners Hero', icon: Image },
-  { id: 'methods', label: 'Métodos', icon: BookOpen },
-  { id: 'references', label: 'Referências', icon: Star },
-  { id: 'orders', label: 'Pedidos', icon: ClipboardList },
-  { id: 'pix_orders', label: 'Financeiro Pix', icon: DollarSign },
-  { id: 'activities', label: 'Atividade', icon: Bell },
-  { id: 'branding', label: 'Branding', icon: Award },
-  { id: 'site_texts', label: 'Textos do Site', icon: FileText },
-  { id: 'settings', label: 'Configurações', icon: Settings },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'Visão Geral' },
+  { id: 'products', label: 'Produtos', icon: ShoppingBag, group: 'Loja' },
+  { id: 'categories', label: 'Categorias', icon: Layers, group: 'Loja' },
+  { id: 'banners', label: 'Banners Hero', icon: Image, group: 'Loja' },
+  { id: 'orders', label: 'Pedidos', icon: ClipboardList, group: 'Operação' },
+  { id: 'pix_orders', label: 'Financeiro Pix', icon: DollarSign, group: 'Operação' },
+  { id: 'recovery', label: 'Recuperação', icon: RefreshCw, group: 'Operação' },
+  { id: 'recovery_settings', label: 'Config. Recuperação', icon: MessageSquare, group: 'Operação' },
+  { id: 'methods', label: 'Métodos', icon: BookOpen, group: 'Marketing' },
+  { id: 'references', label: 'Referências', icon: Star, group: 'Marketing' },
+  { id: 'activities', label: 'Prova Social', icon: Bell, group: 'Marketing' },
+  { id: 'branding', label: 'Branding', icon: Award, group: 'Configurações' },
+  { id: 'site_texts', label: 'Textos do Site', icon: FileText, group: 'Configurações' },
+  { id: 'settings', label: 'Configurações', icon: Settings, group: 'Configurações' },
 ];
+
+const groups = ['Visão Geral', 'Loja', 'Operação', 'Marketing', 'Configurações'];
 
 export default function AdminPage() {
   const [activeModule, setActiveModule] = useState<string | null>(null);

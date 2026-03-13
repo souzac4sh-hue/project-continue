@@ -286,7 +286,7 @@ export function AdminRecovery() {
     if (lead.support_contacted_at) tags.push({ label: '💬 Pediu Suporte', color: 'bg-purple-500/20 text-purple-400' });
     if (lead.lead_status === 'abandoned' && lead.abandoned_at) {
       const mins = Math.floor((Date.now() - new Date(lead.abandoned_at).getTime()) / 60000);
-      if (mins < 60) tags.push({ label: '⏰ Abandono Recente', color: 'bg-red-500/20 text-red-400' });
+      if (mins < 30) tags.push({ label: '⏰ Abandono Recente', color: 'bg-red-500/20 text-red-400' });
     }
     return tags;
   };

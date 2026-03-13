@@ -268,7 +268,7 @@ export function NinjaAssistant({ context = 'homepage', productId }: NinjaAssista
   return (
     <>
       {/* Coupon Hunter (3D Ninja mascot) */}
-      {showCouponHunter && context !== 'checkout' && <Ninja3D />}
+      {showCouponHunter && context !== 'checkout' && <Ninja3D productId={productId} />}
 
       {/* Promo / Checkout bubble */}
       <NinjaBubble

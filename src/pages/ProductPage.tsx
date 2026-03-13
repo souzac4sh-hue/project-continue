@@ -394,7 +394,7 @@ export default function ProductPage() {
                 className="glass-card rounded-xl p-3.5"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-primary">{review.name}</span>
+                  <span className="text-xs font-semibold text-foreground">{review.name}</span>
                   <span className="text-[10px] text-muted-foreground/60">{review.time}</span>
                 </div>
                 <StarRating rating={review.rating} size="sm" />

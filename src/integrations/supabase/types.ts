@@ -14,118 +14,16 @@ export type Database = {
   }
   public: {
     Tables: {
-      pix_orders: {
-        Row: {
-          amount: number
-          created_at: string
-          customer_document: string
-          customer_email: string
-          customer_name: string
-          customer_phone: string
-          id: string
-          identifier: string
-          paid_at: string | null
-          payment_status: Database["public"]["Enums"]["payment_status"]
-          pix_code: string | null
-          product_id: string
-          product_name: string
-          provider: string
-          provider_identifier: string | null
-          provider_response: Json | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string
-          customer_document?: string
-          customer_email?: string
-          customer_name: string
-          customer_phone: string
-          id?: string
-          identifier: string
-          paid_at?: string | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
-          pix_code?: string | null
-          product_id: string
-          product_name: string
-          provider?: string
-          provider_identifier?: string | null
-          provider_response?: Json | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string
-          customer_document?: string
-          customer_email?: string
-          customer_name?: string
-          customer_phone?: string
-          id?: string
-          identifier?: string
-          paid_at?: string | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
-          pix_code?: string | null
-          product_id?: string
-          product_name?: string
-          provider?: string
-          provider_identifier?: string | null
-          provider_response?: Json | null
-        }
-        Relationships: []
-      }
-      site_config: {
-        Row: {
-          id: string
-          settings: Json
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          settings?: Json
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          settings?: Json
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
-      payment_status: "pending" | "paid" | "failed" | "expired"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -252,9 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "moderator", "user"],
-      payment_status: ["pending", "paid", "failed", "expired"],
-    },
+    Enums: {},
   },
 } as const

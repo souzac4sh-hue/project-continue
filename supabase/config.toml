@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.update-checkout-status]
 verify_jwt = false
+
+[functions.generate-ninja-coupon]
+verify_jwt = false
+
+[functions.validate-ninja-coupon]
+verify_jwt = false

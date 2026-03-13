@@ -3,23 +3,39 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { StoreProvider } from "@/context/StoreContext";
+import ShopPage from "./pages/ShopPage";
+import ProductPage from "./pages/ProductPage";
+import MethodsPage from "./pages/MethodsPage";
+import ReferencesPage from "./pages/ReferencesPage";
+import OrderTrackingPage from "./pages/OrderTrackingPage";
+import PixCheckoutPage from "./pages/PixCheckoutPage";
+import AdminPage from "./pages/AdminPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <StoreProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<ShopPage />} />
+            <Route path="/produto/:id" element={<ProductPage />} />
+            <Route path="/metodos" element={<MethodsPage />} />
+            <Route path="/referencias" element={<ReferencesPage />} />
+            <Route path="/pedido" element={<OrderTrackingPage />} />
+            <Route path="/checkout" element={<PixCheckoutPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </StoreProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

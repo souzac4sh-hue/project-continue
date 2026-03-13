@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,
   Bell, Settings, ArrowLeft, ChevronRight, Image, LogOut,

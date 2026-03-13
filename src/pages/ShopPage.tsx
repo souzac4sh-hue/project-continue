@@ -18,7 +18,7 @@ import { FloatingNotifications } from '@/components/site/FloatingNotifications';
 import { StoreModeBanner } from '@/components/site/StoreModeBanner';
 import { MaintenanceScreen } from '@/components/site/MaintenanceScreen';
 import { AnimatedSection } from '@/components/site/AnimatedSection';
-import { NinjaMascot } from '@/components/site/NinjaMascot';
+import { Ninja3D } from '@/components/site/Ninja3D';
 import { Flame } from 'lucide-react';
 
 export default function ShopPage() {
@@ -103,7 +103,7 @@ export default function ShopPage() {
       <SiteFooter />
       <FloatingButtons />
       <FloatingNotifications />
-      <NinjaMascot />
+      <Ninja3D />
     </div>
   );
 }

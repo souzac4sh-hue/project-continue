@@ -165,8 +165,40 @@ export function AdminRecovery() {
       result = result.filter(o => o.product_name === productFilter);
     }
 
+    // Phone search
+    if (phoneSearch.trim()) {
+      const q = phoneSearch.trim().toLowerCase();
+      result = result.filter(o =>
+        o.customer_phone.toLowerCase().includes(q) ||
+        o.customer_name.toLowerCase().includes(q)
+      );
+    }
+
+    // Priority tab
+    const now = Date.now();
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    switch (priorityTab) {
+      case 'hot':
+        result = result.filter(o =>
+          (o.copied_pix && o.payment_status !== 'paid') ||
+          o.support_contacted_at ||
+          (o.lead_status === 'abandoned' && o.abandoned_at && (now - new Date(o.abandoned_at).getTime()) < 30 * 60000)
+        );
+        break;
+      case 'recent':
+        result = result.filter(o => (now - new Date(o.created_at).getTime()) < 60 * 60000);
+        break;
+      case 'abandoned_today':
+        result = result.filter(o => o.lead_status === 'abandoned' && o.abandoned_at && new Date(o.abandoned_at) >= todayStart);
+        break;
+      case 'awaiting':
+        result = result.filter(o => o.recovery_status === 'in_progress' || o.recovery_status === 'pending');
+        result = result.filter(o => o.lead_status !== 'paid' && o.lead_status !== 'recovered');
+        break;
+    }
+
     return result;
-  }, [leads, periodFilter, leadStatusFilter, productFilter, customFrom, customTo]);
+  }, [leads, periodFilter, leadStatusFilter, productFilter, customFrom, customTo, phoneSearch, priorityTab]);
 
   // Stats from filtered
   const stats = useMemo(() => {

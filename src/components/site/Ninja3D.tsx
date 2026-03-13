@@ -390,6 +390,9 @@ export function Ninja3D() {
       {phase === 'active' && trailPositions.length > 0 && (
         <MotionTrail key={trailKey} positions={trailPositions} size={ninjaSize} />
       )}
+
+      <AnimatePresence>
+        {phase === 'smoke' && <SmokeEffect x={smokePos.x} y={smokePos.y} size={ninjaSize} />}
       </AnimatePresence>
 
       <AnimatePresence>

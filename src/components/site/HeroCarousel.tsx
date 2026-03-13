@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '@/context/StoreContext';
+import { HeroParticles } from './HeroParticles';
 
 export function HeroCarousel() {
   const { heroBanners, settings } = useStore();
@@ -69,6 +70,7 @@ export function HeroCarousel() {
       onTouchEnd={onTouchEnd}
     >
       <div className="relative aspect-[16/7] md:aspect-[21/8] w-full overflow-hidden">
+        <HeroParticles />
         <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.a
             key={current}

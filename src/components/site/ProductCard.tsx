@@ -40,10 +40,12 @@ export function ProductCard({ product }: { product: Product }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-20px' }}
       transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -4, transition: { duration: 0.25 } }}
+      whileTap={{ scale: 0.98, transition: { duration: 0.15 } }}
     >
       <Link
         to={`/produto/${product.slug || product.id}`}
-        className="glass-card rounded-xl overflow-hidden group block focus-visible:ring-2 focus-visible:ring-primary transition-all duration-300 hover:-translate-y-1"
+        className="glass-card rounded-xl overflow-hidden group block focus-visible:ring-2 focus-visible:ring-primary transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.4),0_0_20px_rgba(10,132,255,0.06)] hover:border-border/40"
         aria-label={`Ver produto ${product.name} por R$ ${(hasPromo ? product.promotionPrice! : product.price).toFixed(2)}`}
       >
         <div className="aspect-[16/10] bg-secondary flex items-center justify-center relative overflow-hidden">
@@ -104,8 +106,8 @@ export function ProductCard({ product }: { product: Product }) {
                 À vista no Pix
               </p>
             </div>
-            <span className="flex items-center gap-1 text-[10px] font-bold gold-gradient text-primary-foreground px-2.5 py-1.5 rounded-lg transition-all">
-              Ver <ArrowRight className="h-3 w-3" />
+            <span className="flex items-center gap-1 text-[10px] font-bold gold-gradient text-primary-foreground px-2.5 py-1.5 rounded-lg transition-all group-hover:shadow-[0_0_12px_rgba(10,132,255,0.15)]">
+              Ver <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
             </span>
           </div>
         </div>

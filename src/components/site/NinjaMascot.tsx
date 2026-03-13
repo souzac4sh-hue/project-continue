@@ -431,7 +431,7 @@ export function NinjaMascot() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="bg-secondary/80 rounded-xl px-5 py-3.5 font-mono text-xl font-black text-primary tracking-[0.15em] border border-primary/10"
+                  className="bg-secondary/80 rounded-xl px-5 py-3.5 font-mono text-xl font-black text-foreground tracking-[0.15em] border border-border/30"
                 >
                   {rewardCode}
                 </motion.div>

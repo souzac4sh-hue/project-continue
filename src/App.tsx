@@ -27,6 +27,7 @@ const App = () => (
           <DynamicColors />
           <Toaster />
           <Sonner />
+          <FloatingNinja />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<ShopPage />} />

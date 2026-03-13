@@ -256,7 +256,7 @@ export default function ProductPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="glass-card rounded-xl p-4 mb-6"
+            className="glass-card rounded-xl p-4 mb-6 border border-primary/10"
           >
             <h3 className="font-serif font-semibold text-sm mb-3 text-foreground">O que está incluso</h3>
             <ul className="space-y-2">

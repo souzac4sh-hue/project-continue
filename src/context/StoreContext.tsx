@@ -109,6 +109,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const saveAll = useCallback(async () => {
     const payload = JSON.parse(JSON.stringify(stateRef.current));
+
+    // ── STRIP SENSITIVE CREDENTIALS ──
+    // Remove payment provider secrets from the publicly-readable settings JSONB
+    const SENSITIVE_KEYS = ['pixToken', 'pixKey', 'pixWebhook'];
+    if (payload.settings && typeof payload.settings === 'object') {
+      for (const key of SENSITIVE_KEYS) {
+        if (key in payload.settings) {
+          delete payload.settings[key];
+        }
+      }
+    }
+
     try {
       // Check if row exists
       const { data: existing } = await supabase

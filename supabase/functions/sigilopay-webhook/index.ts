@@ -5,6 +5,41 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+/**
+ * Verify webhook signature using HMAC-SHA256.
+ * SigiloPay sends a signature in the x-signature header.
+ * If no secret is configured, we log a warning but still process (graceful degradation).
+ */
+async function verifySignature(body: string, signature: string | null, secret: string): Promise<boolean> {
+  if (!signature) return false
+
+  try {
+    const encoder = new TextEncoder()
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign'],
+    )
+    const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(body))
+    const computed = Array.from(new Uint8Array(sig))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+
+    // Compare in constant time (prevent timing attacks)
+    if (computed.length !== signature.length) return false
+    let mismatch = 0
+    for (let i = 0; i < computed.length; i++) {
+      mismatch |= computed.charCodeAt(i) ^ signature.charCodeAt(i)
+    }
+    return mismatch === 0
+  } catch (err) {
+    console.error('Signature verification error:', err)
+    return false
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -16,7 +51,36 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const body = await req.json()
+    const rawBody = await req.text()
+
+    // ── WEBHOOK SIGNATURE VERIFICATION ──
+    const SIGILOPAY_SECRET_KEY = Deno.env.get('SIGILOPAY_SECRET_KEY')
+    const signature = req.headers.get('x-signature') || req.headers.get('x-webhook-signature')
+
+    if (SIGILOPAY_SECRET_KEY) {
+      if (!signature) {
+        console.warn('Webhook received without signature header — rejecting for security')
+        return new Response(JSON.stringify({ received: true, error: 'missing_signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const isValid = await verifySignature(rawBody, signature, SIGILOPAY_SECRET_KEY)
+      if (!isValid) {
+        console.error('Webhook signature verification FAILED — potential forgery attempt')
+        return new Response(JSON.stringify({ received: true, error: 'invalid_signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      console.log('Webhook signature verified successfully')
+    } else {
+      console.warn('SIGILOPAY_SECRET_KEY not configured — skipping signature verification (UNSAFE for production)')
+    }
+
+    const body = JSON.parse(rawBody)
     console.log('Webhook received:', JSON.stringify(body))
 
     // Extract identifier and status from SigiloPay webhook payload

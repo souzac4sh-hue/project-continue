@@ -320,6 +320,22 @@ export default function PixCheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 py-6 relative">
+      {/* DEBUG PANEL */}
+      {DEBUG_PIX && (
+        <div className="fixed top-2 right-2 z-[9999] bg-black/90 text-green-400 font-mono text-[10px] p-3 rounded-lg max-w-xs shadow-xl border border-green-500/30 overflow-auto max-h-[50vh]">
+          <div className="font-bold text-green-300 mb-1">🐛 PIX DEBUG</div>
+          <div>Order: {orderId?.substring(0, 8)}...</div>
+          <div>Provider: {debugInfo.providerIdentifier?.substring(0, 12) || 'N/A'}</div>
+          <div>State: <span className={state === 'paid' ? 'text-green-300' : 'text-yellow-300'}>{state}</span></div>
+          <div>DB Status: <span className={debugInfo.lastDbStatus === 'paid' ? 'text-green-300' : 'text-yellow-300'}>{debugInfo.lastDbStatus || '...'}</span></div>
+          <div>Edge Status: {debugInfo.lastEdgeStatus || '...'}</div>
+          <div>Gateway: {debugInfo.gatewayStatus || 'N/A'}</div>
+          <div>Webhook: {debugInfo.webhookDetected ? '✅ YES' : '❌ NO'}</div>
+          <div>Polls: {debugInfo.pollCount}</div>
+          <div>Last Check: {debugInfo.lastCheck || '...'}</div>
+          {debugInfo.lastError && <div className="text-red-400 mt-1">Error: {debugInfo.lastError}</div>}
+        </div>
+      )}
       {/* Social Proof Notification */}
       <AnimatePresence>
         {socialProof && isActive && (

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useStore } from '@/context/StoreContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { trackCheckoutEvent, updateLeadStatus, markPixCopied, markAbandoned, markSupportContacted } from '@/lib/checkoutTracker';
+import { trackCheckoutEvent, markPixCopied, markAbandoned, markSupportContacted } from '@/lib/checkoutTracker';
 
 type CheckoutState = 'loading' | 'awaiting' | 'waiting_confirm' | 'paid' | 'error' | 'expired';
 

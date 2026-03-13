@@ -62,6 +62,7 @@ Deno.serve(async (req: Request) => {
       .select("id")
       .eq("session_id", session_id)
       .eq("status", "active")
+      .gte("expires_at", new Date().toISOString())
       .limit(1);
 
     if (existingSession && existingSession.length > 0) {

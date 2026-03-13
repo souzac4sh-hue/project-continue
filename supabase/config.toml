@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.validate-ninja-coupon]
 verify_jwt = false
+
+[functions.validate-coupon]
+verify_jwt = false

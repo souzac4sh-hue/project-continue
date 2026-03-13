@@ -13,7 +13,7 @@ export function ReferencesPreview() {
     <AnimatedSection className="container py-8">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="font-serif text-lg font-bold text-foreground flex items-center gap-2">
+          <h2 className="font-serif text-lg font-bold text-foreground flex items-center gap-2 shimmer-text">
             <Radio className="h-4 w-4 text-primary animate-pulse" />
             Clientes satisfeitos
           </h2>

@@ -47,7 +47,7 @@ export function SiteHeader() {
               initial={brand.logoAnimation ? { opacity: 0, y: -4 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="text-base font-bold gold-text-animated tracking-wide font-sans"
+              className="text-base font-bold gold-text-animated tracking-wide font-sans shimmer-text"
             >
               {brand.brandName}
             </motion.span>

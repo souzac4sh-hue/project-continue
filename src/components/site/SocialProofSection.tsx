@@ -15,7 +15,7 @@ export function SocialProofSection() {
   return (
     <AnimatedSection className="container py-8">
       <div className="text-center mb-5">
-        <h2 className="font-serif text-lg font-bold text-foreground flex items-center justify-center gap-2">
+        <h2 className="font-serif text-lg font-bold text-foreground flex items-center justify-center gap-2 shimmer-text">
           <ShieldCheck className="h-5 w-5 text-foreground/60" />
           Atividade recente
         </h2>

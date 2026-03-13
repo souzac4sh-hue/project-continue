@@ -1,14 +1,13 @@
-import { ShoppingBag, Flame, Tag, Zap, Star, Gem, ArrowRight, TrendingUp } from 'lucide-react';
+import { ShoppingBag, Flame, Tag, Zap, Star, Gem, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Product } from '@/data/mockData';
-import { StarRating } from './StarRating';
 
-const badgeConfig: Record<string, { icon: typeof Flame; label: string; className: string }> = {
-  best_seller: { icon: Flame, label: 'Mais vendido', className: 'bg-orange-500/90 text-white' },
+const badgeConfig: Record<string, { icon: typeof Flame; label: string; className: string; shimmer?: boolean }> = {
+  best_seller: { icon: Flame, label: 'Mais vendido', className: 'bg-orange-500/90 text-white', shimmer: true },
   fast: { icon: Zap, label: 'Rápido', className: 'bg-secondary text-foreground border border-border/50' },
   recommended: { icon: Star, label: 'Recomendado', className: 'bg-emerald-600/90 text-white' },
-  premium: { icon: Gem, label: 'Premium', className: 'bg-secondary text-foreground border border-border/50' },
+  premium: { icon: Gem, label: 'Premium', className: 'bg-secondary text-foreground border border-border/50', shimmer: true },
   promo: { icon: Tag, label: 'Promo', className: 'bg-destructive text-destructive-foreground' },
 };
 
@@ -23,12 +22,17 @@ function getUrgencyText(product: Product): string | null {
   return null;
 }
 
+function getSocialProofText(product: Product): string {
+  const seed = product.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const count = 40 + (seed % 160);
+  return `${count} avaliações positivas`;
+}
+
 export function ProductCard({ product }: { product: Product }) {
   const hasPromo = product.promotion && product.promotionPrice;
   const badge = product.badge ? badgeConfig[product.badge] : null;
   const urgency = getUrgencyText(product);
-  const seed = product.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const reviewCount = 40 + (seed % 160);
+  const socialProof = getSocialProofText(product);
 
   return (
     <motion.div
@@ -57,7 +61,7 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           )}
           {badge && (
-            <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm ${badge.className}`}>
+            <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm ${badge.className} ${badge.shimmer ? 'shimmer-badge' : ''}`}>
               <badge.icon className="h-3 w-3" /> {badge.label}
             </span>
           )}
@@ -66,7 +70,6 @@ export function ProductCard({ product }: { product: Product }) {
               <Tag className="h-3 w-3" /> Promo
             </span>
           )}
-          {/* Hover overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         <div className="p-3.5">
@@ -74,14 +77,14 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
           
-          <div className="mt-1">
-            <StarRating rating={5} count={reviewCount} />
-          </div>
-          
           <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">{product.description}</p>
           
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="text-[10px] text-muted-foreground/70">✓ {socialProof}</span>
+          </div>
+
           {urgency && (
-            <div className="mt-1.5 flex items-center gap-1">
+            <div className="mt-1 flex items-center gap-1">
               <span className="text-[10px] font-semibold text-muted-foreground leading-tight">{urgency}</span>
             </div>
           )}

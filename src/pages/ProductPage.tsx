@@ -176,23 +176,26 @@ export default function ProductPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-primary/10 shadow-lg shadow-primary/5"
+          className="aspect-video rounded-2xl bg-secondary flex items-center justify-center mb-5 overflow-hidden relative ring-1 ring-border/30 shadow-lg shadow-black/30"
         >
           {product.image ? (
             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
           ) : (
-            <ShoppingBag className="h-16 w-16 text-muted-foreground/20" />
+            <div className="flex flex-col items-center gap-3">
+              <ShoppingBag className="h-16 w-16 text-muted-foreground/10" />
+              <span className="text-xs text-muted-foreground/30">Imagem do produto</span>
+            </div>
           )}
-          {/* Live badge - reflects store mode */}
-          <div className={`absolute top-3 right-3 flex items-center gap-1.5 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-full border ${
+          {/* Live badge */}
+          <div className={`absolute top-3 right-3 flex items-center gap-1.5 bg-background/70 backdrop-blur-md px-2.5 py-1 rounded-full border ${
             settings.storeMode === 'offline' ? 'border-destructive/30' :
-            settings.storeMode === 'busy' ? 'border-yellow-500/30' : 'border-primary/20'
+            settings.storeMode === 'busy' ? 'border-yellow-500/30' : 'border-border/30'
           }`}>
             <span className={`h-2 w-2 rounded-full ${
               settings.storeMode === 'offline' ? 'bg-destructive' :
-              settings.storeMode === 'busy' ? 'bg-yellow-500' : 'bg-green-500 animate-pulse'
+              settings.storeMode === 'busy' ? 'bg-yellow-500' : 'bg-emerald-400 animate-pulse'
             }`} />
-            <span className="text-[10px] font-bold text-foreground/80">
+            <span className="text-[10px] font-bold text-foreground/70">
               {settings.storeMode === 'offline' ? 'OFFLINE' : settings.storeMode === 'busy' ? 'OCUPADO' : 'ONLINE'}
             </span>
           </div>
@@ -205,7 +208,7 @@ export default function ProductPage() {
           transition={{ duration: 0.3, delay: 0.05 }}
           className="flex items-center gap-3 mb-4 flex-wrap"
         >
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground bg-secondary px-2.5 py-1 rounded-full border border-border/30">
             <TrendingUp className="h-3 w-3" /> Alta demanda
           </span>
           <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
@@ -232,16 +235,16 @@ export default function ProductPage() {
           {product.promotion && product.promotionPrice ? (
             <div className="flex items-center gap-3 mb-2">
               <span className="text-muted-foreground line-through text-lg">R$ {product.price.toFixed(2)}</span>
-              <span className="gold-text text-2xl font-bold">R$ {product.promotionPrice.toFixed(2)}</span>
+              <span className="text-foreground text-2xl font-bold">R$ {product.promotionPrice.toFixed(2)}</span>
               <span className="text-[10px] font-bold bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">
                 -{Math.round((1 - product.promotionPrice / product.price) * 100)}%
               </span>
             </div>
           ) : (
-            <p className="gold-text text-2xl font-bold mb-2">R$ {product.price.toFixed(2)}</p>
+            <p className="text-foreground text-2xl font-bold mb-2">R$ {product.price.toFixed(2)}</p>
           )}
           <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1">
-            <svg viewBox="0 0 512 512" className="h-3 w-3 fill-primary/60" aria-hidden="true"><path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C347.6 377.6 342.7 391.2 331.2 392.4C252.7 400.7 183.6 358.3 152.5 295.4L134.6 313.3C129.2 318.7 119.9 318.7 114.5 313.3L37.5 236.3C32.1 230.9 32.1 221.6 37.5 216.2L114.5 139.2C119.9 133.8 129.2 133.8 134.6 139.2L211.6 216.2C217 221.6 217 230.9 211.6 236.3L193.7 254.2C217.1 267.9 242.4 278.1 269.5 283.5L242.4 292.5zM464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256z"/></svg>
+            <svg viewBox="0 0 512 512" className="h-3 w-3 fill-muted-foreground/50" aria-hidden="true"><path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C347.6 377.6 342.7 391.2 331.2 392.4C252.7 400.7 183.6 358.3 152.5 295.4L134.6 313.3C129.2 318.7 119.9 318.7 114.5 313.3L37.5 236.3C32.1 230.9 32.1 221.6 37.5 216.2L114.5 139.2C119.9 133.8 129.2 133.8 134.6 139.2L211.6 216.2C217 221.6 217 230.9 211.6 236.3L193.7 254.2C217.1 267.9 242.4 278.1 269.5 283.5L242.4 292.5zM464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256z"/></svg>
             À vista no Pix
           </p>
 
@@ -256,13 +259,13 @@ export default function ProductPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.15 }}
-            className="glass-card rounded-xl p-4 mb-6 border border-primary/10"
+            className="glass-card rounded-xl p-4 mb-6"
           >
             <h3 className="font-serif font-semibold text-sm mb-3 text-foreground">O que está incluso</h3>
             <ul className="space-y-2">
               {product.benefits.map((b, i) => (
                 <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Check className="h-4 w-4 text-primary shrink-0" />
+                  <Check className="h-4 w-4 text-emerald-400/80 shrink-0" />
                   {b}
                 </li>
               ))}
@@ -305,7 +308,7 @@ export default function ProductPage() {
               'Pedido finalizado com agilidade',
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <span className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0 text-[10px] font-bold text-primary mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center shrink-0 text-[10px] font-bold text-foreground/70 mt-0.5 border border-border/30">
                   {i + 1}
                 </span>
                 {step}
@@ -341,12 +344,12 @@ export default function ProductPage() {
           <Button
             onClick={() => setBuyOpen(true)}
             disabled={settings.storeMode === 'offline'}
-            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full gold-gradient text-primary-foreground font-bold py-7 text-base rounded-xl hover:scale-[1.02] transition-transform pulse-glow shadow-lg shadow-black/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
           </Button>
           <a href={settings.vipGroupLink} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-primary/30 text-primary hover:bg-primary/10">
+            <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-border/50 text-foreground/70 hover:text-foreground hover:bg-secondary hover:border-border">
               <Users className="h-4 w-4 mr-2" /> Entrar no Grupo VIP
             </Button>
           </a>
@@ -355,13 +358,13 @@ export default function ProductPage() {
         {/* Trust seals below CTA */}
         <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
           <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <Zap className="h-3.5 w-3.5 text-primary/70" /> Entrega rápida
+            <Zap className="h-3.5 w-3.5 text-muted-foreground/60" /> Entrega rápida
           </span>
           <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary/70" /> Processo seguro
+            <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground/60" /> Processo seguro
           </span>
           <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <MessageCircle className="h-3.5 w-3.5 text-primary/70" /> Suporte via WhatsApp
+            <MessageCircle className="h-3.5 w-3.5 text-muted-foreground/60" /> Suporte via WhatsApp
           </span>
         </div>
 
@@ -378,7 +381,7 @@ export default function ProductPage() {
         {/* Customer Reviews */}
         <AnimatedSection className="mb-8">
           <h3 className="font-serif font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-            <MessageCircle className="h-4 w-4 text-primary" /> Avaliações de clientes
+            <MessageCircle className="h-4 w-4 text-foreground/60" /> Avaliações de clientes
           </h3>
           <div className="space-y-2.5">
             {settings.fakeReviews.map((review, i) => (
@@ -391,7 +394,7 @@ export default function ProductPage() {
                 className="glass-card rounded-xl p-3.5"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-primary">{review.name}</span>
+                  <span className="text-xs font-semibold text-foreground">{review.name}</span>
                   <span className="text-[10px] text-muted-foreground/60">{review.time}</span>
                 </div>
                 <StarRating rating={review.rating} size="sm" />
@@ -459,7 +462,7 @@ export default function ProductPage() {
                   className="flex-1 font-mono uppercase"
                   maxLength={30}
                 />
-                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-primary/30 text-primary">
+                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-border/50 text-foreground/70 hover:text-foreground hover:border-border">
                   Aplicar
                 </Button>
               </div>
@@ -470,10 +473,10 @@ export default function ProductPage() {
             {/* Trust indicators inside dialog */}
             <div className="flex items-center justify-center gap-3 py-1 flex-wrap">
               <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <ShieldCheck className="h-3 w-3 text-primary/70" /> Pagamento seguro
+                <ShieldCheck className="h-3 w-3 text-muted-foreground/60" /> Pagamento seguro
               </span>
               <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <Zap className="h-3 w-3 text-primary/70" /> Confirmação automática
+                <Zap className="h-3 w-3 text-muted-foreground/60" /> Confirmação automática
               </span>
             </div>
 
@@ -505,12 +508,12 @@ export default function ProductPage() {
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-foreground truncate">{product.name}</p>
-                <p className="text-sm font-bold text-primary">R$ {finalPrice.toFixed(2)}</p>
+                <p className="text-sm font-bold text-foreground">R$ {finalPrice.toFixed(2)}</p>
               </div>
               <Button
                 onClick={() => setBuyOpen(true)}
                 disabled={settings.storeMode === 'offline'}
-                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-primary/20 disabled:opacity-50"
+                className="gold-gradient text-primary-foreground font-bold px-6 py-5 rounded-xl text-sm shrink-0 shadow-lg shadow-black/30 disabled:opacity-50"
               >
                 <ShoppingBag className="h-4 w-4 mr-1.5" /> {settings.storeMode === 'offline' ? 'Offline' : 'Comprar'}
               </Button>

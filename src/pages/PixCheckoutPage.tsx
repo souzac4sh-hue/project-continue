@@ -270,7 +270,7 @@ export default function PixCheckoutPage() {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Valor</p>
-              <p className="font-bold text-primary text-xl">R$ {amount.toFixed(2)}</p>
+              <p className="font-bold text-foreground text-xl">R$ {amount.toFixed(2)}</p>
             </div>
           </div>
 
@@ -352,7 +352,7 @@ export default function PixCheckoutPage() {
 
                 {/* QR Code */}
                 <div className="flex justify-center">
-                  <div className="bg-white p-4 rounded-2xl shadow-xl ring-2 ring-primary/12 shadow-primary/8">
+                  <div className="bg-white p-4 rounded-2xl shadow-xl ring-1 ring-border/20 shadow-black/20">
                     <QRCodeSVG value={pixCode} size={180} level="M" className="sm:w-[200px] sm:h-[200px]" />
                   </div>
                 </div>
@@ -370,8 +370,8 @@ export default function PixCheckoutPage() {
                   onClick={handleCopy}
                   className={`w-full py-6 rounded-xl font-bold text-sm transition-all duration-300 ${
                     copied
-                      ? 'bg-green-600 hover:bg-green-600 text-white scale-[1.02]'
-                      : 'gold-gradient text-primary-foreground pulse-glow shadow-lg shadow-primary/20'
+                      ? 'bg-emerald-600 hover:bg-emerald-600 text-white scale-[1.02]'
+                      : 'gold-gradient text-primary-foreground pulse-glow shadow-lg shadow-black/30'
                   }`}
                 >
                   {copied ? (
@@ -394,7 +394,7 @@ export default function PixCheckoutPage() {
                       variant="outline"
                       onClick={handleRegeneratePix}
                       disabled={isRegenerating}
-                      className="w-full h-10 text-xs border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors"
+                      className="w-full h-10 text-xs border-border/50 hover:border-border text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {isRegenerating ? (
                         <><Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Gerando novo Pix...</>
@@ -513,7 +513,7 @@ export default function PixCheckoutPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 text-xs border-primary/30 text-primary mt-1"
+                      className="h-8 text-xs border-border/50 text-foreground/70 mt-1"
                       onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
                     >
                       <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
@@ -530,7 +530,7 @@ export default function PixCheckoutPage() {
         {isActive && (
           <div className="glass-card rounded-2xl p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <HelpCircle className="h-4 w-4 text-primary" />
+              <HelpCircle className="h-4 w-4 text-foreground/60" />
               <h3 className="text-sm font-semibold text-foreground">{ct.guidanceTitle}</h3>
             </div>
 
@@ -540,15 +540,15 @@ export default function PixCheckoutPage() {
 
             <div className="space-y-2">
               <GuidanceItem
-                icon={<CheckCircle2 className="h-3.5 w-3.5 text-primary" />}
+                icon={<CheckCircle2 className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip1}
               />
               <GuidanceItem
-                icon={<Smartphone className="h-3.5 w-3.5 text-primary" />}
+                icon={<Smartphone className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip2}
               />
               <GuidanceItem
-                icon={<RefreshCw className="h-3.5 w-3.5 text-primary" />}
+                icon={<RefreshCw className="h-3.5 w-3.5 text-foreground/50" />}
                 text={ct.guidanceTip3}
               />
             </div>
@@ -558,7 +558,7 @@ export default function PixCheckoutPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full h-9 text-xs border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors"
+                className="w-full h-9 text-xs border-border/50 hover:border-border text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
               >
                 <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
@@ -576,8 +576,8 @@ export default function PixCheckoutPage() {
 
 function TrustPill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-xl bg-secondary/40 border border-primary/8">
-      <span className="text-primary/70">{icon}</span>
+    <div className="flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-xl bg-secondary/50 border border-border/20">
+      <span className="text-foreground/50">{icon}</span>
       <span className="text-[9px] text-muted-foreground text-center leading-tight font-medium">{text}</span>
     </div>
   );

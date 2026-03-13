@@ -22,7 +22,7 @@ export function FloatingButtons() {
           href={settings.vipGroupLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-full gold-gradient px-5 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 pulse-glow"
+          className="flex items-center gap-2 rounded-full gold-gradient px-5 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-black/30 pulse-glow"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -36,7 +36,7 @@ export function FloatingButtons() {
         className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
         aria-label="Navegação principal"
       >
-        <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl" style={{ boxShadow: '0 -4px 20px rgba(10,132,255,0.06)' }}>
+        <div className="border-t border-border/30 bg-background/98 backdrop-blur-xl" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.4)' }}>
           <div className="flex items-center justify-around px-1 py-2">
             {buttons.map((btn) => {
               const isActive = btn.path && location.pathname === btn.path;
@@ -49,7 +49,7 @@ export function FloatingButtons() {
                     href={btn.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-primary"
+                    className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-foreground/70"
                     aria-label={btn.label}
                   >
                     <btn.icon className="h-5 w-5" />
@@ -63,7 +63,7 @@ export function FloatingButtons() {
                   <Link
                     to={btn.path!}
                     className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors relative ${
-                      isActive ? 'text-primary' : 'text-muted-foreground'
+                      isActive ? 'text-foreground' : 'text-muted-foreground'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                     aria-label={btn.label}
@@ -73,7 +73,7 @@ export function FloatingButtons() {
                     {isActive && (
                       <motion.div
                         layoutId="mobile-nav-indicator"
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 h-0.5 w-5 rounded-full gold-gradient"
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 h-0.5 w-5 rounded-full bg-primary/60"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}

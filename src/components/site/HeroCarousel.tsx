@@ -88,11 +88,9 @@ export function HeroCarousel() {
               <div className="absolute inset-0 bg-secondary" />
             )}
             {/* Deeper gradient overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
-            {!banner.image && <div className="absolute inset-0 gold-gradient opacity-[0.06]" />}
-            {/* Ambient radial glow */}
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 80%, rgba(10,132,255,0.07), transparent 70%)' }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/30 via-transparent to-background/30" />
+            {!banner.image && <div className="absolute inset-0 bg-secondary" />}
 
             {(banner.title || banner.subtitle) && (
               <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 md:pb-14 text-center px-6">
@@ -101,8 +99,8 @@ export function HeroCarousel() {
                     initial={{ opacity: 0, y: 20, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.6, delay: 0.15 }}
-                    className="font-serif text-xl sm:text-2xl md:text-4xl font-bold gold-text leading-tight"
-                    style={{ textShadow: '0 2px 20px rgba(10,132,255,0.25), 0 4px 40px rgba(0,0,0,0.5)' }}
+                    className="font-serif text-xl sm:text-2xl md:text-4xl font-bold text-foreground leading-tight"
+                    style={{ textShadow: '0 2px 20px rgba(0,0,0,0.5), 0 4px 40px rgba(0,0,0,0.4)' }}
                   >
                     {banner.title}
                   </motion.h2>
@@ -112,8 +110,8 @@ export function HeroCarousel() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 }}
-                    className="text-xs md:text-sm text-foreground/70 max-w-md mt-1.5"
-                    style={{ textShadow: '0 1px 8px hsl(0 0% 0% / 0.6)' }}
+                    className="text-xs md:text-sm text-foreground/60 max-w-md mt-1.5"
+                    style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}
                   >
                     {banner.subtitle}
                   </motion.p>
@@ -122,24 +120,23 @@ export function HeroCarousel() {
             )}
           </motion.a>
         </AnimatePresence>
-
       </div>
 
       {banners.length > 1 && (
         <>
           <button
             onClick={(e) => { e.preventDefault(); interact(); prev(); }}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 h-8 w-8 md:h-10 md:w-10 rounded-full bg-background/60 border border-primary/20 flex items-center justify-center backdrop-blur-md hover:bg-background/80 hover:border-primary/40 transition-all"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 h-8 w-8 md:h-10 md:w-10 rounded-full bg-background/50 border border-border/30 flex items-center justify-center backdrop-blur-md hover:bg-background/70 hover:border-border/50 transition-all"
             aria-label="Anterior"
           >
-            <ChevronLeft className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+            <ChevronLeft className="h-4 w-4 md:h-5 md:w-5 text-foreground/70" />
           </button>
           <button
             onClick={(e) => { e.preventDefault(); interact(); next(); }}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 h-8 w-8 md:h-10 md:w-10 rounded-full bg-background/60 border border-primary/20 flex items-center justify-center backdrop-blur-md hover:bg-background/80 hover:border-primary/40 transition-all"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 h-8 w-8 md:h-10 md:w-10 rounded-full bg-background/50 border border-border/30 flex items-center justify-center backdrop-blur-md hover:bg-background/70 hover:border-border/50 transition-all"
             aria-label="Próximo"
           >
-            <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+            <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-foreground/70" />
           </button>
         </>
       )}
@@ -152,8 +149,8 @@ export function HeroCarousel() {
               onClick={() => { interact(); setCurrent(i); }}
               className={`rounded-full transition-all duration-300 ${
                 i === current
-                  ? 'w-7 h-2 gold-gradient shadow-sm shadow-primary/30'
-                  : 'w-2 h-2 bg-foreground/20 hover:bg-foreground/40'
+                  ? 'w-7 h-2 bg-foreground/80'
+                  : 'w-2 h-2 bg-foreground/20 hover:bg-foreground/35'
               }`}
               aria-label={`Slide ${i + 1}`}
             />

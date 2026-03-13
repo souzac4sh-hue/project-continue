@@ -16,7 +16,7 @@ export function SocialProofSection() {
     <AnimatedSection className="container py-8">
       <div className="text-center mb-5">
         <h2 className="font-serif text-lg font-bold text-foreground flex items-center justify-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-primary" />
+          <ShieldCheck className="h-5 w-5 text-foreground/60" />
           Atividade recente
         </h2>
         <p className="text-xs text-muted-foreground mt-1">Clientes que já passaram pela C4SH STORE.</p>
@@ -28,23 +28,23 @@ export function SocialProofSection() {
           
           return (
             <AnimatedSection key={a.id} delay={i * 0.08}>
-              <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 hover:border-primary/20 transition-all">
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <IconComponent className="h-4 w-4 text-primary" />
+              <div className="glass-card rounded-xl px-4 py-3 flex items-center gap-3 transition-all">
+                <div className="h-9 w-9 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                  <IconComponent className="h-4 w-4 text-foreground/50" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-sm text-foreground/90 leading-relaxed">
                     {a.displayName && (
-                      <span className="font-semibold text-primary">{a.displayName} </span>
+                      <span className="font-semibold text-foreground">{a.displayName} </span>
                     )}
                     {a.message}
                   </span>
                   <div className="flex items-center gap-1 mt-0.5">
-                    <Clock className="h-2.5 w-2.5 text-muted-foreground/60" />
-                    <span className="text-[10px] text-muted-foreground/60">{timeLabel}</span>
+                    <Clock className="h-2.5 w-2.5 text-muted-foreground/50" />
+                    <span className="text-[10px] text-muted-foreground/50">{timeLabel}</span>
                   </div>
                 </div>
-                <div className="h-2 w-2 rounded-full bg-green-500/80 animate-pulse shrink-0" aria-label="Ativo" />
+                <div className="h-2 w-2 rounded-full bg-emerald-500/60 animate-pulse shrink-0" aria-label="Ativo" />
               </div>
             </AnimatedSection>
           );

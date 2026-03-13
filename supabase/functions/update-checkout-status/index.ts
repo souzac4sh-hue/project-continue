@@ -96,15 +96,14 @@ Deno.serve(async (req) => {
         break
 
       case 'update_lead_status':
-        if (leadStatus) updateData.lead_status = leadStatus
-        if (lastStep) updateData.last_step = lastStep
-        if (extraFields && typeof extraFields === 'object') {
-          // Only allow safe fields
-          const safeFields = ['paid_at', 'last_step', 'lead_status']
-          for (const [k, v] of Object.entries(extraFields)) {
-            if (safeFields.includes(k)) updateData[k] = v
-          }
+        if (leadStatus && typeof leadStatus === 'string' && leadStatus.length < 50) {
+          // Don't allow setting to 'paid' from client
+          if (leadStatus !== 'paid') updateData.lead_status = leadStatus
         }
+        if (lastStep && typeof lastStep === 'string' && lastStep.length < 50) {
+          if (lastStep !== 'payment_confirmed') updateData.last_step = lastStep
+        }
+        // No extraFields allowed - prevents paid_at injection
         break
     }
 

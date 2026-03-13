@@ -37,6 +37,8 @@ export default function ProductPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   if (!product) {
     return (

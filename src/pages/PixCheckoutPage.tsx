@@ -190,6 +190,10 @@ export default function PixCheckoutPage() {
         return;
       }
 
+      // Track new Pix generation
+      if (orderId) {
+        trackCheckoutEvent(orderId, 'new_pix_generated', { new_order_id: data.orderId });
+      }
       setOrderId(data.orderId);
       setPixCode(data.pixCode);
       setCountdown(TIMER_SECONDS);
@@ -197,6 +201,7 @@ export default function PixCheckoutPage() {
       setShowNudge(false);
       setState('awaiting');
       setCopied(false);
+      trackedScreenOpen.current = false;
     } finally {
       setIsRegenerating(false);
     }

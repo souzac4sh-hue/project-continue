@@ -7,7 +7,7 @@ type LeadStatus = Database['public']['Enums']['lead_status'];
 export async function trackCheckoutEvent(
   orderId: string,
   eventType: CheckoutEventType,
-  metadata?: Record<string, unknown>,
+  metadata?: Json,
   identifier?: string,
 ) {
   try {

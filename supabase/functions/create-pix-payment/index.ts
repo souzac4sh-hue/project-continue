@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    const pixAmount = sigiloData?.pix?.amount || sigiloData?.amount || cleanAmount
+    const pixAmount = (pixData?.amount as number) || (sigiloData?.amount as number) || cleanAmount
 
     const { error: dbError } = await supabase.from('pix_orders').insert({
       identifier,

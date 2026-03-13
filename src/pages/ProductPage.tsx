@@ -428,7 +428,14 @@ export default function ProductPage() {
         <DialogContent className="sm:max-w-md bg-card border-border">
           <DialogHeader>
             <DialogTitle className="font-serif">Finalizar Compra</DialogTitle>
-            <DialogDescription>{product.name} — R$ {finalPrice.toFixed(2)}</DialogDescription>
+            <DialogDescription>
+              {product.name} — {couponDiscount ? (
+                <><span className="line-through text-muted-foreground">R$ {finalPrice.toFixed(2)}</span>{' '}
+                <span className="text-primary font-bold">R$ {discountedPrice.toFixed(2)}</span></>
+              ) : (
+                <>R$ {finalPrice.toFixed(2)}</>
+              )}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
@@ -438,6 +445,26 @@ export default function ProductPage() {
             <div>
               <Label htmlFor="phone">WhatsApp</Label>
               <Input id="phone" value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" className="mt-1" maxLength={20} inputMode="tel" />
+            </div>
+
+            {/* Coupon */}
+            <div>
+              <Label htmlFor="coupon" className="text-xs">Cupom de desconto</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  id="coupon"
+                  value={couponCode}
+                  onChange={e => { setCouponCode(e.target.value); setCouponError(''); setCouponDiscount(null); }}
+                  placeholder="NINJA10"
+                  className="flex-1 font-mono uppercase"
+                  maxLength={30}
+                />
+                <Button variant="outline" size="sm" onClick={validateCoupon} className="shrink-0 text-xs border-primary/30 text-primary">
+                  Aplicar
+                </Button>
+              </div>
+              {couponError && <p className="text-[10px] text-destructive mt-1">{couponError}</p>}
+              {couponDiscount && <p className="text-[10px] text-green-500 mt-1">✓ Cupom aplicado! Desconto de {couponDiscount.type === 'percentage' ? `${couponDiscount.value}%` : `R$ ${couponDiscount.value.toFixed(2)}`}</p>}
             </div>
 
             {/* Trust indicators inside dialog */}
@@ -454,7 +481,7 @@ export default function ProductPage() {
               {isProcessing ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gerando Pix...</>
               ) : (
-                <>Confirmar Pedido — R$ {finalPrice.toFixed(2)}</>
+                <>Confirmar Pedido — R$ {discountedPrice.toFixed(2)}</>
               )}
             </Button>
 

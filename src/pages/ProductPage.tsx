@@ -3,6 +3,7 @@ import { ShoppingBag, ArrowLeft, Play, Users, Check, ShieldCheck, Zap, Clock, Tr
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { trackCheckoutEvent } from '@/lib/checkoutTracker';
 import { useStore } from '@/context/StoreContext';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
@@ -77,6 +78,12 @@ export default function ProductPage() {
         toast({ title: 'Erro ao gerar Pix', description: data?.error || 'Tente novamente.', variant: 'destructive' });
         setIsProcessing(false);
         return;
+      }
+
+      // Track form submitted event
+      if (data.orderId) {
+        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: finalPrice } as Record<string, string | number>);
+        trackCheckoutEvent(data.orderId, 'pix_generated');
       }
 
       setBuyOpen(false);

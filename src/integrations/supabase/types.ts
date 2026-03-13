@@ -14,77 +14,201 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkout_events: {
+        Row: {
+          created_at: string
+          event_type: Database["public"]["Enums"]["checkout_event_type"]
+          id: string
+          identifier: string | null
+          metadata: Json | null
+          order_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: Database["public"]["Enums"]["checkout_event_type"]
+          id?: string
+          identifier?: string | null
+          metadata?: Json | null
+          order_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["checkout_event_type"]
+          id?: string
+          identifier?: string | null
+          metadata?: Json | null
+          order_id?: string
+        }
+        Relationships: []
+      }
       pix_orders: {
         Row: {
+          abandoned_at: string | null
           amount: number
+          copied_at: string | null
+          copied_pix: boolean | null
           created_at: string
-          customer_document: string
-          customer_email: string
+          customer_document: string | null
+          customer_email: string | null
           customer_name: string
           customer_phone: string
           id: string
           identifier: string
+          last_step: string | null
+          lead_status: Database["public"]["Enums"]["lead_status"] | null
+          notes: string | null
           paid_at: string | null
-          payment_status: Database["public"]["Enums"]["payment_status"]
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          pix_amount: number | null
           pix_code: string | null
           product_id: string
           product_name: string
-          provider: string
+          product_price: number | null
+          provider: string | null
           provider_identifier: string | null
           provider_response: Json | null
+          recovered_at: string | null
+          recovery_status: Database["public"]["Enums"]["recovery_status"] | null
+          support_contacted_at: string | null
         }
         Insert: {
+          abandoned_at?: string | null
           amount: number
+          copied_at?: string | null
+          copied_pix?: boolean | null
           created_at?: string
-          customer_document?: string
-          customer_email?: string
+          customer_document?: string | null
+          customer_email?: string | null
           customer_name: string
           customer_phone: string
           id?: string
           identifier: string
+          last_step?: string | null
+          lead_status?: Database["public"]["Enums"]["lead_status"] | null
+          notes?: string | null
           paid_at?: string | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          pix_amount?: number | null
           pix_code?: string | null
           product_id: string
           product_name: string
-          provider?: string
+          product_price?: number | null
+          provider?: string | null
           provider_identifier?: string | null
           provider_response?: Json | null
+          recovered_at?: string | null
+          recovery_status?:
+            | Database["public"]["Enums"]["recovery_status"]
+            | null
+          support_contacted_at?: string | null
         }
         Update: {
+          abandoned_at?: string | null
           amount?: number
+          copied_at?: string | null
+          copied_pix?: boolean | null
           created_at?: string
-          customer_document?: string
-          customer_email?: string
+          customer_document?: string | null
+          customer_email?: string | null
           customer_name?: string
           customer_phone?: string
           id?: string
           identifier?: string
+          last_step?: string | null
+          lead_status?: Database["public"]["Enums"]["lead_status"] | null
+          notes?: string | null
           paid_at?: string | null
-          payment_status?: Database["public"]["Enums"]["payment_status"]
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          pix_amount?: number | null
           pix_code?: string | null
           product_id?: string
           product_name?: string
-          provider?: string
+          product_price?: number | null
+          provider?: string | null
           provider_identifier?: string | null
           provider_response?: Json | null
+          recovered_at?: string | null
+          recovery_status?:
+            | Database["public"]["Enums"]["recovery_status"]
+            | null
+          support_contacted_at?: string | null
+        }
+        Relationships: []
+      }
+      recovery_messages: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          id: string
+          is_default: boolean | null
+          sort_order: number | null
+          template: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          sort_order?: number | null
+          template: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          is_default?: boolean | null
+          sort_order?: number | null
+          template?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      recovery_settings: {
+        Row: {
+          abandonment_timeout_minutes: number | null
+          id: string
+          mark_hot_on_copy: boolean | null
+          show_regenerate_pix: boolean | null
+          show_support_button: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          abandonment_timeout_minutes?: number | null
+          id?: string
+          mark_hot_on_copy?: boolean | null
+          show_regenerate_pix?: boolean | null
+          show_support_button?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          abandonment_timeout_minutes?: number | null
+          id?: string
+          mark_hot_on_copy?: boolean | null
+          show_regenerate_pix?: boolean | null
+          show_support_button?: boolean | null
+          updated_at?: string
         }
         Relationships: []
       }
       site_config: {
         Row: {
           id: string
-          settings: Json
+          settings: Json | null
           updated_at: string
         }
         Insert: {
           id?: string
-          settings?: Json
+          settings?: Json | null
           updated_at?: string
         }
         Update: {
           id?: string
-          settings?: Json
+          settings?: Json | null
           updated_at?: string
         }
         Relationships: []
@@ -125,7 +249,34 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      checkout_event_type:
+        | "form_submitted"
+        | "pix_generated"
+        | "pix_copied"
+        | "support_clicked"
+        | "new_pix_generated"
+        | "payment_confirmed"
+        | "order_abandoned"
+        | "whatsapp_redirected"
+        | "pix_expired"
+        | "pix_screen_opened"
+      lead_status:
+        | "started"
+        | "pix_generated"
+        | "pix_copied"
+        | "awaiting_payment"
+        | "abandoned"
+        | "support_requested"
+        | "recovered"
+        | "paid"
+        | "expired"
       payment_status: "pending" | "paid" | "failed" | "expired"
+      recovery_status:
+        | "pending"
+        | "in_progress"
+        | "no_response"
+        | "recovered"
+        | "lost"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -254,7 +405,37 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      checkout_event_type: [
+        "form_submitted",
+        "pix_generated",
+        "pix_copied",
+        "support_clicked",
+        "new_pix_generated",
+        "payment_confirmed",
+        "order_abandoned",
+        "whatsapp_redirected",
+        "pix_expired",
+        "pix_screen_opened",
+      ],
+      lead_status: [
+        "started",
+        "pix_generated",
+        "pix_copied",
+        "awaiting_payment",
+        "abandoned",
+        "support_requested",
+        "recovered",
+        "paid",
+        "expired",
+      ],
       payment_status: ["pending", "paid", "failed", "expired"],
+      recovery_status: [
+        "pending",
+        "in_progress",
+        "no_response",
+        "recovered",
+        "lost",
+      ],
     },
   },
 } as const

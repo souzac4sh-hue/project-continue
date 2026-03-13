@@ -8,7 +8,8 @@ import { Link, Navigate } from 'react-router-dom';
 import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,
   Bell, Settings, ArrowLeft, ChevronRight, Image, LogOut,
-  TrendingUp, Calendar, CalendarDays, Award, DollarSign, FileText,
+  TrendingUp, Calendar, Award, DollarSign, FileText,
+  LayoutDashboard, RefreshCw, MessageSquare,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { isAdminAuthenticated, clearAdminSession } from '@/lib/adminAuth';
@@ -23,20 +24,28 @@ import { AdminBanners } from '@/components/admin/AdminBanners';
 import { AdminBranding } from '@/components/admin/AdminBranding';
 import { AdminPixOrders } from '@/components/admin/AdminPixOrders';
 import { AdminSiteTexts } from '@/components/admin/AdminSiteTexts';
+import { AdminDashboard } from '@/components/admin/AdminDashboard';
+import { AdminRecovery } from '@/components/admin/AdminRecovery';
+import { AdminRecoverySettings } from '@/components/admin/AdminRecoverySettings';
 
 const modules = [
-  { id: 'products', label: 'Produtos', icon: ShoppingBag },
-  { id: 'categories', label: 'Categorias', icon: Layers },
-  { id: 'banners', label: 'Banners Hero', icon: Image },
-  { id: 'methods', label: 'Métodos', icon: BookOpen },
-  { id: 'references', label: 'Referências', icon: Star },
-  { id: 'orders', label: 'Pedidos', icon: ClipboardList },
-  { id: 'pix_orders', label: 'Financeiro Pix', icon: DollarSign },
-  { id: 'activities', label: 'Atividade', icon: Bell },
-  { id: 'branding', label: 'Branding', icon: Award },
-  { id: 'site_texts', label: 'Textos do Site', icon: FileText },
-  { id: 'settings', label: 'Configurações', icon: Settings },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, group: 'Visão Geral' },
+  { id: 'products', label: 'Produtos', icon: ShoppingBag, group: 'Loja' },
+  { id: 'categories', label: 'Categorias', icon: Layers, group: 'Loja' },
+  { id: 'banners', label: 'Banners Hero', icon: Image, group: 'Loja' },
+  { id: 'orders', label: 'Pedidos', icon: ClipboardList, group: 'Operação' },
+  { id: 'pix_orders', label: 'Financeiro Pix', icon: DollarSign, group: 'Operação' },
+  { id: 'recovery', label: 'Recuperação', icon: RefreshCw, group: 'Operação' },
+  { id: 'recovery_settings', label: 'Config. Recuperação', icon: MessageSquare, group: 'Operação' },
+  { id: 'methods', label: 'Métodos', icon: BookOpen, group: 'Marketing' },
+  { id: 'references', label: 'Referências', icon: Star, group: 'Marketing' },
+  { id: 'activities', label: 'Prova Social', icon: Bell, group: 'Marketing' },
+  { id: 'branding', label: 'Branding', icon: Award, group: 'Configurações' },
+  { id: 'site_texts', label: 'Textos do Site', icon: FileText, group: 'Configurações' },
+  { id: 'settings', label: 'Configurações', icon: Settings, group: 'Configurações' },
 ];
+
+const groups = ['Visão Geral', 'Loja', 'Operação', 'Marketing', 'Configurações'];
 
 export default function AdminPage() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
@@ -45,19 +54,9 @@ export default function AdminPage() {
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
-    const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
-
     const ordersToday = store.orders.filter(o => o.date >= today).length;
     const ordersWeek = store.orders.filter(o => o.date >= weekAgo).length;
-    const ordersMonth = store.orders.filter(o => o.date >= monthAgo).length;
-
-    const productCounts: Record<string, number> = {};
-    store.orders.forEach(o => {
-      productCounts[o.productName] = (productCounts[o.productName] || 0) + 1;
-    });
-    const topProduct = Object.entries(productCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
-
-    return { ordersToday, ordersWeek, ordersMonth, topProduct };
+    return { ordersToday, ordersWeek };
   }, [store.orders]);
 
   if (!isAdminAuthenticated()) {
@@ -74,6 +73,7 @@ export default function AdminPage() {
 
   const renderModule = () => {
     switch (activeModule) {
+      case 'dashboard': return <AdminDashboard />;
       case 'products': return <AdminProducts />;
       case 'categories': return <AdminCategories />;
       case 'banners': return <AdminBanners />;
@@ -81,6 +81,8 @@ export default function AdminPage() {
       case 'references': return <AdminReferences />;
       case 'orders': return <AdminOrders />;
       case 'pix_orders': return <AdminPixOrders />;
+      case 'recovery': return <AdminRecovery />;
+      case 'recovery_settings': return <AdminRecoverySettings />;
       case 'activities': return <AdminActivities />;
       case 'branding': return <AdminBranding />;
       case 'site_texts': return <AdminSiteTexts />;
@@ -128,12 +130,12 @@ export default function AdminPage() {
       </header>
 
       <div className="container py-6">
-        {/* Statistics */}
+        {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Hoje</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Pedidos Hoje</p>
             </div>
             <p className="text-2xl font-bold text-primary">{stats.ordersToday}</p>
           </div>
@@ -144,38 +146,32 @@ export default function AdminPage() {
             </div>
             <p className="text-2xl font-bold text-primary">{stats.ordersWeek}</p>
           </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <CalendarDays className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Mês</p>
-            </div>
-            <p className="text-2xl font-bold text-primary">{stats.ordersMonth}</p>
-          </div>
-          <div className="glass-card rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Award className="h-3.5 w-3.5 text-primary" />
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Top produto</p>
-            </div>
-            <p className="text-sm font-bold text-primary truncate">{stats.topProduct}</p>
-          </div>
         </div>
 
-        <h2 className="font-serif text-lg font-semibold mb-4">Módulos</h2>
-        <div className="grid gap-2">
-          {modules.map(mod => (
-            <button
-              key={mod.id}
-              onClick={() => setActiveModule(mod.id)}
-              className="flex items-center justify-between p-4 rounded-xl glass-card hover:border-primary/30 transition-colors w-full text-left"
-            >
-              <div className="flex items-center gap-3">
-                <mod.icon className="h-5 w-5 text-primary" />
-                <span className="font-medium">{mod.label}</span>
+        {/* Grouped Modules */}
+        {groups.map(group => {
+          const groupModules = modules.filter(m => m.group === group);
+          return (
+            <div key={group} className="mb-6">
+              <h2 className="font-serif text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">{group}</h2>
+              <div className="grid gap-2">
+                {groupModules.map(mod => (
+                  <button
+                    key={mod.id}
+                    onClick={() => setActiveModule(mod.id)}
+                    className="flex items-center justify-between p-4 rounded-xl glass-card hover:border-primary/30 transition-colors w-full text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <mod.icon className="h-5 w-5 text-primary" />
+                      <span className="font-medium">{mod.label}</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                ))}
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

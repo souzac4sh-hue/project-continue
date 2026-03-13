@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useStore } from '@/context/StoreContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { trackCheckoutEvent, updateLeadStatus, markPixCopied, markAbandoned, markSupportContacted } from '@/lib/checkoutTracker';
 
 type CheckoutState = 'loading' | 'awaiting' | 'waiting_confirm' | 'paid' | 'error' | 'expired';
 
@@ -59,6 +60,16 @@ export default function PixCheckoutPage() {
   const [elapsed, setElapsed] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [socialProof, setSocialProof] = useState<string | null>(null);
+  const trackedScreenOpen = useRef(false);
+
+  // Track screen opened
+  useEffect(() => {
+    if (orderId && !trackedScreenOpen.current) {
+      trackedScreenOpen.current = true;
+      trackCheckoutEvent(orderId, 'pix_screen_opened');
+      updateLeadStatus(orderId, 'pix_generated', 'pix_screen_opened');
+    }
+  }, [orderId]);
 
   const handleCopy = useCallback(() => {
     if (!pixCode) return;
@@ -66,7 +77,11 @@ export default function PixCheckoutPage() {
     setCopied(true);
     setState('waiting_confirm');
     setTimeout(() => setCopied(false), 2500);
-  }, [pixCode]);
+    // Track pix copied
+    if (orderId) {
+      markPixCopied(orderId);
+    }
+  }, [pixCode, orderId]);
 
   // Poll for payment status
   useEffect(() => {
@@ -76,7 +91,11 @@ export default function PixCheckoutPage() {
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
           body: { orderId },
         });
-        if (!error && data?.status === 'paid') setState('paid');
+        if (!error && data?.status === 'paid') {
+          setState('paid');
+          trackCheckoutEvent(orderId, 'payment_confirmed');
+          updateLeadStatus(orderId, 'paid', 'payment_confirmed', { paid_at: new Date().toISOString() });
+        }
       } catch { /* silently retry */ }
     };
     const interval = setInterval(check, 5000);
@@ -89,7 +108,14 @@ export default function PixCheckoutPage() {
     if (state !== 'awaiting' && state !== 'waiting_confirm') return;
     const timer = setInterval(() => {
       setCountdown(prev => {
-        if (prev <= 1) { setState('expired'); return 0; }
+        if (prev <= 1) {
+          setState('expired');
+          if (orderId) {
+            markAbandoned(orderId);
+            trackCheckoutEvent(orderId, 'pix_expired');
+          }
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
@@ -136,6 +162,7 @@ export default function PixCheckoutPage() {
   // Auto redirect to WhatsApp on payment
   useEffect(() => {
     if (state !== 'paid' || !orderId || !productName) return;
+    trackCheckoutEvent(orderId, 'whatsapp_redirected');
     const whatsappUrl = buildWhatsAppUrl(settings.whatsappNumber, orderId, productName);
     const timer = setTimeout(() => { window.open(whatsappUrl, '_blank'); }, 4000);
     return () => clearTimeout(timer);
@@ -163,6 +190,10 @@ export default function PixCheckoutPage() {
         return;
       }
 
+      // Track new Pix generation
+      if (orderId) {
+        trackCheckoutEvent(orderId, 'new_pix_generated', { new_order_id: data.orderId });
+      }
       setOrderId(data.orderId);
       setPixCode(data.pixCode);
       setCountdown(TIMER_SECONDS);
@@ -170,6 +201,7 @@ export default function PixCheckoutPage() {
       setShowNudge(false);
       setState('awaiting');
       setCopied(false);
+      trackedScreenOpen.current = false;
     } finally {
       setIsRegenerating(false);
     }
@@ -438,7 +470,7 @@ export default function PixCheckoutPage() {
                       variant="outline"
                       size="sm"
                       className="h-8 text-xs border-primary/30 text-primary mt-1"
-                      onClick={() => window.open(supportUrl, '_blank')}
+                     onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
                     >
                       <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                       Falar com suporte
@@ -490,7 +522,7 @@ export default function PixCheckoutPage() {
                 variant="outline"
                 size="sm"
                 className="w-full h-9 text-xs border-border hover:border-primary/30 text-muted-foreground hover:text-primary transition-colors"
-                onClick={() => window.open(supportUrl, '_blank')}
+                onClick={() => { if (orderId) markSupportContacted(orderId); window.open(supportUrl, '_blank'); }}
               >
                 <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
                 Falar com suporte no WhatsApp

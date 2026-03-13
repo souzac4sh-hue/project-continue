@@ -172,6 +172,7 @@ export function Ninja3D() {
   // Single entry effect - runs once on mount
   useEffect(() => {
     mountedRef.current = true;
+    console.log('[Ninja3D] Effect running, enabled:', enabled, 'started:', startedRef.current);
     if (startedRef.current) return;
     if (!enabled) return;
 

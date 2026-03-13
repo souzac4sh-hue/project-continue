@@ -83,6 +83,7 @@ export default function AdminPage() {
 
   const renderModule = () => {
     switch (activeModule) {
+      case 'dashboard': return <AdminDashboard />;
       case 'products': return <AdminProducts />;
       case 'categories': return <AdminCategories />;
       case 'banners': return <AdminBanners />;
@@ -90,6 +91,8 @@ export default function AdminPage() {
       case 'references': return <AdminReferences />;
       case 'orders': return <AdminOrders />;
       case 'pix_orders': return <AdminPixOrders />;
+      case 'recovery': return <AdminRecovery />;
+      case 'recovery_settings': return <AdminRecoverySettings />;
       case 'activities': return <AdminActivities />;
       case 'branding': return <AdminBranding />;
       case 'site_texts': return <AdminSiteTexts />;

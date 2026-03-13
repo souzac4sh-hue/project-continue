@@ -16,8 +16,8 @@ function generateCode(): string {
 }
 
 function pickDiscount(): number {
-  // 70% chance for 10%, 30% chance for 20%
-  return Math.random() < 0.7 ? 10 : 20;
+  // 92% chance for 5%, 8% chance for 10%
+  return Math.random() < 0.08 ? 10 : 5;
 }
 
 Deno.serve(async (req: Request) => {
@@ -89,7 +89,7 @@ Deno.serve(async (req: Request) => {
     // Generate the reward server-side
     const discount = pickDiscount();
     const code = generateCode();
-    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // 30 min
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min
 
     const { data: coupon, error: insertError } = await supabase
       .from("ninja_coupons")

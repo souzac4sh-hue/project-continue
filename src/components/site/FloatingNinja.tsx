@@ -58,7 +58,7 @@ export default function FloatingNinja() {
   const [posY] = useState(window.innerHeight - 180);
   const [phrase, setPhrase] = useState<string | null>(null);
   const [escapeBubble, setEscapeBubble] = useState(false);
-  const [reward, setReward] = useState<{ code: string; discount: number; expiresAt: string } | null>(null);
+  const [reward, setReward] = useState<{ code: string; discount: number; expiresAt: string; isRare: boolean } | null>(null);
   const [rewardLoading, setRewardLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [countdown, setCountdown] = useState(ninjaConfig.couponDurationSeconds);
@@ -179,26 +179,29 @@ export default function FloatingNinja() {
       });
 
       if (error || !data?.code) {
-        // Fallback mock
-        const discount = Math.random() < 0.7 ? 10 : 20;
+        // Fallback mock (same 92/8 distribution)
+        const discount = Math.random() < 0.08 ? 10 : 5;
         setReward({
           code: `NINJA${discount}`,
           discount,
           expiresAt: new Date(Date.now() + ninjaConfig.couponDurationSeconds * 1000).toISOString(),
+          isRare: discount === 10,
         });
       } else {
         setReward({
           code: data.code,
           discount: data.discount_percentage,
           expiresAt: data.expires_at,
+          isRare: data.discount_percentage === 10,
         });
       }
     } catch {
-      const discount = Math.random() < 0.7 ? 10 : 20;
+      const discount = Math.random() < 0.08 ? 10 : 5;
       setReward({
         code: `NINJA${discount}`,
         discount,
         expiresAt: new Date(Date.now() + ninjaConfig.couponDurationSeconds * 1000).toISOString(),
+        isRare: discount === 10,
       });
     } finally {
       setRewardLoading(false);
@@ -377,193 +380,67 @@ export default function FloatingNinja() {
         >
           <div
             style={{
-              background: "linear-gradient(135deg, hsl(220 20% 8%), hsl(220 15% 12%))",
-              border: "1px solid rgba(96,165,250,0.4)",
+              background: reward.isRare
+                ? "linear-gradient(135deg, hsl(220 25% 6%), hsl(230 30% 12%), hsl(220 25% 8%))"
+                : "linear-gradient(135deg, hsl(220 20% 8%), hsl(220 15% 12%))",
+              border: reward.isRare ? "1px solid rgba(96,165,250,0.7)" : "1px solid rgba(96,165,250,0.4)",
               borderRadius: 20,
               padding: "32px 28px",
               maxWidth: 340,
               width: "90%",
-              textAlign: "center",
-              boxShadow: "0 0 60px rgba(59,130,246,0.2), 0 20px 60px rgba(0,0,0,0.5)",
-              position: "relative",
-              overflow: "hidden",
-              animation: "rewardPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              textAlign: "center" as const,
+              boxShadow: reward.isRare
+                ? "0 0 80px rgba(59,130,246,0.4), 0 0 120px rgba(59,130,246,0.15), 0 20px 60px rgba(0,0,0,0.5)"
+                : "0 0 60px rgba(59,130,246,0.2), 0 20px 60px rgba(0,0,0,0.5)",
+              position: "relative" as const,
+              overflow: "hidden" as const,
+              animation: reward.isRare
+                ? "rewardPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), jackpotGlow 1.5s ease-in-out infinite"
+                : "rewardPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
             }}
           >
-            {/* Decorative glow */}
-            <div
-              style={{
-                position: "absolute",
-                top: -60,
-                right: -60,
-                width: 160,
-                height: 160,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(59,130,246,0.12), transparent)",
-                pointerEvents: "none",
-              }}
-            />
+            <div style={{ position: "absolute" as const, top: -60, right: -60, width: 160, height: 160, borderRadius: "50%", background: reward.isRare ? "radial-gradient(circle, rgba(59,130,246,0.25), transparent)" : "radial-gradient(circle, rgba(59,130,246,0.12), transparent)", pointerEvents: "none" as const }} />
+            {reward.isRare && <div style={{ position: "absolute" as const, bottom: -40, left: -40, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(59,130,246,0.2), transparent)", pointerEvents: "none" as const }} />}
 
-            {/* Close */}
-            <button
-              onClick={() => setPhase("cooldown")}
-              style={{
-                position: "absolute",
-                top: 12,
-                right: 12,
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
-                border: "1px solid rgba(148,163,184,0.3)",
-                background: "transparent",
-                color: "rgba(148,163,184,0.7)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-              }}
-            >
-              ✕
-            </button>
+            <button onClick={() => setPhase("cooldown")} style={{ position: "absolute" as const, top: 12, right: 12, width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(148,163,184,0.3)", background: "transparent", color: "rgba(148,163,184,0.7)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>✕</button>
 
-            {/* Ninja icon */}
-            <div
-              style={{
-                width: 70,
-                height: 70,
-                margin: "0 auto 16px",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "radial-gradient(circle, rgba(59,130,246,0.15), rgba(59,130,246,0.05))",
-                border: "1px solid rgba(96,165,250,0.3)",
-                boxShadow: "0 0 24px rgba(59,130,246,0.25)",
-                fontSize: 36,
-                animation: "rewardSpin 0.6s ease-out",
-              }}
-            >
+            {reward.isRare && !rewardLoading && (
+              <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" as const, color: "rgba(96,165,250,1)", marginBottom: 12, animation: "jackpotPulse 1s ease-in-out infinite" }}>
+                ⚡ NINJA RARO ENCONTRADO ⚡
+              </div>
+            )}
+
+            <div style={{ width: 70, height: 70, margin: "0 auto 16px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: reward.isRare ? "radial-gradient(circle, rgba(59,130,246,0.25), rgba(59,130,246,0.08))" : "radial-gradient(circle, rgba(59,130,246,0.15), rgba(59,130,246,0.05))", border: reward.isRare ? "2px solid rgba(96,165,250,0.5)" : "1px solid rgba(96,165,250,0.3)", boxShadow: reward.isRare ? "0 0 30px rgba(59,130,246,0.4)" : "0 0 24px rgba(59,130,246,0.25)", fontSize: 36, animation: "rewardSpin 0.6s ease-out" }}>
               {rewardLoading ? "⏳" : "🥷"}
             </div>
 
-            <h3
-              style={{
-                fontSize: 18,
-                fontWeight: 800,
-                color: "rgba(241,245,249,1)",
-                margin: "0 0 4px",
-              }}
-            >
-              {rewardLoading ? "Gerando recompensa..." : "Ninja capturado!"}
+            <h3 style={{ fontSize: reward.isRare ? 20 : 18, fontWeight: 800, color: "rgba(241,245,249,1)", margin: "0 0 4px" }}>
+              {rewardLoading ? "Gerando recompensa..." : reward.isRare ? "🥷 JACKPOT!" : "🥷 Ninja capturado!"}
             </h3>
 
             {!rewardLoading && (
               <>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: "rgba(148,163,184,1)",
-                    margin: "0 0 16px",
-                  }}
-                >
-                  Cupom secreto desbloqueado!
+                <p style={{ fontSize: 13, color: reward.isRare ? "rgba(147,197,253,1)" : "rgba(148,163,184,1)", margin: "0 0 16px" }}>
+                  {reward.isRare ? "Você encontrou o ninja raro!" : "Cupom secreto liberado!"}
                 </p>
 
-                {/* Discount badge */}
-                <div
-                  style={{
-                    display: "inline-block",
-                    fontSize: 11,
-                    fontWeight: 800,
-                    padding: "4px 16px",
-                    borderRadius: 999,
-                    color: "rgba(147,197,253,1)",
-                    background: "rgba(59,130,246,0.12)",
-                    border: "1px solid rgba(96,165,250,0.25)",
-                    marginBottom: 12,
-                  }}
-                >
+                <div style={{ display: "inline-block", fontSize: reward.isRare ? 14 : 11, fontWeight: 800, padding: reward.isRare ? "6px 20px" : "4px 16px", borderRadius: 999, color: reward.isRare ? "rgba(96,165,250,1)" : "rgba(147,197,253,1)", background: reward.isRare ? "rgba(59,130,246,0.18)" : "rgba(59,130,246,0.12)", border: reward.isRare ? "1px solid rgba(96,165,250,0.4)" : "1px solid rgba(96,165,250,0.25)", marginBottom: 12 }}>
                   {reward.discount}% OFF
                 </div>
 
-                {/* Coupon code */}
-                <div
-                  style={{
-                    background: "rgba(59,130,246,0.06)",
-                    border: "1px solid rgba(96,165,250,0.2)",
-                    borderRadius: 14,
-                    padding: "14px 20px",
-                    fontFamily: "monospace",
-                    fontSize: 22,
-                    fontWeight: 900,
-                    letterSpacing: "0.12em",
-                    color: "rgba(191,219,254,1)",
-                    marginBottom: 8,
-                  }}
-                >
+                <div style={{ background: "rgba(59,130,246,0.06)", border: reward.isRare ? "1px solid rgba(96,165,250,0.35)" : "1px solid rgba(96,165,250,0.2)", borderRadius: 14, padding: "14px 20px", fontFamily: "monospace", fontSize: 22, fontWeight: 900, letterSpacing: "0.12em", color: "rgba(191,219,254,1)", marginBottom: 8 }}>
                   {reward.code}
                 </div>
 
-                {/* Timer */}
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(148,163,184,0.8)",
-                    margin: "0 0 16px",
-                  }}
-                >
+                <p style={{ fontSize: 11, color: "rgba(148,163,184,0.8)", margin: "0 0 16px" }}>
                   ⏱ Válido por {formatTime(countdown)}
                 </p>
 
-                {/* Buttons */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  <button
-                    onClick={handleCopy}
-                    style={{
-                      width: "100%",
-                      padding: "12px 20px",
-                      borderRadius: 14,
-                      border: "none",
-                      fontWeight: 800,
-                      fontSize: 14,
-                      cursor: "pointer",
-                      color: "#fff",
-                      background: "linear-gradient(135deg, hsl(200 100% 50%), hsl(200 100% 38%))",
-                      boxShadow: "0 0 20px rgba(59,130,246,0.35)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                      transition: "opacity 0.15s",
-                    }}
-                  >
+                <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+                  <button onClick={handleCopy} style={{ width: "100%", padding: "12px 20px", borderRadius: 14, border: "none", fontWeight: 800, fontSize: 14, cursor: "pointer", color: "#fff", background: "linear-gradient(135deg, hsl(200 100% 50%), hsl(200 100% 38%))", boxShadow: "0 0 20px rgba(59,130,246,0.35)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                     {copied ? "✓ Código copiado!" : "📋 Copiar código"}
                   </button>
-
-                  <button
-                    onClick={() => {
-                      handleCopy();
-                      setPhase("cooldown");
-                      window.location.href = "/checkout";
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "10px 20px",
-                      borderRadius: 14,
-                      border: "1px solid rgba(96,165,250,0.3)",
-                      fontWeight: 600,
-                      fontSize: 13,
-                      cursor: "pointer",
-                      color: "rgba(147,197,253,1)",
-                      background: "transparent",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                      transition: "background 0.15s",
-                    }}
-                  >
+                  <button onClick={() => { handleCopy(); setPhase("cooldown"); window.location.href = "/checkout"; }} style={{ width: "100%", padding: "10px 20px", borderRadius: 14, border: "1px solid rgba(96,165,250,0.3)", fontWeight: 600, fontSize: 13, cursor: "pointer", color: "rgba(147,197,253,1)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                     🛒 Usar agora
                   </button>
                 </div>
@@ -591,6 +468,14 @@ export default function FloatingNinja() {
         @keyframes rewardSpin {
           from { transform: scale(0) rotate(-180deg); }
           to { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes jackpotGlow {
+          0%, 100% { box-shadow: 0 0 60px rgba(59,130,246,0.3), 0 20px 60px rgba(0,0,0,0.5); }
+          50% { box-shadow: 0 0 100px rgba(59,130,246,0.5), 0 0 140px rgba(59,130,246,0.2), 0 20px 60px rgba(0,0,0,0.5); }
+        }
+        @keyframes jackpotPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.05); }
         }
       `}</style>
     </>

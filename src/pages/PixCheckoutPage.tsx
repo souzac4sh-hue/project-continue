@@ -83,18 +83,37 @@ export default function PixCheckoutPage() {
   // Poll for payment status
   useEffect(() => {
     if (!orderId || state === 'paid' || state === 'error' || state === 'expired') return;
+
     const check = async () => {
       try {
+        console.log('[PIX-CHECKOUT] Checking payment status for order:', orderId);
         const { data, error } = await supabase.functions.invoke('check-pix-status', {
           body: { orderId },
         });
-        if (!error && data?.status === 'paid') {
+
+        if (error) {
+          console.error('[PIX-CHECKOUT] check-pix-status returned error:', error);
+          return;
+        }
+
+        console.log('[PIX-CHECKOUT] check-pix-status response:', data);
+
+        if (data?.status === 'paid') {
+          console.log('[PIX-CHECKOUT] Payment confirmed, moving UI to paid state:', orderId);
           setState('paid');
           trackCheckoutEvent(orderId, 'payment_confirmed');
-          updateLeadStatus(orderId, 'paid', 'payment_confirmed', { paid_at: new Date().toISOString() });
+          return;
         }
-      } catch { /* silently retry */ }
+
+        if (data?.status === 'expired' || data?.status === 'failed') {
+          console.warn('[PIX-CHECKOUT] Terminal status received:', data.status, 'order:', orderId);
+          setState(data.status === 'expired' ? 'expired' : 'error');
+        }
+      } catch (err) {
+        console.error('[PIX-CHECKOUT] Polling error:', err);
+      }
     };
+
     const interval = setInterval(check, 5000);
     check();
     return () => clearInterval(interval);

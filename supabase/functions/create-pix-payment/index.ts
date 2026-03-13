@@ -126,19 +126,28 @@ Deno.serve(async (req) => {
     const SIGILOPAY_SECRET_KEY = Deno.env.get('SIGILOPAY_SECRET_KEY')
 
     if (!SIGILOPAY_PUBLIC_KEY || !SIGILOPAY_SECRET_KEY) {
-      console.error('SigiloPay API keys not configured')
+      console.error('[CREATE-PIX] SigiloPay API keys not configured')
       return new Response(JSON.stringify({ error: 'Payment provider not configured' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
+    console.log('[CREATE-PIX] Starting Pix generation', JSON.stringify({
+      productId,
+      productName: realProductName,
+      orderAmount: cleanAmount,
+      originalAmount,
+      hasCoupon: Boolean(validatedCouponCode),
+    }))
+
     // Generate unique identifier for this order
     const identifier = crypto.randomUUID()
+    console.log('[CREATE-PIX] Generated checkout identifier:', identifier)
 
     // Call SigiloPay API to create Pix charge
     const apiUrl = 'https://app.sigilopay.com.br/api/v1/gateway/pix/receive'
-    console.log('Calling SigiloPay:', apiUrl, 'with validated amount:', cleanAmount, '(original price:', originalAmount, ')')
+    console.log('[CREATE-PIX] Calling SigiloPay:', apiUrl, 'with validated amount:', cleanAmount, '(original price:', originalAmount, ')')
 
     const sigiloResponse = await fetch(apiUrl, {
       method: 'POST',
@@ -160,10 +169,10 @@ Deno.serve(async (req) => {
     })
 
     const responseText = await sigiloResponse.text()
-    console.log('SigiloPay response status:', sigiloResponse.status, 'body preview:', responseText.substring(0, 500))
+    console.log('[CREATE-PIX] SigiloPay response status:', sigiloResponse.status, 'body preview:', responseText.substring(0, 500))
 
     if (!sigiloResponse.ok) {
-      console.error('SigiloPay API error:', sigiloResponse.status, responseText.substring(0, 1000))
+      console.error('[CREATE-PIX] SigiloPay API error:', sigiloResponse.status, responseText.substring(0, 1000))
       return new Response(JSON.stringify({ error: 'Failed to generate Pix payment', details: responseText.substring(0, 200) }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -174,7 +183,7 @@ Deno.serve(async (req) => {
     try {
       sigiloData = JSON.parse(responseText)
     } catch {
-      console.error('SigiloPay returned non-JSON:', responseText.substring(0, 500))
+      console.error('[CREATE-PIX] SigiloPay returned non-JSON:', responseText.substring(0, 500))
       return new Response(JSON.stringify({ error: 'Invalid payment provider response' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -182,15 +191,23 @@ Deno.serve(async (req) => {
     }
 
     const pixData = sigiloData?.pix as Record<string, unknown> | undefined
+    const transactionData = sigiloData?.transaction as Record<string, unknown> | undefined
     const pixCode = pixData?.code || (sigiloData?.pixCode as string) || (sigiloData?.qrcode as string)
 
     if (!pixCode) {
-      console.error('No pix code in SigiloPay response:', JSON.stringify(sigiloData))
+      console.error('[CREATE-PIX] No pix code in SigiloPay response:', JSON.stringify(sigiloData))
       return new Response(JSON.stringify({ error: 'Invalid payment provider response' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+
+    const providerIdentifier =
+      (sigiloData?.transactionId as string) ||
+      (sigiloData?.id as string) ||
+      (transactionData?.id as string) ||
+      (pixData?.transactionId as string) ||
+      null
 
     const pixAmount = (pixData?.amount as number) || (sigiloData?.amount as number) || cleanAmount
 
@@ -210,15 +227,27 @@ Deno.serve(async (req) => {
       lead_status: 'pix_generated',
       last_step: 'pix_generated',
       provider: 'sigilopay',
-      provider_identifier: (sigiloData?.transactionId as string) || (sigiloData?.id as string) || null,
+      provider_identifier: providerIdentifier,
       provider_response: sigiloData as Record<string, unknown>,
       coupon_code: validatedCouponCode,
       discount_amount: validatedDiscount,
     })
 
     if (dbError) {
-      console.error('Failed to save order:', dbError)
+      console.error('[CREATE-PIX] Failed to save order in database:', dbError)
+      return new Response(JSON.stringify({ error: 'Failed to persist checkout order' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
+
+    console.log('[CREATE-PIX] Checkout saved successfully', JSON.stringify({
+      identifier,
+      providerIdentifier,
+      productId,
+      amount: cleanAmount,
+      pixAmount,
+    }))
 
     // Track checkout event
     await supabase.from('checkout_events').insert({

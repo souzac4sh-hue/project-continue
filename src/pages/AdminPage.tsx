@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import {
   ShoppingBag, Layers, BookOpen, Star, ClipboardList,

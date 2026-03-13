@@ -11,12 +11,12 @@ export async function trackCheckoutEvent(
   identifier?: string,
 ) {
   try {
-    await supabase.from('checkout_events').insert({
+    await supabase.from('checkout_events').insert([{
       order_id: orderId,
       event_type: eventType,
       metadata: metadata || {},
       identifier: identifier || null,
-    });
+    }]);
   } catch (err) {
     console.error('Failed to track checkout event:', err);
   }

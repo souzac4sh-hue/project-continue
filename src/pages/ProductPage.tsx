@@ -508,7 +508,7 @@ export default function ProductPage() {
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-foreground truncate">{product.name}</p>
-                <p className="text-sm font-bold text-primary">R$ {finalPrice.toFixed(2)}</p>
+                <p className="text-sm font-bold text-foreground">R$ {finalPrice.toFixed(2)}</p>
               </div>
               <Button
                 onClick={() => setBuyOpen(true)}

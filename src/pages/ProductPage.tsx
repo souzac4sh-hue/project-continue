@@ -526,7 +526,7 @@ export default function ProductPage() {
 
       <FloatingButtons />
       <FloatingNotifications />
-      <NinjaMascot />
+      <Ninja3D />
     </div>
   );
 }

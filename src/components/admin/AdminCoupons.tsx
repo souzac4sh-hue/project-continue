@@ -24,7 +24,6 @@ export function AdminCoupons() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // New coupon form
   const [code, setCode] = useState('');
   const [discountType, setDiscountType] = useState<'percentage' | 'fixed'>('percentage');
   const [discountValue, setDiscountValue] = useState('');
@@ -33,11 +32,11 @@ export function AdminCoupons() {
 
   const loadCoupons = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('coupons')
       .select('*')
       .order('created_at', { ascending: false });
-    if (!error && data) setCoupons(data as unknown as Coupon[]);
+    if (!error && data) setCoupons(data as Coupon[]);
     setLoading(false);
   };
 
@@ -49,13 +48,13 @@ export function AdminCoupons() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from('coupons').insert({
+    const { error } = await (supabase as any).from('coupons').insert({
       code: code.trim().toUpperCase(),
       discount_type: discountType,
       discount_value: parseFloat(discountValue),
       expires_at: expiresAt || null,
       usage_limit: usageLimit ? parseInt(usageLimit) : null,
-    } as any);
+    });
     if (error) {
       toast({ title: 'Erro ao criar cupom', description: error.message, variant: 'destructive' });
     } else {
@@ -67,12 +66,12 @@ export function AdminCoupons() {
   };
 
   const toggleActive = async (id: string, active: boolean) => {
-    await supabase.from('coupons').update({ active } as any).eq('id', id);
+    await (supabase as any).from('coupons').update({ active }).eq('id', id);
     setCoupons(prev => prev.map(c => c.id === id ? { ...c, active } : c));
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from('coupons').delete().eq('id', id);
+    await (supabase as any).from('coupons').delete().eq('id', id);
     setCoupons(prev => prev.filter(c => c.id !== id));
     toast({ title: 'Cupom removido' });
   };
@@ -81,7 +80,6 @@ export function AdminCoupons() {
 
   return (
     <div className="space-y-6">
-      {/* Add form */}
       <div className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold text-sm flex items-center gap-2"><Tag className="h-4 w-4 text-primary" /> Novo Cupom</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -119,7 +117,6 @@ export function AdminCoupons() {
         </Button>
       </div>
 
-      {/* List */}
       <div className="space-y-2">
         {coupons.length === 0 && <p className="text-sm text-muted-foreground text-center py-6">Nenhum cupom criado</p>}
         {coupons.map(c => (

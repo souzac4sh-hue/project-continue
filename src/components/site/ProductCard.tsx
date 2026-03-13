@@ -8,7 +8,7 @@ const badgeConfig: Record<string, { icon: typeof Flame; label: string; className
   best_seller: { icon: Flame, label: 'Mais vendido', className: 'bg-orange-600 text-white' },
   fast: { icon: Zap, label: 'Rápido', className: 'bg-blue-600 text-white' },
   recommended: { icon: Star, label: 'Recomendado', className: 'bg-green-600 text-white' },
-  premium: { icon: Gem, label: 'Premium', className: 'gold-gradient text-primary-foreground' },
+  premium: { icon: Gem, label: 'Premium', className: 'bg-cyan-600 text-white' },
   promo: { icon: Tag, label: 'Promo', className: 'bg-destructive text-destructive-foreground' },
 };
 

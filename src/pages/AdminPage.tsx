@@ -90,6 +90,8 @@ export default function AdminPage() {
       case 'recovery': return <AdminRecovery />;
       case 'recovery_settings': return <AdminRecoverySettings />;
       case 'activities': return <AdminActivities />;
+      case 'coupons': return <AdminCoupons />;
+      case 'ninja': return <AdminNinja />;
       case 'branding': return <AdminBranding />;
       case 'site_texts': return <AdminSiteTexts />;
       case 'settings': return <AdminSettings />;

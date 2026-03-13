@@ -34,7 +34,9 @@ export function AdminDashboard() {
       .select('id, product_name, amount, payment_status, lead_status, copied_pix, support_contacted_at, created_at, paid_at, abandoned_at, recovered_at')
       .order('created_at', { ascending: false })
       .limit(1000)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('[ADMIN] Failed to load orders:', error);
+        console.log('[ADMIN] Orders loaded:', data?.length ?? 0);
         setOrders((data as PixOrder[]) || []);
         setLoading(false);
       });

@@ -10,9 +10,10 @@ const COOLDOWN_KEY = 'ninja3d_cooldown_ts';
 const SESSION_KEY = 'ninja3d_session_done';
 
 /* ─── Procedural 3D Cyber Ninja Model ─── */
-function CyberNinjaModel({ idle }: { idle?: boolean }) {
+function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const timeRef = useRef(0);
+  const spinRef = useRef(0);
 
   const neonMat = useMemo(() => new THREE.MeshStandardMaterial({
     color: new THREE.Color('hsl(200, 100%, 50%)'),
@@ -41,9 +42,22 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
     if (!groupRef.current) return;
     timeRef.current += delta;
     const t = timeRef.current;
-    if (idle) {
-      groupRef.current.position.y = Math.sin(t * 2) * 0.05;
-      groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
+
+    if (dodging) {
+      // Spinning jump: full Y rotation + vertical arc
+      spinRef.current += delta * 14; // fast spin
+      groupRef.current.rotation.y = spinRef.current;
+      groupRef.current.position.y = Math.sin(Math.min(spinRef.current / 3, Math.PI)) * 0.4;
+    } else {
+      // Ease spin back to 0
+      spinRef.current = 0;
+      if (idle) {
+        groupRef.current.position.y = Math.sin(t * 2) * 0.05;
+        groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
+      } else {
+        groupRef.current.position.y *= 0.9; // settle down
+        groupRef.current.rotation.y *= 0.9;
+      }
     }
   });
 

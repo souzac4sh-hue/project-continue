@@ -231,14 +231,14 @@ export function NinjaMascot() {
       if (!mountedRef.current) return;
       setPhase('idle');
 
-      // Auto-disappear after idle
+      // Auto-disappear after idle — longer pause for visibility
       hideTimerRef.current = setTimeout(() => {
         if (!mountedRef.current) return;
         setPhase('smoke');
         setTimeout(() => {
           if (mountedRef.current) setPhase('hidden');
         }, 700);
-      }, 3000);
+      }, 5000);
     }, animationSpeed * 1000 * 0.6); // stop at ~60% across screen
   }, [canAppear, getDirection, animationSpeed, incrementStat]);
 

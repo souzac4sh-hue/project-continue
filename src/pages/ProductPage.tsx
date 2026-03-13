@@ -80,6 +80,12 @@ export default function ProductPage() {
         return;
       }
 
+      // Track form submitted event
+      if (data.orderId) {
+        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: finalPrice } as Record<string, string | number>);
+        trackCheckoutEvent(data.orderId, 'pix_generated');
+      }
+
       setBuyOpen(false);
       setName('');
       setPhone('');

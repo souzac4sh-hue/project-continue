@@ -16,8 +16,8 @@ function generateCode(): string {
 }
 
 function pickDiscount(): number {
-  // 70% chance for 10%, 30% chance for 20%
-  return Math.random() < 0.7 ? 10 : 20;
+  // 92% chance for 5%, 8% chance for 10%
+  return Math.random() < 0.08 ? 10 : 5;
 }
 
 Deno.serve(async (req: Request) => {

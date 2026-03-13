@@ -349,7 +349,7 @@ export default function ProductPage() {
             <ShoppingBag className="h-5 w-5 mr-2" /> {settings.storeMode === 'offline' ? 'Loja Offline' : `Comprar Agora — R$ ${finalPrice.toFixed(2)}`}
           </Button>
           <a href={settings.vipGroupLink} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-primary/30 text-primary hover:bg-primary/10">
+            <Button variant="outline" className="w-full py-5 text-sm rounded-xl border-border/50 text-foreground/70 hover:text-foreground hover:bg-secondary hover:border-border">
               <Users className="h-4 w-4 mr-2" /> Entrar no Grupo VIP
             </Button>
           </a>

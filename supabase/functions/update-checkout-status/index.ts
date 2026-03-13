@@ -16,6 +16,14 @@ Deno.serve(async (req) => {
   try {
     const { action, orderId, leadStatus, lastStep, extraFields } = await req.json()
 
+    console.log('[UPDATE-CHECKOUT-STATUS] Request received', JSON.stringify({
+      action,
+      orderId,
+      hasLeadStatus: Boolean(leadStatus),
+      hasLastStep: Boolean(lastStep),
+      hasExtraFields: Boolean(extraFields),
+    }))
+
     // Input validation
     if (!orderId || typeof orderId !== 'string' || orderId.length > 100) {
       return new Response(JSON.stringify({ error: 'Invalid orderId' }), {
@@ -107,19 +115,32 @@ Deno.serve(async (req) => {
         break
     }
 
+    console.log('[UPDATE-CHECKOUT-STATUS] Prepared update payload', JSON.stringify({ action, orderId, updateData }))
+
     if (Object.keys(updateData).length > 0) {
-      const { error } = await supabase
+      const { data: updatedRows, error } = await supabase
         .from('pix_orders')
         .update(updateData)
         .eq('identifier', orderId)
+        .select('id, identifier, payment_status, lead_status, last_step')
 
       if (error) {
-        console.error('Failed to update order:', error)
+        console.error('[UPDATE-CHECKOUT-STATUS] Database update error:', error)
         return new Response(JSON.stringify({ error: 'Update failed' }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
+
+      if (!updatedRows || updatedRows.length === 0) {
+        console.warn('[UPDATE-CHECKOUT-STATUS] Checkout not found for orderId:', orderId)
+        return new Response(JSON.stringify({ error: 'Checkout not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      console.log('[UPDATE-CHECKOUT-STATUS] Checkout updated successfully', JSON.stringify(updatedRows[0]))
     }
 
     return new Response(JSON.stringify({ success: true }), {

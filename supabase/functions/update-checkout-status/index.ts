@@ -16,8 +16,25 @@ Deno.serve(async (req) => {
   try {
     const { action, orderId, leadStatus, lastStep, extraFields } = await req.json()
 
-    if (!orderId || !action) {
-      return new Response(JSON.stringify({ error: 'Missing orderId or action' }), {
+    // Input validation
+    if (!orderId || typeof orderId !== 'string' || orderId.length > 100) {
+      return new Response(JSON.stringify({ error: 'Invalid orderId' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    if (!action || typeof action !== 'string') {
+      return new Response(JSON.stringify({ error: 'Missing action' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Validate orderId format (UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(orderId)) {
+      return new Response(JSON.stringify({ error: 'Invalid orderId format' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -79,15 +96,14 @@ Deno.serve(async (req) => {
         break
 
       case 'update_lead_status':
-        if (leadStatus) updateData.lead_status = leadStatus
-        if (lastStep) updateData.last_step = lastStep
-        if (extraFields && typeof extraFields === 'object') {
-          // Only allow safe fields
-          const safeFields = ['paid_at', 'last_step', 'lead_status']
-          for (const [k, v] of Object.entries(extraFields)) {
-            if (safeFields.includes(k)) updateData[k] = v
-          }
+        if (leadStatus && typeof leadStatus === 'string' && leadStatus.length < 50) {
+          // Don't allow setting to 'paid' from client
+          if (leadStatus !== 'paid') updateData.lead_status = leadStatus
         }
+        if (lastStep && typeof lastStep === 'string' && lastStep.length < 50) {
+          if (lastStep !== 'payment_confirmed') updateData.last_step = lastStep
+        }
+        // No extraFields allowed - prevents paid_at injection
         break
     }
 

@@ -79,29 +79,22 @@ export default function ProductPage() {
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) { setCouponDiscount(null); setCouponError(''); return; }
-    const { data, error } = await (supabase as any)
-      .from('coupons')
-      .select('*')
-      .eq('code', couponCode.trim().toUpperCase())
-      .eq('active', true)
-      .maybeSingle();
-    if (error || !data) {
-      setCouponError('Cupom inválido');
+    try {
+      // Validate coupon server-side to avoid exposing coupon codes publicly
+      const { data, error } = await supabase.functions.invoke('validate-coupon', {
+        body: { code: couponCode.trim().toUpperCase(), productId: product.id },
+      });
+      if (error || !data?.valid) {
+        setCouponError(data?.error || 'Cupom inválido');
+        setCouponDiscount(null);
+        return;
+      }
+      setCouponDiscount({ type: data.discount_type, value: data.discount_value });
+      setCouponError('');
+    } catch {
+      setCouponError('Erro ao validar cupom');
       setCouponDiscount(null);
-      return;
     }
-    if (data.expires_at && new Date(data.expires_at) < new Date()) {
-      setCouponError('Cupom expirado');
-      setCouponDiscount(null);
-      return;
-    }
-    if (data.usage_limit && data.times_used >= data.usage_limit) {
-      setCouponError('Cupom esgotado');
-      setCouponDiscount(null);
-      return;
-    }
-    setCouponDiscount({ type: data.discount_type, value: data.discount_value });
-    setCouponError('');
   };
 
   const handlePurchase = async () => {

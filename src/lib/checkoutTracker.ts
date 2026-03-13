@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 type CheckoutEventType = Database['public']['Enums']['checkout_event_type'];
 type LeadStatus = Database['public']['Enums']['lead_status'];

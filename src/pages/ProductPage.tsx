@@ -14,7 +14,7 @@ import { PaymentMethods } from '@/components/site/PaymentMethods';
 import { SimilarProducts } from '@/components/site/SimilarProducts';
 import { AnimatedSection } from '@/components/site/AnimatedSection';
 import { StarRating } from '@/components/site/StarRating';
-import { NinjaMascot } from '@/components/site/NinjaMascot';
+import { Ninja3D } from '@/components/site/Ninja3D';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

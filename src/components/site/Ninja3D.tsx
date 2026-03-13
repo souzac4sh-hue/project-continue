@@ -10,9 +10,10 @@ const COOLDOWN_KEY = 'ninja3d_cooldown_ts';
 const SESSION_KEY = 'ninja3d_session_done';
 
 /* ─── Procedural 3D Cyber Ninja Model ─── */
-function CyberNinjaModel({ idle }: { idle?: boolean }) {
+function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const timeRef = useRef(0);
+  const spinRef = useRef(0);
 
   const neonMat = useMemo(() => new THREE.MeshStandardMaterial({
     color: new THREE.Color('hsl(200, 100%, 50%)'),
@@ -41,9 +42,22 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
     if (!groupRef.current) return;
     timeRef.current += delta;
     const t = timeRef.current;
-    if (idle) {
-      groupRef.current.position.y = Math.sin(t * 2) * 0.05;
-      groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
+
+    if (dodging) {
+      // Spinning jump: full Y rotation + vertical arc
+      spinRef.current += delta * 14; // fast spin
+      groupRef.current.rotation.y = spinRef.current;
+      groupRef.current.position.y = Math.sin(Math.min(spinRef.current / 3, Math.PI)) * 0.4;
+    } else {
+      // Ease spin back to 0
+      spinRef.current = 0;
+      if (idle) {
+        groupRef.current.position.y = Math.sin(t * 2) * 0.05;
+        groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
+      } else {
+        groupRef.current.position.y *= 0.9; // settle down
+        groupRef.current.rotation.y *= 0.9;
+      }
     }
   });
 
@@ -77,7 +91,7 @@ function CyberNinjaModel({ idle }: { idle?: boolean }) {
   );
 }
 
-function NinjaCanvas({ size, idle }: { size: number; idle?: boolean }) {
+function NinjaCanvas({ size, idle, dodging }: { size: number; idle?: boolean; dodging?: boolean }) {
   return (
     <div style={{ width: size, height: size, pointerEvents: 'none' }}>
       <Canvas
@@ -90,12 +104,35 @@ function NinjaCanvas({ size, idle }: { size: number; idle?: boolean }) {
         <directionalLight position={[3, 5, 4]} intensity={0.8} color="#ffffff" />
         <pointLight position={[0, 1, 2]} intensity={0.6} color="hsl(200, 100%, 55%)" distance={5} />
         <pointLight position={[-1, 0, 1]} intensity={0.3} color="hsl(200, 100%, 40%)" distance={4} />
-        <CyberNinjaModel idle={idle} />
+        <CyberNinjaModel idle={idle} dodging={dodging} />
       </Canvas>
     </div>
   );
 }
 
+/* ─── Motion Trail ─── */
+function MotionTrail({ positions, size }: { positions: { x: number; y: number }[]; size: number }) {
+  return (
+    <>
+      {positions.map((p, i) => (
+        <motion.div
+          key={`trail-${i}`}
+          className="fixed pointer-events-none z-[64] rounded-full"
+          style={{
+            width: size * 0.5,
+            height: size * 0.5,
+            left: p.x - size * 0.25,
+            top: p.y - size * 0.25,
+            background: 'radial-gradient(circle, rgba(18,181,255,0.2), transparent 70%)',
+          }}
+          initial={{ opacity: 0.5, scale: 1 }}
+          animate={{ opacity: 0, scale: 0.3 }}
+          transition={{ duration: 0.6, delay: i * 0.02, ease: 'easeOut' }}
+        />
+      ))}
+    </>
+  );
+}
 function SmokeEffect({ x, y, size }: { x: number; y: number; size: number }) {
   return (
     <div className="fixed pointer-events-none z-[80]" style={{ left: x - size / 2, top: y - size / 2, width: size * 2, height: size * 2 }}>
@@ -149,6 +186,8 @@ export function Ninja3D() {
   const [rewardCode, setRewardCode] = useState('');
   const [rewardLabel, setRewardLabel] = useState('');
   const [smokePos, setSmokePos] = useState({ x: 0, y: 0 });
+  const [trailPositions, setTrailPositions] = useState<{ x: number; y: number }[]>([]);
+  const [trailKey, setTrailKey] = useState(0);
   const dodgeCountRef = useRef(0);
   const maxDodgesRef = useRef(2 + Math.floor(Math.random() * 3));
   const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -157,6 +196,7 @@ export function Ninja3D() {
   const startedRef = useRef(false);
   const posRef = useRef(pos);
   posRef.current = pos;
+  const trailHistoryRef = useRef<{ x: number; y: number }[]>([]);
 
   // Use ref to avoid re-triggering effect when settings load
   const settingsRef = useRef(ninja);
@@ -168,6 +208,21 @@ export function Ninja3D() {
       ninjaSettings: { ...prev.ninjaSettings, stats: { ...prev.ninjaSettings.stats, [key]: (prev.ninjaSettings.stats[key] || 0) + 1 } },
     }));
   }, [setSettings]);
+
+  // Emit trail particles from a position
+  const emitTrail = useCallback((from: { x: number; y: number }) => {
+    // Generate interpolated trail points
+    const points: { x: number; y: number }[] = [];
+    for (let i = 0; i < 5; i++) {
+      points.push({
+        x: from.x + (Math.random() - 0.5) * 15,
+        y: from.y + (Math.random() - 0.5) * 15,
+      });
+    }
+    trailHistoryRef.current = points;
+    setTrailPositions(points);
+    setTrailKey(k => k + 1);
+  }, []);
 
   // Single entry effect - runs once on mount
   useEffect(() => {
@@ -209,6 +264,7 @@ export function Ninja3D() {
       setTimeout(() => {
         if (!mountedRef.current) return;
         const first = getRandomPosition(ninjaSize);
+        emitTrail(starts[side]);
         setPos(first);
         posRef.current = first;
 
@@ -220,6 +276,7 @@ export function Ninja3D() {
       moveIntervalRef.current = setInterval(() => {
         if (!mountedRef.current) return;
         setIsIdle(false);
+        emitTrail(posRef.current);
         const next = getRandomPosition(ninjaSize);
         setPos(next);
         posRef.current = next;
@@ -251,10 +308,11 @@ export function Ninja3D() {
     if (dodgeCountRef.current < maxDodgesRef.current) {
       dodgeCountRef.current++;
       setIsDodging(true);
+      emitTrail(posRef.current);
       const dodge = getDodgePosition(posRef.current.x, posRef.current.y, ninjaSize);
       setPos(dodge);
       posRef.current = dodge;
-      setTimeout(() => setIsDodging(false), 400);
+      setTimeout(() => setIsDodging(false), 600);
       return;
     }
 
@@ -292,7 +350,7 @@ export function Ninja3D() {
         }
       }
     }, 700);
-  }, [phase, ninjaSize, incrementStat]);
+  }, [phase, ninjaSize, incrementStat, emitTrail]);
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(rewardCode);
@@ -320,13 +378,18 @@ export function Ninja3D() {
             }}
             onClick={handleClick}
           >
-            <NinjaCanvas size={ninjaSize} idle={isIdle} />
+            <NinjaCanvas size={ninjaSize} idle={isIdle} dodging={isDodging} />
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
               style={{ width: ninjaSize * 0.6, height: ninjaSize * 0.12, background: 'radial-gradient(ellipse, rgba(18,181,255,0.35) 0%, transparent 70%)', filter: 'blur(3px)' }}
             />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Motion trail */}
+      {phase === 'active' && trailPositions.length > 0 && (
+        <MotionTrail key={trailKey} positions={trailPositions} size={ninjaSize} />
+      )}
 
       <AnimatePresence>
         {phase === 'smoke' && <SmokeEffect x={smokePos.x} y={smokePos.y} size={ninjaSize} />}

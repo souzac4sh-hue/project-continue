@@ -6,7 +6,7 @@ type CheckoutEventType = Database['public']['Enums']['checkout_event_type'];
 export async function trackCheckoutEvent(
   orderId: string,
   eventType: CheckoutEventType,
-  metadata?: Record<string, unknown>,
+  metadata?: Record<string, string | number | boolean | null>,
   identifier?: string,
 ) {
   try {

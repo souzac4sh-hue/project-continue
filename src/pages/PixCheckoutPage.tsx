@@ -545,14 +545,8 @@ export default function PixCheckoutPage() {
                   </div>
                 </motion.div>
                 <h2 className="font-serif text-lg font-bold text-foreground">{ct.paidTitle}</h2>
-                <p className="text-sm text-muted-foreground">{ct.paidRedirectText}</p>
-                <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
-                <Button variant="outline" className="mt-4" onClick={() => {
-                  const url = buildWhatsAppUrl(settings.whatsappNumber, orderId!, productName!);
-                  window.open(url, '_blank');
-                }}>
-                  <ExternalLink className="h-4 w-4 mr-2" /> Abrir WhatsApp agora
-                </Button>
+                <p className="text-sm text-muted-foreground">Clique no botão abaixo para receber seu produto via WhatsApp</p>
+                <PaidAutoRedirect whatsappUrl={buildWhatsAppUrl(settings.whatsappNumber, orderId!, productName!)} />
               </motion.div>
             )}
 

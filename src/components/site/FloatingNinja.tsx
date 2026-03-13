@@ -469,6 +469,18 @@ export default function FloatingNinja() {
           from { transform: scale(0) rotate(-180deg); }
           to { transform: scale(1) rotate(0deg); }
         }
+        @keyframes jackpotGlow {
+          0%, 100% { box-shadow: 0 0 60px rgba(59,130,246,0.3), 0 20px 60px rgba(0,0,0,0.5); }
+          50% { box-shadow: 0 0 100px rgba(59,130,246,0.5), 0 0 140px rgba(59,130,246,0.2), 0 20px 60px rgba(0,0,0,0.5); }
+        }
+        @keyframes jackpotPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.05); }
+        }
+      `}</style>
+          from { transform: scale(0) rotate(-180deg); }
+          to { transform: scale(1) rotate(0deg); }
+        }
       `}</style>
     </>
   );

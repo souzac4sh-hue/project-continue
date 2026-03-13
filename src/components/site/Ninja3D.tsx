@@ -1,8 +1,6 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Copy, Check, X, ShoppingBag, Sparkles, Loader2 } from 'lucide-react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 import { useStore } from '@/context/StoreContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -28,101 +26,317 @@ function getSessionId(): string {
   return id;
 }
 
-/* ─── Procedural 3D Cyber Ninja Model ─── */
-function CyberNinjaModel({ idle, dodging }: { idle?: boolean; dodging?: boolean }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const timeRef = useRef(0);
-  const spinRef = useRef(0);
-
-  const neonMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('hsl(200, 100%, 50%)'),
-    emissive: new THREE.Color('hsl(200, 100%, 40%)'),
-    emissiveIntensity: 1.2, metalness: 0.8, roughness: 0.2,
-  }), []);
-  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('hsl(220, 15%, 10%)'),
-    metalness: 0.6, roughness: 0.4,
-  }), []);
-  const armorMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('hsl(220, 20%, 14%)'),
-    metalness: 0.7, roughness: 0.3,
-  }), []);
-  const eyeMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('hsl(200, 100%, 85%)'),
-    emissive: new THREE.Color('hsl(200, 100%, 70%)'),
-    emissiveIntensity: 2,
-  }), []);
-  const swordMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('hsl(0, 0%, 70%)'),
-    metalness: 0.9, roughness: 0.1,
-  }), []);
-
-  useFrame((_, delta) => {
-    if (!groupRef.current) return;
-    timeRef.current += delta;
-    const t = timeRef.current;
-
-    if (dodging) {
-      spinRef.current += delta * 14;
-      groupRef.current.rotation.y = spinRef.current;
-      groupRef.current.position.y = Math.sin(Math.min(spinRef.current / 3, Math.PI)) * 0.4;
-    } else {
-      spinRef.current = 0;
-      if (idle) {
-        groupRef.current.position.y = Math.sin(t * 2) * 0.05;
-        groupRef.current.rotation.y = Math.sin(t * 0.5) * 0.15;
-      } else {
-        groupRef.current.position.y *= 0.9;
-        groupRef.current.rotation.y *= 0.9;
-      }
-    }
-  });
-
+/* ─── CSS Cyber Ninja (fake 3D, always renders) ─── */
+function CSSNinja({ size, idle, dodging }: { size: number; idle?: boolean; dodging?: boolean }) {
   return (
-    <group ref={groupRef} scale={0.9}>
-      <mesh position={[0, 0.2, 0]} material={bodyMat}><boxGeometry args={[0.6, 0.7, 0.35]} /></mesh>
-      <mesh position={[0, 0.25, 0.18]} material={armorMat}><boxGeometry args={[0.45, 0.5, 0.05]} /></mesh>
-      <mesh position={[0, 0.25, 0.21]} material={neonMat}><boxGeometry args={[0.03, 0.4, 0.02]} /></mesh>
-      <mesh position={[0, -0.12, 0]} material={armorMat}><boxGeometry args={[0.65, 0.1, 0.38]} /></mesh>
-      <mesh position={[0, -0.12, 0.2]} material={neonMat}><boxGeometry args={[0.18, 0.07, 0.03]} /></mesh>
-      <mesh position={[0, 0.8, 0]} material={bodyMat}><sphereGeometry args={[0.28, 16, 16]} /></mesh>
-      <mesh position={[0, 0.82, 0]} material={neonMat}><cylinderGeometry args={[0.29, 0.29, 0.08, 16]} /></mesh>
-      <mesh position={[-0.1, 0.78, 0.22]} material={eyeMat}><sphereGeometry args={[0.055, 8, 8]} /></mesh>
-      <mesh position={[0.1, 0.78, 0.22]} material={eyeMat}><sphereGeometry args={[0.055, 8, 8]} /></mesh>
-      <mesh position={[-0.35, 0.85, -0.1]} rotation={[0, 0, -0.5]} material={neonMat}><boxGeometry args={[0.3, 0.04, 0.02]} /></mesh>
-      <mesh position={[-0.42, 0.82, -0.12]} rotation={[0, 0, -0.7]} material={neonMat}><boxGeometry args={[0.22, 0.03, 0.02]} /></mesh>
-      <mesh position={[-0.42, 0.2, 0]} rotation={[0, 0, 0.3]} material={bodyMat}><boxGeometry args={[0.15, 0.5, 0.15]} /></mesh>
-      <mesh position={[-0.5, -0.02, 0]} material={armorMat}><sphereGeometry args={[0.08, 8, 8]} /></mesh>
-      <mesh position={[0.42, 0.2, 0]} rotation={[0, 0, -0.3]} material={bodyMat}><boxGeometry args={[0.15, 0.5, 0.15]} /></mesh>
-      <mesh position={[0.5, -0.02, 0]} material={armorMat}><sphereGeometry args={[0.08, 8, 8]} /></mesh>
-      <mesh position={[-0.15, -0.5, 0]} material={bodyMat}><boxGeometry args={[0.17, 0.55, 0.17]} /></mesh>
-      <mesh position={[-0.15, -0.5, 0.09]} material={neonMat}><boxGeometry args={[0.03, 0.4, 0.02]} /></mesh>
-      <mesh position={[0.15, -0.5, 0]} material={bodyMat}><boxGeometry args={[0.17, 0.55, 0.17]} /></mesh>
-      <mesh position={[0.15, -0.5, 0.09]} material={neonMat}><boxGeometry args={[0.03, 0.4, 0.02]} /></mesh>
-      <group position={[0.2, 0.4, -0.2]} rotation={[0, 0, -0.35]}>
-        <mesh material={swordMat}><boxGeometry args={[0.04, 0.7, 0.02]} /></mesh>
-        <mesh position={[0, -0.35, 0]} material={neonMat}><boxGeometry args={[0.15, 0.04, 0.06]} /></mesh>
-        <mesh position={[0, -0.45, 0]} material={armorMat}><boxGeometry args={[0.05, 0.15, 0.05]} /></mesh>
-      </group>
-    </group>
-  );
-}
+    <div
+      style={{ width: size, height: size, position: 'relative', userSelect: 'none' }}
+      className="pointer-events-none"
+    >
+      {/* Outer glow */}
+      <div
+        className="absolute inset-0 rounded-full animate-pulse"
+        style={{
+          background: 'radial-gradient(circle, rgba(18,181,255,0.25) 0%, transparent 70%)',
+          filter: 'blur(8px)',
+          transform: 'scale(1.4)',
+        }}
+      />
 
-function NinjaCanvas({ size, idle, dodging }: { size: number; idle?: boolean; dodging?: boolean }) {
-  return (
-    <div style={{ width: size, height: size, pointerEvents: 'none' }}>
-      <Canvas
-        camera={{ position: [0, 0.3, 2.8], fov: 35 }}
-        gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
-        style={{ background: 'transparent' }}
-        dpr={[1, 1.5]}
+      {/* Body container with perspective */}
+      <div
+        className="absolute inset-0 flex items-center justify-center"
+        style={{
+          perspective: '200px',
+          animation: idle ? 'ninja-float 2.5s ease-in-out infinite' : undefined,
+        }}
       >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[3, 5, 4]} intensity={0.8} color="#ffffff" />
-        <pointLight position={[0, 1, 2]} intensity={0.6} color="hsl(200, 100%, 55%)" distance={5} />
-        <pointLight position={[-1, 0, 1]} intensity={0.3} color="hsl(200, 100%, 40%)" distance={4} />
-        <CyberNinjaModel idle={idle} dodging={dodging} />
-      </Canvas>
+        <div
+          style={{
+            width: size * 0.6,
+            height: size * 0.85,
+            position: 'relative',
+            transformStyle: 'preserve-3d',
+            transform: dodging ? 'rotateY(180deg) scale(1.1)' : 'rotateY(0deg)',
+            transition: dodging ? 'transform 0.3s ease-out' : 'transform 0.6s ease',
+          }}
+        >
+          {/* Head */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: size * 0.32,
+              height: size * 0.32,
+              top: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'linear-gradient(135deg, hsl(220 15% 12%) 0%, hsl(220 20% 8%) 100%)',
+              boxShadow: '0 0 12px rgba(18,181,255,0.3), inset 0 -2px 6px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(18,181,255,0.15)',
+            }}
+          >
+            {/* Eyes */}
+            <div className="absolute flex gap-1" style={{ top: '45%', left: '50%', transform: 'translateX(-50%)' }}>
+              <div
+                className="rounded-full"
+                style={{
+                  width: size * 0.06,
+                  height: size * 0.035,
+                  background: 'hsl(200 100% 75%)',
+                  boxShadow: '0 0 8px rgba(18,181,255,0.8), 0 0 16px rgba(18,181,255,0.4)',
+                }}
+              />
+              <div style={{ width: size * 0.04 }} />
+              <div
+                className="rounded-full"
+                style={{
+                  width: size * 0.06,
+                  height: size * 0.035,
+                  background: 'hsl(200 100% 75%)',
+                  boxShadow: '0 0 8px rgba(18,181,255,0.8), 0 0 16px rgba(18,181,255,0.4)',
+                }}
+              />
+            </div>
+            {/* Headband */}
+            <div
+              className="absolute"
+              style={{
+                width: '120%',
+                height: size * 0.04,
+                top: '35%',
+                left: '-10%',
+                background: 'linear-gradient(90deg, transparent 0%, hsl(200 100% 50%) 20%, hsl(200 100% 50%) 80%, transparent 100%)',
+                boxShadow: '0 0 10px rgba(18,181,255,0.5)',
+                borderRadius: 2,
+              }}
+            />
+            {/* Headband tails */}
+            <div
+              className="absolute"
+              style={{
+                width: size * 0.18,
+                height: size * 0.03,
+                top: '36%',
+                right: -size * 0.15,
+                background: 'hsl(200 100% 50%)',
+                borderRadius: '0 4px 4px 0',
+                boxShadow: '0 0 6px rgba(18,181,255,0.4)',
+                transform: 'rotate(-15deg)',
+                transformOrigin: 'left center',
+                animation: idle ? 'ninja-tail 2s ease-in-out infinite' : undefined,
+              }}
+            />
+            <div
+              className="absolute"
+              style={{
+                width: size * 0.12,
+                height: size * 0.025,
+                top: '42%',
+                right: -size * 0.1,
+                background: 'hsl(200 100% 45%)',
+                borderRadius: '0 3px 3px 0',
+                boxShadow: '0 0 4px rgba(18,181,255,0.3)',
+                transform: 'rotate(-25deg)',
+                transformOrigin: 'left center',
+                animation: idle ? 'ninja-tail 2s ease-in-out infinite 0.15s' : undefined,
+              }}
+            />
+          </div>
+
+          {/* Torso */}
+          <div
+            className="absolute"
+            style={{
+              width: size * 0.35,
+              height: size * 0.3,
+              top: size * 0.28,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'linear-gradient(180deg, hsl(220 15% 10%) 0%, hsl(220 20% 7%) 100%)',
+              borderRadius: '4px 4px 2px 2px',
+              boxShadow: 'inset 0 0 8px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(18,181,255,0.1)',
+            }}
+          >
+            {/* Chest stripe */}
+            <div
+              className="absolute"
+              style={{
+                width: 2,
+                height: '80%',
+                top: '10%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'linear-gradient(180deg, hsl(200 100% 50%), transparent)',
+                boxShadow: '0 0 6px rgba(18,181,255,0.4)',
+              }}
+            />
+            {/* Belt */}
+            <div
+              className="absolute"
+              style={{
+                width: '110%',
+                height: size * 0.04,
+                bottom: 0,
+                left: '-5%',
+                background: 'hsl(220 20% 14%)',
+                borderRadius: 2,
+                boxShadow: '0 0 4px rgba(18,181,255,0.2)',
+              }}
+            >
+              <div
+                className="absolute"
+                style={{
+                  width: size * 0.05,
+                  height: size * 0.05,
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%) rotate(45deg)',
+                  background: 'hsl(200 100% 50%)',
+                  boxShadow: '0 0 8px rgba(18,181,255,0.6)',
+                  borderRadius: 2,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Arms */}
+          <div
+            className="absolute"
+            style={{
+              width: size * 0.1,
+              height: size * 0.25,
+              top: size * 0.3,
+              left: -size * 0.02,
+              background: 'linear-gradient(180deg, hsl(220 15% 11%) 0%, hsl(220 15% 8%) 100%)',
+              borderRadius: '4px 4px 6px 6px',
+              transform: idle ? 'rotate(8deg)' : 'rotate(0deg)',
+              transition: 'transform 0.4s ease',
+              transformOrigin: 'top center',
+              boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.3)',
+            }}
+          />
+          <div
+            className="absolute"
+            style={{
+              width: size * 0.1,
+              height: size * 0.25,
+              top: size * 0.3,
+              right: -size * 0.02,
+              background: 'linear-gradient(180deg, hsl(220 15% 11%) 0%, hsl(220 15% 8%) 100%)',
+              borderRadius: '4px 4px 6px 6px',
+              transform: idle ? 'rotate(-8deg)' : 'rotate(0deg)',
+              transition: 'transform 0.4s ease',
+              transformOrigin: 'top center',
+              boxShadow: 'inset 2px 0 4px rgba(0,0,0,0.3)',
+            }}
+          />
+
+          {/* Sword on back */}
+          <div
+            className="absolute"
+            style={{
+              width: 3,
+              height: size * 0.4,
+              top: size * 0.08,
+              right: -size * 0.04,
+              background: 'linear-gradient(180deg, hsl(0 0% 75%), hsl(0 0% 50%))',
+              borderRadius: 1,
+              transform: 'rotate(-20deg)',
+              transformOrigin: 'bottom center',
+              boxShadow: '0 0 4px rgba(255,255,255,0.2)',
+            }}
+          >
+            {/* Sword guard */}
+            <div
+              className="absolute"
+              style={{
+                width: size * 0.06,
+                height: 3,
+                bottom: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'hsl(200 100% 50%)',
+                boxShadow: '0 0 6px rgba(18,181,255,0.5)',
+                borderRadius: 1,
+              }}
+            />
+          </div>
+
+          {/* Legs */}
+          <div
+            className="absolute flex gap-[2px]"
+            style={{ bottom: 0, left: '50%', transform: 'translateX(-50%)' }}
+          >
+            <div
+              style={{
+                width: size * 0.14,
+                height: size * 0.25,
+                background: 'linear-gradient(180deg, hsl(220 20% 8%) 0%, hsl(220 15% 6%) 100%)',
+                borderRadius: '2px 2px 4px 4px',
+                boxShadow: 'inset 0 0 4px rgba(0,0,0,0.4)',
+              }}
+            >
+              <div
+                style={{
+                  width: 2,
+                  height: '70%',
+                  margin: '15% auto 0',
+                  background: 'linear-gradient(180deg, hsl(200 100% 50%), transparent)',
+                  boxShadow: '0 0 4px rgba(18,181,255,0.3)',
+                  borderRadius: 1,
+                }}
+              />
+            </div>
+            <div
+              style={{
+                width: size * 0.14,
+                height: size * 0.25,
+                background: 'linear-gradient(180deg, hsl(220 20% 8%) 0%, hsl(220 15% 6%) 100%)',
+                borderRadius: '2px 2px 4px 4px',
+                boxShadow: 'inset 0 0 4px rgba(0,0,0,0.4)',
+              }}
+            >
+              <div
+                style={{
+                  width: 2,
+                  height: '70%',
+                  margin: '15% auto 0',
+                  background: 'linear-gradient(180deg, hsl(200 100% 50%), transparent)',
+                  boxShadow: '0 0 4px rgba(18,181,255,0.3)',
+                  borderRadius: 1,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Ground shadow */}
+      <div
+        className="absolute"
+        style={{
+          width: size * 0.5,
+          height: size * 0.08,
+          bottom: 2,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'radial-gradient(ellipse, rgba(18,181,255,0.3) 0%, transparent 70%)',
+          filter: 'blur(3px)',
+        }}
+      />
+
+      {/* Inline keyframes */}
+      <style>{`
+        @keyframes ninja-float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @keyframes ninja-tail {
+          0%, 100% { transform: rotate(-15deg); }
+          50% { transform: rotate(-25deg) scaleX(1.1); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -231,13 +445,12 @@ export function Ninja3D({ productId }: Ninja3DProps) {
     setTrailKey(k => k + 1);
   }, []);
 
-  // Single entry effect
+  // Single entry effect — always runs in testMode
   useEffect(() => {
     mountedRef.current = true;
     if (startedRef.current) return;
     if (!enabled) return;
 
-    // Check cooldowns — testMode or ?ninja=1 bypasses
     const urlParams = new URLSearchParams(window.location.search);
     const debugMode = urlParams.get('ninja') === '1' || testMode;
     if (!debugMode) {
@@ -247,11 +460,11 @@ export function Ninja3D({ productId }: Ninja3DProps) {
     }
 
     startedRef.current = true;
-    const delay = testMode ? 1500 : (3000 + Math.random() * 3000);
+    const delay = debugMode ? 1500 : (3000 + Math.random() * 3000);
 
     const timer = setTimeout(() => {
       if (!mountedRef.current) return;
-      if (!testMode) {
+      if (!debugMode) {
         sessionStorage.setItem(SESSION_KEY, 'true');
         localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       }
@@ -318,7 +531,6 @@ export function Ninja3D({ productId }: Ninja3DProps) {
       });
 
       if (error || !data?.code) {
-        // Fallback: show generic message if backend fails
         console.error('Ninja coupon generation failed:', error || data?.error);
         setRewardCode('');
         setRewardLabel(data?.error || 'Tente novamente mais tarde');
@@ -367,7 +579,6 @@ export function Ninja3D({ productId }: Ninja3DProps) {
       const s = settingsRef.current;
       const showReward = s.showReward ?? true;
       if (showReward) {
-        // Generate reward from backend (secure)
         generateRewardFromBackend();
       }
     }, 700);
@@ -400,10 +611,7 @@ export function Ninja3D({ productId }: Ninja3DProps) {
             }}
             onClick={handleClick}
           >
-            <NinjaCanvas size={ninjaSize} idle={isIdle} dodging={isDodging} />
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full"
-              style={{ width: ninjaSize * 0.6, height: ninjaSize * 0.12, background: 'radial-gradient(ellipse, rgba(18,181,255,0.35) 0%, transparent 70%)', filter: 'blur(3px)' }}
-            />
+            <CSSNinja size={ninjaSize} idle={isIdle} dodging={isDodging} />
           </motion.div>
         )}
       </AnimatePresence>

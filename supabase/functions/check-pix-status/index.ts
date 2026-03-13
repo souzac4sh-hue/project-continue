@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
 
     if (SIGILOPAY_PUBLIC_KEY && SIGILOPAY_SECRET_KEY) {
       try {
-        const checkResponse = await fetch(`https://api.sigilopay.com/v1/charges/${orderId}`, {
+        const checkResponse = await fetch(`https://app.sigilopay.com.br/api/v1/gateway/pix/status/${orderId}`, {
           method: 'GET',
           headers: {
             'x-public-key': SIGILOPAY_PUBLIC_KEY,

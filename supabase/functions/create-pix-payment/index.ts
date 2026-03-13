@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     const identifier = crypto.randomUUID()
 
     // Call SigiloPay API to create Pix charge
-    const apiUrl = 'https://api.sigilopay.com/v1/charges'
+    const apiUrl = 'https://app.sigilopay.com.br/api/v1/gateway/pix/receive'
     console.log('Calling SigiloPay:', apiUrl, 'with amount:', cleanAmount)
 
     const sigiloResponse = await fetch(apiUrl, {
@@ -60,12 +60,11 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         identifier,
         amount: cleanAmount,
-        paymentMethod: 'pix',
         client: {
           name: cleanName,
-          email: customerEmail || `${cleanPhone}@noemail.com`,
+          email: customerEmail || 'deposito@deposito.com',
           phone: cleanPhone,
-          document: customerDocument || '',
+          document: customerDocument || '37734576850',
         },
       }),
     })
@@ -127,7 +126,7 @@ Deno.serve(async (req) => {
       lead_status: 'pix_generated',
       last_step: 'pix_generated',
       provider: 'sigilopay',
-      provider_identifier: (sigiloData?.id as string) || null,
+      provider_identifier: (sigiloData?.transactionId as string) || (sigiloData?.id as string) || null,
       provider_response: sigiloData as Record<string, unknown>,
     })
 

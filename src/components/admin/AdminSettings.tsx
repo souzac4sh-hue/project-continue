@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import type { StoreMode } from '@/data/mockData';
 
 export function AdminSettings() {
   const { settings, setSettings, saveAll } = useStore();
@@ -15,6 +16,13 @@ export function AdminSettings() {
 
   const update = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const updateColor = (key: string, value: number) => {
+    setSettings(prev => ({
+      ...prev,
+      colors: { ...prev.colors, [key]: value },
+    }));
   };
 
   const handleSave = async () => {
@@ -31,6 +39,31 @@ export function AdminSettings() {
 
   return (
     <div className="space-y-6 max-w-md">
+      {/* Store Operation Mode */}
+      <section className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="font-serif font-semibold">Modo de Operação da Loja</h3>
+        <p className="text-[10px] text-muted-foreground">Controla o status visível da loja para os visitantes.</p>
+        <Select value={settings.storeMode} onValueChange={(v: StoreMode) => update('storeMode', v)}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="online">🟢 Online — Operação normal</SelectItem>
+            <SelectItem value="busy">🟡 Ocupado — Entregas com atraso</SelectItem>
+            <SelectItem value="offline">🔴 Offline — Loja fechada</SelectItem>
+          </SelectContent>
+        </Select>
+        {settings.storeMode !== 'online' && (
+          <div>
+            <Label>Mensagem personalizada (opcional)</Label>
+            <Input
+              value={settings.storeModeMessage || ''}
+              onChange={e => update('storeModeMessage', e.target.value)}
+              className="mt-1"
+              placeholder={settings.storeMode === 'busy' ? 'Alta demanda no momento...' : 'Loja offline no momento...'}
+            />
+          </div>
+        )}
+      </section>
+
       <section className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold">Modo de Compra</h3>
         <Select value={settings.purchaseMode} onValueChange={v => update('purchaseMode', v)}>
@@ -64,20 +97,20 @@ export function AdminSettings() {
 
       <section className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold">Redes Sociais</h3>
-        <div><Label>Link Telegram</Label><Input value={(settings as any).telegramLink || ''} onChange={e => update('telegramLink', e.target.value)} className="mt-1" placeholder="https://t.me/seucanalaqui" /></div>
-        <div><Label>Link Instagram</Label><Input value={(settings as any).instagramLink || ''} onChange={e => update('instagramLink', e.target.value)} className="mt-1" placeholder="https://instagram.com/seuuser" /></div>
+        <div><Label>Link Telegram</Label><Input value={settings.telegramLink || ''} onChange={e => update('telegramLink', e.target.value)} className="mt-1" placeholder="https://t.me/seucanalaqui" /></div>
+        <div><Label>Link Instagram</Label><Input value={settings.instagramLink || ''} onChange={e => update('instagramLink', e.target.value)} className="mt-1" placeholder="https://instagram.com/seuuser" /></div>
       </section>
 
       <section className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold">Notificação Superior</h3>
         <div className="flex items-center gap-2">
-          <Switch checked={(settings as any).showTopNotification || false} onCheckedChange={v => update('showTopNotification', v)} />
+          <Switch checked={settings.showTopNotification || false} onCheckedChange={v => update('showTopNotification', v)} />
           <Label>Exibir barra de notificação no topo</Label>
         </div>
-        {(settings as any).showTopNotification && (
+        {settings.showTopNotification && (
           <div>
             <Label>Texto da notificação</Label>
-            <Input value={(settings as any).topNotificationText || ''} onChange={e => update('topNotificationText', e.target.value)} className="mt-1" placeholder="🔥 Promoção por tempo limitado!" />
+            <Input value={settings.topNotificationText || ''} onChange={e => update('topNotificationText', e.target.value)} className="mt-1" placeholder="🔥 Promoção por tempo limitado!" />
           </div>
         )}
       </section>
@@ -85,10 +118,68 @@ export function AdminSettings() {
       <section className="glass-card rounded-xl p-5 space-y-4">
         <h3 className="font-serif font-semibold">Modo Manutenção</h3>
         <div className="flex items-center gap-2">
-          <Switch checked={(settings as any).maintenanceMode || false} onCheckedChange={v => update('maintenanceMode', v)} />
+          <Switch checked={settings.maintenanceMode || false} onCheckedChange={v => update('maintenanceMode', v)} />
           <Label>Ativar modo manutenção</Label>
         </div>
-        <p className="text-[10px] text-muted-foreground">Quando ativado, visitantes verão uma mensagem de manutenção no site.</p>
+        {settings.maintenanceMode && (
+          <div>
+            <Label>Mensagem de manutenção</Label>
+            <Input value={settings.maintenanceMessage || ''} onChange={e => update('maintenanceMessage', e.target.value)} className="mt-1" placeholder="🔧 Estamos em manutenção. Voltamos em breve!" />
+          </div>
+        )}
+        <p className="text-[10px] text-muted-foreground">Quando ativado, visitantes verão uma tela de manutenção e não poderão comprar.</p>
+      </section>
+
+      {/* Color Controls */}
+      <section className="glass-card rounded-xl p-5 space-y-4">
+        <h3 className="font-serif font-semibold">Cores da Marca</h3>
+        <p className="text-[10px] text-muted-foreground">Ajuste as cores principais do site. O padrão é dourado (gold).</p>
+        
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs">Cor Primária (Matiz: {settings.colors.primaryHue}°)</Label>
+            <input
+              type="range"
+              min={0}
+              max={360}
+              value={settings.colors.primaryHue}
+              onChange={e => updateColor('primaryHue', Number(e.target.value))}
+              className="w-full mt-1 accent-primary"
+              style={{ background: `linear-gradient(to right, hsl(0 74% 49%), hsl(60 74% 49%), hsl(120 74% 49%), hsl(180 74% 49%), hsl(240 74% 49%), hsl(300 74% 49%), hsl(360 74% 49%))` }}
+            />
+            <div className="flex gap-2 mt-1">
+              <div>
+                <Label className="text-[10px]">Saturação</Label>
+                <Input type="number" min={0} max={100} value={settings.colors.primarySaturation} onChange={e => updateColor('primarySaturation', Number(e.target.value))} className="h-7 text-xs w-20" />
+              </div>
+              <div>
+                <Label className="text-[10px]">Luminosidade</Label>
+                <Input type="number" min={0} max={100} value={settings.colors.primaryLightness} onChange={e => updateColor('primaryLightness', Number(e.target.value))} className="h-7 text-xs w-20" />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <div
+              className="h-10 w-10 rounded-lg border border-border"
+              style={{ background: `hsl(${settings.colors.primaryHue} ${settings.colors.primarySaturation}% ${settings.colors.primaryLightness}%)` }}
+            />
+            <span className="text-xs text-muted-foreground">Preview da cor primária</span>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs"
+            onClick={() => {
+              updateColor('primaryHue', 43);
+              updateColor('primarySaturation', 74);
+              updateColor('primaryLightness', 49);
+            }}
+          >
+            Restaurar padrão (Gold)
+          </Button>
+        </div>
       </section>
 
       <section className="glass-card rounded-xl p-5 space-y-4">

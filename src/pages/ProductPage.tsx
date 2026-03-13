@@ -473,10 +473,10 @@ export default function ProductPage() {
             {/* Trust indicators inside dialog */}
             <div className="flex items-center justify-center gap-3 py-1 flex-wrap">
               <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <ShieldCheck className="h-3 w-3 text-primary/70" /> Pagamento seguro
+                <ShieldCheck className="h-3 w-3 text-muted-foreground/60" /> Pagamento seguro
               </span>
               <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                <Zap className="h-3 w-3 text-primary/70" /> Confirmação automática
+                <Zap className="h-3 w-3 text-muted-foreground/60" /> Confirmação automática
               </span>
             </div>
 

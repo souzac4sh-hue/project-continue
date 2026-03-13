@@ -98,14 +98,24 @@ function getDateRange(period: string): { start: Date | null; end: Date | null } 
   }
 }
 
+const priorityTabs = [
+  { id: 'all', label: 'Todos' },
+  { id: 'hot', label: '🔥 Quentes' },
+  { id: 'recent', label: '⏰ Recentes' },
+  { id: 'abandoned_today', label: '📉 Abandonos Hoje' },
+  { id: 'awaiting', label: '⏳ Aguardando' },
+];
+
 export function AdminRecovery() {
   const { settings } = useStore();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [messages, setMessages] = useState<RecoveryMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState('7d');
-  const [leadStatusFilter, setLeadStatusFilter] = useState('abandoned');
+  const [leadStatusFilter, setLeadStatusFilter] = useState('all');
   const [productFilter, setProductFilter] = useState('all');
+  const [priorityTab, setPriorityTab] = useState('all');
+  const [phoneSearch, setPhoneSearch] = useState('');
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -155,8 +165,40 @@ export function AdminRecovery() {
       result = result.filter(o => o.product_name === productFilter);
     }
 
+    // Phone search
+    if (phoneSearch.trim()) {
+      const q = phoneSearch.trim().toLowerCase();
+      result = result.filter(o =>
+        o.customer_phone.toLowerCase().includes(q) ||
+        o.customer_name.toLowerCase().includes(q)
+      );
+    }
+
+    // Priority tab
+    const now = Date.now();
+    const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+    switch (priorityTab) {
+      case 'hot':
+        result = result.filter(o =>
+          (o.copied_pix && o.payment_status !== 'paid') ||
+          o.support_contacted_at ||
+          (o.lead_status === 'abandoned' && o.abandoned_at && (now - new Date(o.abandoned_at).getTime()) < 30 * 60000)
+        );
+        break;
+      case 'recent':
+        result = result.filter(o => (now - new Date(o.created_at).getTime()) < 60 * 60000);
+        break;
+      case 'abandoned_today':
+        result = result.filter(o => o.lead_status === 'abandoned' && o.abandoned_at && new Date(o.abandoned_at) >= todayStart);
+        break;
+      case 'awaiting':
+        result = result.filter(o => o.recovery_status === 'in_progress' || o.recovery_status === 'pending');
+        result = result.filter(o => o.lead_status !== 'paid' && o.lead_status !== 'recovered');
+        break;
+    }
+
     return result;
-  }, [leads, periodFilter, leadStatusFilter, productFilter, customFrom, customTo]);
+  }, [leads, periodFilter, leadStatusFilter, productFilter, customFrom, customTo, phoneSearch, priorityTab]);
 
   // Stats from filtered
   const stats = useMemo(() => {
@@ -244,7 +286,7 @@ export function AdminRecovery() {
     if (lead.support_contacted_at) tags.push({ label: '💬 Pediu Suporte', color: 'bg-purple-500/20 text-purple-400' });
     if (lead.lead_status === 'abandoned' && lead.abandoned_at) {
       const mins = Math.floor((Date.now() - new Date(lead.abandoned_at).getTime()) / 60000);
-      if (mins < 60) tags.push({ label: '⏰ Abandono Recente', color: 'bg-red-500/20 text-red-400' });
+      if (mins < 30) tags.push({ label: '⏰ Abandono Recente', color: 'bg-red-500/20 text-red-400' });
     }
     return tags;
   };
@@ -268,8 +310,34 @@ export function AdminRecovery() {
         <StatCard icon={TrendingUp} label="Mais Recuperação" value={stats.topRecovered} small />
       </div>
 
-      {/* Filters */}
+      {/* Priority Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {priorityTabs.map(tab => (
+          <button key={tab.id} onClick={() => setPriorityTab(tab.id)}
+            className={cn('text-xs font-semibold px-4 py-2 rounded-xl border transition-all',
+              priorityTab === tab.id
+                ? 'gold-gradient text-primary-foreground border-transparent shadow-md'
+                : 'bg-secondary/50 text-muted-foreground border-border hover:border-primary/30'
+            )}>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Search + Filters */}
       <div className="space-y-3">
+        {/* Phone/Name Search */}
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={phoneSearch}
+            onChange={e => setPhoneSearch(e.target.value)}
+            placeholder="Buscar por telefone ou nome..."
+            className="w-full text-sm bg-secondary/50 border border-border rounded-xl pl-9 pr-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-3.5 w-3.5 text-muted-foreground" />
           {periodFilters.map(f => (
@@ -324,6 +392,11 @@ export function AdminRecovery() {
           </select>
         </div>
       </div>
+
+      {/* Results count */}
+      <p className="text-xs text-muted-foreground">
+        {filtered.length} lead{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
+      </p>
 
       {/* Leads List */}
       <div className="space-y-3">

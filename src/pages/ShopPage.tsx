@@ -103,7 +103,7 @@ export default function ShopPage() {
       <SiteFooter />
       <FloatingButtons />
       <FloatingNotifications />
-      <Ninja3D />
+      <NinjaAssistant context="homepage" />
     </div>
   );
 }

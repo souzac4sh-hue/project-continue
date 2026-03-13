@@ -526,7 +526,7 @@ export default function ProductPage() {
 
       <FloatingButtons />
       <FloatingNotifications />
-      <Ninja3D />
+      <NinjaAssistant context="product" />
     </div>
   );
 }

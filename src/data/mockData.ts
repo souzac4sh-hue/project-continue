@@ -147,6 +147,17 @@ export interface CheckoutTexts {
   pixUrgencyMinutes: number;
 }
 
+export interface ColorSettings {
+  primaryHue: number;
+  primarySaturation: number;
+  primaryLightness: number;
+  accentHue: number;
+  accentSaturation: number;
+  accentLightness: number;
+}
+
+export type StoreMode = 'online' | 'busy' | 'offline';
+
 export interface Settings {
   purchaseMode: 'manual' | 'automatic';
   pixEnabled: boolean;
@@ -166,6 +177,15 @@ export interface Settings {
   socialProofNames: string[];
   checkoutTexts: CheckoutTexts;
   fakeReviews: { name: string; text: string; rating: number; time: string }[];
+  storeMode: StoreMode;
+  storeModeMessage: string;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
+  showTopNotification: boolean;
+  topNotificationText: string;
+  telegramLink: string;
+  instagramLink: string;
+  colors: ColorSettings;
 }
 
 export const BADGE_OPTIONS = [
@@ -336,4 +356,20 @@ export const defaultSettings: Settings = {
     { name: 'R**ael', text: 'Já é minha segunda compra. Sempre entregam com qualidade.', rating: 5, time: 'há 1 semana' },
     { name: 'M**ia', text: 'Atendimento excelente e resultado garantido.', rating: 5, time: 'há 1 semana' },
   ],
+  storeMode: 'online',
+  storeModeMessage: '',
+  maintenanceMode: false,
+  maintenanceMessage: '🔧 Estamos em manutenção. Voltamos em breve!',
+  showTopNotification: false,
+  topNotificationText: '',
+  telegramLink: '',
+  instagramLink: '',
+  colors: {
+    primaryHue: 43,
+    primarySaturation: 74,
+    primaryLightness: 49,
+    accentHue: 43,
+    accentSaturation: 74,
+    accentLightness: 49,
+  },
 };

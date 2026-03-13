@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { StoreProvider } from "@/context/StoreContext";
+import { DynamicColors } from "@/components/site/DynamicColors";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import MethodsPage from "./pages/MethodsPage";
@@ -20,6 +21,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <StoreProvider>
+        <DynamicColors />
         <Toaster />
         <Sonner />
         <BrowserRouter>

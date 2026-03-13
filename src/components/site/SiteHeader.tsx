@@ -16,14 +16,21 @@ export function SiteHeader() {
   const { settings } = useStore();
   const { brand } = settings;
 
-  const showTopNotif = (settings as any).showTopNotification && (settings as any).topNotificationText;
+  const showTopNotif = settings.showTopNotification && settings.topNotificationText;
+
+  // Show store mode indicator in header
+  const storeModeLabel = settings.storeMode === 'online'
+    ? null
+    : settings.storeMode === 'busy'
+      ? { text: 'Ocupado', color: 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20' }
+      : { text: 'Offline', color: 'text-destructive bg-destructive/10 border-destructive/20' };
 
   return (
     <>
       {/* Top notification bar */}
       {showTopNotif && (
         <div className="w-full bg-primary/10 border-b border-primary/20 py-1.5 text-center">
-          <p className="text-xs font-medium text-primary">{(settings as any).topNotificationText}</p>
+          <p className="text-xs font-medium text-primary">{settings.topNotificationText}</p>
         </div>
       )}
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80">
@@ -46,11 +53,18 @@ export function SiteHeader() {
             >
               {brand.brandName}
             </motion.span>
-            {/* Online badge */}
-            <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[8px] font-bold text-green-500/90 uppercase tracking-wider">Online</span>
-            </span>
+            {/* Online/Status badge */}
+            {storeModeLabel ? (
+              <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full border ${storeModeLabel.color}`}>
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                <span className="text-[8px] font-bold uppercase tracking-wider">{storeModeLabel.text}</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-green-500/10 border border-green-500/20">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[8px] font-bold text-green-500/90 uppercase tracking-wider">Online</span>
+              </span>
+            )}
           </div>
         </Link>
 

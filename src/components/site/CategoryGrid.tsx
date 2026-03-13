@@ -41,13 +41,17 @@ export function CategoryGrid({ onSelectCategory, selectedCategory }: CategoryGri
               whileTap={{ scale: 0.95 }}
               onClick={() => onSelectCategory(item.id)}
               aria-pressed={isActive}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl text-[10px] font-medium transition-all duration-300 shrink-0 min-w-[72px] ${
+              className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl text-[10px] font-medium transition-all duration-300 shrink-0 min-w-[72px] border ${
                 isActive
-                  ? 'gold-gradient text-primary-foreground shadow-md shadow-primary/20'
-                  : 'glass-card text-muted-foreground hover:text-foreground'
+                  ? 'bg-card border-primary/35 text-foreground shadow-[0_0_14px_rgba(0,178,255,0.12)]'
+                  : 'bg-card border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60 hover:shadow-[0_0_14px_rgba(0,178,255,0.06)]'
               }`}
             >
-              <item.icon className="h-4.5 w-4.5" />
+              <div className={`h-7 w-7 rounded-full flex items-center justify-center ${
+                isActive ? 'bg-primary/15' : 'bg-secondary'
+              }`}>
+                <item.icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary/80' : ''}`} />
+              </div>
               <span className="leading-tight text-center whitespace-nowrap">{item.name}</span>
             </motion.button>
           );

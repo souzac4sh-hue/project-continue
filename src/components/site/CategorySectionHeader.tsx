@@ -12,7 +12,6 @@ const iconMap: Record<string, LucideIcon> = {
 
 export function CategorySectionHeader({ category }: { category: Category }) {
   const Icon = iconMap[category.icon || ''] || Layers;
-  const color = category.color || 'hsl(var(--primary))';
 
   return (
     <motion.div
@@ -23,18 +22,13 @@ export function CategorySectionHeader({ category }: { category: Category }) {
       className="mb-4"
     >
       <div
-        className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border backdrop-blur-sm"
+        className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:border-border/60"
         style={{
-          borderColor: `${color}40`,
-          background: `linear-gradient(135deg, ${color}15, ${color}08)`,
-          boxShadow: `0 0 20px ${color}15, inset 0 1px 0 ${color}20`,
+          boxShadow: '0 0 14px rgba(0,178,255,0.06)',
         }}
       >
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ background: `${color}25` }}
-        >
-          <Icon className="h-3.5 w-3.5" style={{ color }} />
+        <div className="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center">
+          <Icon className="h-3.5 w-3.5 text-primary/80" />
         </div>
         <span className="font-serif font-semibold text-sm text-foreground">{category.name}</span>
       </div>

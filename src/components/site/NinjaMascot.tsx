@@ -257,8 +257,8 @@ export function NinjaMascot() {
     mountedRef.current = true;
     if (!enabled) return;
 
-    // First appearance after 30-60s
-    const initialDelay = (30 + Math.random() * 30) * 1000;
+    // First appearance after 15-30s for better discoverability
+    const initialDelay = (15 + Math.random() * 15) * 1000;
     timerRef.current = setTimeout(() => {
       triggerAppearance();
       scheduleNext();

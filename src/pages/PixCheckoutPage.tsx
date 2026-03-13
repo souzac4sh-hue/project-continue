@@ -576,8 +576,8 @@ export default function PixCheckoutPage() {
 
 function TrustPill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-xl bg-secondary/40 border border-primary/8">
-      <span className="text-primary/70">{icon}</span>
+    <div className="flex flex-col items-center gap-1.5 py-2 px-1.5 rounded-xl bg-secondary/50 border border-border/20">
+      <span className="text-foreground/50">{icon}</span>
       <span className="text-[9px] text-muted-foreground text-center leading-tight font-medium">{text}</span>
     </div>
   );

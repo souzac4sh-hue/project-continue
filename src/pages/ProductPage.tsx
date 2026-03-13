@@ -68,9 +68,41 @@ export default function ProductPage() {
   }
 
   const finalPrice = product.promotion && product.promotionPrice ? product.promotionPrice : product.price;
+  const discountedPrice = couponDiscount
+    ? couponDiscount.type === 'percentage'
+      ? Math.max(finalPrice * (1 - couponDiscount.value / 100), 0.01)
+      : Math.max(finalPrice - couponDiscount.value, 0.01)
+    : finalPrice;
   const seed = product.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const reviewCount = 40 + (seed % 160);
   const recentBuyers = 15 + (seed % 30);
+
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) { setCouponDiscount(null); setCouponError(''); return; }
+    const { data, error } = await (supabase as any)
+      .from('coupons')
+      .select('*')
+      .eq('code', couponCode.trim().toUpperCase())
+      .eq('active', true)
+      .maybeSingle();
+    if (error || !data) {
+      setCouponError('Cupom inválido');
+      setCouponDiscount(null);
+      return;
+    }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      setCouponError('Cupom expirado');
+      setCouponDiscount(null);
+      return;
+    }
+    if (data.usage_limit && data.times_used >= data.usage_limit) {
+      setCouponError('Cupom esgotado');
+      setCouponDiscount(null);
+      return;
+    }
+    setCouponDiscount({ type: data.discount_type, value: data.discount_value });
+    setCouponError('');
+  };
 
   const handlePurchase = async () => {
     if (!name.trim() || !phone.trim()) {
@@ -88,6 +120,8 @@ export default function ProductPage() {
           amount: finalPrice,
           customerName: name.trim(),
           customerPhone: phone.trim(),
+          couponCode: couponDiscount ? couponCode.trim().toUpperCase() : undefined,
+          discountAmount: couponDiscount ? Math.round((finalPrice - discountedPrice) * 100) / 100 : undefined,
         },
       });
 
@@ -97,17 +131,17 @@ export default function ProductPage() {
         return;
       }
 
-      // Track form submitted event
       if (data.orderId) {
-        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: finalPrice } as Record<string, string | number>);
+        trackCheckoutEvent(data.orderId, 'form_submitted', { product_name: product.name, amount: discountedPrice } as Record<string, string | number>);
         trackCheckoutEvent(data.orderId, 'pix_generated');
       }
 
       setBuyOpen(false);
       setName('');
       setPhone('');
+      setCouponCode('');
+      setCouponDiscount(null);
 
-      // Navigate to checkout page
       const params = new URLSearchParams({
         orderId: data.orderId,
         pixCode: data.pixCode,

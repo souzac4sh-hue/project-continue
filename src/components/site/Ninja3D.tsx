@@ -186,6 +186,8 @@ export function Ninja3D() {
   const [rewardCode, setRewardCode] = useState('');
   const [rewardLabel, setRewardLabel] = useState('');
   const [smokePos, setSmokePos] = useState({ x: 0, y: 0 });
+  const [trailPositions, setTrailPositions] = useState<{ x: number; y: number }[]>([]);
+  const [trailKey, setTrailKey] = useState(0);
   const dodgeCountRef = useRef(0);
   const maxDodgesRef = useRef(2 + Math.floor(Math.random() * 3));
   const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -194,6 +196,7 @@ export function Ninja3D() {
   const startedRef = useRef(false);
   const posRef = useRef(pos);
   posRef.current = pos;
+  const trailHistoryRef = useRef<{ x: number; y: number }[]>([]);
 
   // Use ref to avoid re-triggering effect when settings load
   const settingsRef = useRef(ninja);

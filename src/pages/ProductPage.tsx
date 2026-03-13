@@ -235,16 +235,16 @@ export default function ProductPage() {
           {product.promotion && product.promotionPrice ? (
             <div className="flex items-center gap-3 mb-2">
               <span className="text-muted-foreground line-through text-lg">R$ {product.price.toFixed(2)}</span>
-              <span className="gold-text text-2xl font-bold">R$ {product.promotionPrice.toFixed(2)}</span>
+              <span className="text-foreground text-2xl font-bold">R$ {product.promotionPrice.toFixed(2)}</span>
               <span className="text-[10px] font-bold bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">
                 -{Math.round((1 - product.promotionPrice / product.price) * 100)}%
               </span>
             </div>
           ) : (
-            <p className="gold-text text-2xl font-bold mb-2">R$ {product.price.toFixed(2)}</p>
+            <p className="text-foreground text-2xl font-bold mb-2">R$ {product.price.toFixed(2)}</p>
           )}
           <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1">
-            <svg viewBox="0 0 512 512" className="h-3 w-3 fill-primary/60" aria-hidden="true"><path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C347.6 377.6 342.7 391.2 331.2 392.4C252.7 400.7 183.6 358.3 152.5 295.4L134.6 313.3C129.2 318.7 119.9 318.7 114.5 313.3L37.5 236.3C32.1 230.9 32.1 221.6 37.5 216.2L114.5 139.2C119.9 133.8 129.2 133.8 134.6 139.2L211.6 216.2C217 221.6 217 230.9 211.6 236.3L193.7 254.2C217.1 267.9 242.4 278.1 269.5 283.5L242.4 292.5zM464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256z"/></svg>
+            <svg viewBox="0 0 512 512" className="h-3 w-3 fill-muted-foreground/50" aria-hidden="true"><path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C347.6 377.6 342.7 391.2 331.2 392.4C252.7 400.7 183.6 358.3 152.5 295.4L134.6 313.3C129.2 318.7 119.9 318.7 114.5 313.3L37.5 236.3C32.1 230.9 32.1 221.6 37.5 216.2L114.5 139.2C119.9 133.8 129.2 133.8 134.6 139.2L211.6 216.2C217 221.6 217 230.9 211.6 236.3L193.7 254.2C217.1 267.9 242.4 278.1 269.5 283.5L242.4 292.5zM464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256z"/></svg>
             À vista no Pix
           </p>
 

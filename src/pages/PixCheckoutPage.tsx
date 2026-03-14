@@ -75,6 +75,8 @@ export default function PixCheckoutPage() {
   const [showNudge, setShowNudge] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isManualChecking, setIsManualChecking] = useState(false);
+  const [manualCheckMessage, setManualCheckMessage] = useState<string | null>(null);
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 

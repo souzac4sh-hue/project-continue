@@ -235,21 +235,46 @@ Deno.serve(async (req) => {
 
     const signature = req.headers.get('x-signature') || req.headers.get('x-webhook-signature')
     const sigiloSecret = Deno.env.get('SIGILOPAY_SECRET_KEY')
+    const sigiloPublicKey = Deno.env.get('SIGILOPAY_PUBLIC_KEY')
 
-    if (sigiloSecret) {
-      if (!signature) {
-        console.error('[WEBHOOK] No signature header received — rejecting unsigned webhook')
-        return jsonResponse({ received: false, error: 'missing_signature' }, 401)
-      }
+    // SigiloPay does NOT send HMAC signature headers.
+    // Validation strategy (in priority order):
+    // 1. HMAC header signature (if provider ever adds support)
+    // 2. Token in payload body (SigiloPay sends a "token" field matching the configured public key)
+    // 3. Reject if neither method validates
+
+    let authenticated = false
+
+    if (signature && sigiloSecret) {
       const isValid = await verifySignature(rawBody, signature, sigiloSecret)
-      if (!isValid) {
-        console.error('[WEBHOOK] Signature verification failed')
-        return jsonResponse({ received: false, error: 'invalid_signature' }, 401)
+      if (isValid) {
+        console.log('[WEBHOOK] Authenticated via HMAC signature header')
+        authenticated = true
+      } else {
+        console.warn('[WEBHOOK] HMAC signature present but invalid — trying token fallback')
       }
-      console.log('[WEBHOOK] Signature verified successfully')
-    } else {
-      // SIGILOPAY_SECRET_KEY not configured — log warning but allow for initial setup
-      console.warn('[WEBHOOK] SIGILOPAY_SECRET_KEY not configured — accepting webhook without signature verification. Configure the secret for production security.')
+    }
+
+    if (!authenticated) {
+      const payloadToken = typeof payload.token === 'string' ? payload.token.trim() : ''
+      if (payloadToken && sigiloPublicKey && payloadToken === sigiloPublicKey) {
+        console.log('[WEBHOOK] Authenticated via payload token match')
+        authenticated = true
+      } else if (payloadToken && sigiloSecret && payloadToken === sigiloSecret) {
+        console.log('[WEBHOOK] Authenticated via payload token match (secret)')
+        authenticated = true
+      } else if (payloadToken) {
+        console.warn('[WEBHOOK] Payload token present but does not match configured keys:', payloadToken.substring(0, 4) + '...')
+      }
+    }
+
+    if (!authenticated) {
+      if (!sigiloSecret && !sigiloPublicKey) {
+        console.warn('[WEBHOOK] No SigiloPay keys configured — accepting webhook without verification (setup mode)')
+      } else {
+        console.error('[WEBHOOK] Authentication failed — no valid signature or token')
+        return jsonResponse({ received: false, error: 'authentication_failed' }, 401)
+      }
     }
 
     const extracted = extractWebhookFields(payload)

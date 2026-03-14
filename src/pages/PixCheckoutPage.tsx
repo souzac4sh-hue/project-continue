@@ -548,6 +548,34 @@ export default function PixCheckoutPage() {
                   )}
                 </Button>
 
+                {/* Verify Payment Button */}
+                <Button
+                  onClick={handleManualCheck}
+                  disabled={isManualChecking}
+                  variant="outline"
+                  className="w-full py-5 rounded-xl font-semibold text-sm border-primary/30 hover:border-primary/60 text-primary hover:text-primary transition-all"
+                >
+                  {isManualChecking ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verificando pagamento...</>
+                  ) : (
+                    <><ShieldCheck className="h-4 w-4 mr-2" /> Verificar pagamento</>
+                  )}
+                </Button>
+
+                {/* Manual check feedback */}
+                <AnimatePresence>
+                  {manualCheckMessage && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs text-center text-yellow-500 font-medium"
+                    >
+                      {manualCheckMessage}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
                 {/* Generate New Pix */}
                 {elapsed >= 30 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

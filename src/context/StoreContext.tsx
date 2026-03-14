@@ -68,14 +68,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data, error } = await supabase
-          .from('site_config')
-          .select('settings')
-          .eq('id', 'main')
-          .maybeSingle();
+        // Use secure RPC function for public reads (strips sensitive keys)
+        const { data, error } = await supabase.rpc('get_public_site_config');
 
-        if (!error && data?.settings) {
-          const saved = data.settings as unknown as Partial<StoredData>;
+        if (!error && data) {
+          const saved = data as unknown as Partial<StoredData>;
           if (saved.settings) setSettings(deepMerge(defaultSettings, saved.settings) as Settings);
           if (saved.products?.length) setProducts(saved.products);
           if (saved.categories?.length) setCategories(saved.categories);

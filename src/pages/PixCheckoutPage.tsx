@@ -75,6 +75,8 @@ export default function PixCheckoutPage() {
   const [showNudge, setShowNudge] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isManualChecking, setIsManualChecking] = useState(false);
+  const [manualCheckMessage, setManualCheckMessage] = useState<string | null>(null);
   const [socialProof, setSocialProof] = useState<string | null>(null);
   const trackedScreenOpen = useRef(false);
 
@@ -271,6 +273,40 @@ export default function PixCheckoutPage() {
     const timer = setTimeout(() => { window.open(whatsappUrl, '_blank'); }, 4000);
     return () => clearTimeout(timer);
   }, [state, orderId, productName, settings.whatsappNumber]);
+
+  const handleManualCheck = useCallback(async () => {
+    if (isManualChecking || !orderId || state === 'paid') return;
+    setIsManualChecking(true);
+    setManualCheckMessage(null);
+    try {
+      // First check DB (fast)
+      const { data: dbData } = await supabase.rpc('get_pix_order_status', { order_identifier: orderId });
+      const row = Array.isArray(dbData) ? dbData[0] : dbData;
+      if (row?.payment_status === 'paid') {
+        setState('paid');
+        trackCheckoutEvent(orderId, 'payment_confirmed');
+        return;
+      }
+      // Then call edge function (probes SigiloPay)
+      const { data } = await supabase.functions.invoke('check-pix-status', { body: { orderId } });
+      if (data?.status === 'paid') {
+        setState('paid');
+        trackCheckoutEvent(orderId, 'payment_confirmed');
+        return;
+      }
+      if (data?.status === 'expired') {
+        setState('expired');
+        return;
+      }
+      setManualCheckMessage('Pagamento ainda não identificado. Tente novamente em alguns segundos.');
+      setTimeout(() => setManualCheckMessage(null), 6000);
+    } catch {
+      setManualCheckMessage('Erro ao verificar. Tente novamente.');
+      setTimeout(() => setManualCheckMessage(null), 5000);
+    } finally {
+      setIsManualChecking(false);
+    }
+  }, [orderId, state, isManualChecking]);
 
   const handleRegeneratePix = async () => {
     setIsRegenerating(true);
@@ -511,6 +547,34 @@ export default function PixCheckoutPage() {
                     <><Copy className="h-5 w-5 mr-2" /> Copiar código Pix</>
                   )}
                 </Button>
+
+                {/* Verify Payment Button */}
+                <Button
+                  onClick={handleManualCheck}
+                  disabled={isManualChecking}
+                  variant="outline"
+                  className="w-full py-5 rounded-xl font-semibold text-sm border-primary/30 hover:border-primary/60 text-primary hover:text-primary transition-all"
+                >
+                  {isManualChecking ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verificando pagamento...</>
+                  ) : (
+                    <><ShieldCheck className="h-4 w-4 mr-2" /> Verificar pagamento</>
+                  )}
+                </Button>
+
+                {/* Manual check feedback */}
+                <AnimatePresence>
+                  {manualCheckMessage && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs text-center text-yellow-500 font-medium"
+                    >
+                      {manualCheckMessage}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
 
                 {/* Generate New Pix */}
                 {elapsed >= 30 && (

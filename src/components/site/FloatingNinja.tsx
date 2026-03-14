@@ -441,7 +441,7 @@ export default function FloatingNinja() {
                   <button onClick={handleCopy} style={{ width: "100%", padding: "12px 20px", borderRadius: 14, border: "none", fontWeight: 800, fontSize: 14, cursor: "pointer", color: "#fff", background: "linear-gradient(135deg, hsl(200 100% 50%), hsl(200 100% 38%))", boxShadow: "0 0 20px rgba(59,130,246,0.35)", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                     {copied ? "✓ Código copiado!" : "📋 Copiar código"}
                   </button>
-                  <button onClick={() => { handleCopy(); setPhase("cooldown"); window.location.href = "/checkout"; }} style={{ width: "100%", padding: "10px 20px", borderRadius: 14, border: "1px solid rgba(96,165,250,0.3)", fontWeight: 600, fontSize: 13, cursor: "pointer", color: "rgba(147,197,253,1)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <button onClick={() => { handleCopy(); setPhase("cooldown"); window.location.href = "/#loja"; }} style={{ width: "100%", padding: "10px 20px", borderRadius: 14, border: "1px solid rgba(96,165,250,0.3)", fontWeight: 600, fontSize: 13, cursor: "pointer", color: "rgba(147,197,253,1)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                     🛒 Usar agora
                   </button>
                 </div>

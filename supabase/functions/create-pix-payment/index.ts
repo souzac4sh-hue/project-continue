@@ -93,6 +93,7 @@ Deno.serve(async (req) => {
     let validatedDiscount = 0
 
     if (couponCode) {
+      // Check regular coupons first
       const { data: coupon } = await supabase
         .from('coupons')
         .select('*')
@@ -118,6 +119,31 @@ Deno.serve(async (req) => {
             .from('coupons')
             .update({ times_used: (coupon.times_used || 0) + 1 })
             .eq('id', coupon.id)
+        }
+      } else {
+        // Check ninja coupons
+        const { data: ninjaCoupon } = await supabase
+          .from('ninja_coupons')
+          .select('*')
+          .eq('code', couponCode.toUpperCase())
+          .eq('status', 'active')
+          .maybeSingle()
+
+        if (ninjaCoupon) {
+          const notExpired = new Date(ninjaCoupon.expires_at) > new Date()
+          const notUsed = !ninjaCoupon.is_used && ninjaCoupon.current_uses < ninjaCoupon.max_uses
+
+          if (notExpired && notUsed) {
+            validatedDiscount = Math.round(cleanAmount * ninjaCoupon.discount_percentage / 100 * 100) / 100
+            cleanAmount = Math.round((cleanAmount - validatedDiscount) * 100) / 100
+            validatedCouponCode = ninjaCoupon.code
+
+            // Mark ninja coupon as used
+            await supabase
+              .from('ninja_coupons')
+              .update({ is_used: true, current_uses: ninjaCoupon.current_uses + 1, used_at: new Date().toISOString(), status: 'used' })
+              .eq('id', ninjaCoupon.id)
+          }
         }
       }
     }

@@ -236,17 +236,20 @@ Deno.serve(async (req) => {
     const signature = req.headers.get('x-signature') || req.headers.get('x-webhook-signature')
     const sigiloSecret = Deno.env.get('SIGILOPAY_SECRET_KEY')
 
-    if (sigiloSecret && signature) {
+    if (sigiloSecret) {
+      if (!signature) {
+        console.error('[WEBHOOK] No signature header received — rejecting unsigned webhook')
+        return jsonResponse({ received: false, error: 'missing_signature' }, 401)
+      }
       const isValid = await verifySignature(rawBody, signature, sigiloSecret)
       if (!isValid) {
         console.error('[WEBHOOK] Signature verification failed')
         return jsonResponse({ received: false, error: 'invalid_signature' }, 401)
       }
       console.log('[WEBHOOK] Signature verified successfully')
-    } else if (signature) {
-      console.warn('[WEBHOOK] Signature received but SIGILOPAY_SECRET_KEY missing, accepting for compatibility')
     } else {
-      console.warn('[WEBHOOK] No signature header received - accepting for compatibility')
+      // SIGILOPAY_SECRET_KEY not configured — log warning but allow for initial setup
+      console.warn('[WEBHOOK] SIGILOPAY_SECRET_KEY not configured — accepting webhook without signature verification. Configure the secret for production security.')
     }
 
     const extracted = extractWebhookFields(payload)

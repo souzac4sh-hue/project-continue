@@ -180,14 +180,11 @@ export default function FloatingNinja() {
       });
 
       if (error || !data?.code) {
-        // Fallback mock (same 92/8 distribution)
-        const discount = Math.random() < 0.08 ? 10 : 5;
-        setReward({
-          code: `NINJA${discount}`,
-          discount,
-          expiresAt: new Date(Date.now() + ninjaConfig.couponDurationSeconds * 1000).toISOString(),
-          isRare: discount === 10,
-        });
+        // No fallback — don't generate fake coupon codes that won't validate
+        console.error('Failed to generate ninja coupon:', error);
+        setReward(null);
+        setPhase("cooldown");
+        return;
       } else {
         setReward({
           code: data.code,
@@ -196,14 +193,11 @@ export default function FloatingNinja() {
           isRare: data.discount_percentage === 10,
         });
       }
-    } catch {
-      const discount = Math.random() < 0.08 ? 10 : 5;
-      setReward({
-        code: `NINJA${discount}`,
-        discount,
-        expiresAt: new Date(Date.now() + ninjaConfig.couponDurationSeconds * 1000).toISOString(),
-        isRare: discount === 10,
-      });
+    } catch (err) {
+      console.error('Failed to generate ninja coupon:', err);
+      setReward(null);
+      setPhase("cooldown");
+      return;
     } finally {
       setRewardLoading(false);
       setCountdown(ninjaConfig.couponDurationSeconds);

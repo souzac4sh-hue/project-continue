@@ -344,6 +344,7 @@ export type Database = {
           provider_identifier: string
         }[]
       }
+      get_public_site_config: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -274,6 +274,40 @@ export default function PixCheckoutPage() {
     return () => clearTimeout(timer);
   }, [state, orderId, productName, settings.whatsappNumber]);
 
+  const handleManualCheck = useCallback(async () => {
+    if (isManualChecking || !orderId || state === 'paid') return;
+    setIsManualChecking(true);
+    setManualCheckMessage(null);
+    try {
+      // First check DB (fast)
+      const { data: dbData } = await supabase.rpc('get_pix_order_status', { order_identifier: orderId });
+      const row = Array.isArray(dbData) ? dbData[0] : dbData;
+      if (row?.payment_status === 'paid') {
+        setState('paid');
+        trackCheckoutEvent(orderId, 'payment_confirmed');
+        return;
+      }
+      // Then call edge function (probes SigiloPay)
+      const { data } = await supabase.functions.invoke('check-pix-status', { body: { orderId } });
+      if (data?.status === 'paid') {
+        setState('paid');
+        trackCheckoutEvent(orderId, 'payment_confirmed');
+        return;
+      }
+      if (data?.status === 'expired') {
+        setState('expired');
+        return;
+      }
+      setManualCheckMessage('Pagamento ainda não identificado. Tente novamente em alguns segundos.');
+      setTimeout(() => setManualCheckMessage(null), 6000);
+    } catch {
+      setManualCheckMessage('Erro ao verificar. Tente novamente.');
+      setTimeout(() => setManualCheckMessage(null), 5000);
+    } finally {
+      setIsManualChecking(false);
+    }
+  }, [orderId, state, isManualChecking]);
+
   const handleRegeneratePix = async () => {
     setIsRegenerating(true);
     try {
